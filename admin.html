@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel · Bacano.cl</title>
+<link rel="icon" href="assets/img/logo-mark.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#0c0c0e; --black-2:#15151a; --line:#e2e2e8; --line-d:#2a2a32;
+  --paper:#f5f5f7; --gray:#6c6c78; --gray-2:#9a9aa5;
+  --red:#8b0f14; --red-2:#a8151b; --ok:#1c7a4b; --warn:#b7791f;
+  --r:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--paper);color:var(--black);font-size:15px}
+a{color:inherit}
+button{font:inherit;cursor:pointer;border:0;background:none}
+input,select,textarea{font:inherit}
+h1,h2,h3,h4{margin:0;line-height:1.2}
+
+/* ---------- Estructura ---------- */
+.top{
+  position:sticky;top:0;z-index:20;background:var(--black);color:#fff;
+  display:flex;align-items:center;gap:14px;padding:12px 20px;flex-wrap:wrap;
+}
+.top__logo{display:flex;align-items:center;gap:9px;font-family:Anton,sans-serif;font-size:1.25rem;text-transform:uppercase}
+.top__logo svg{width:26px;height:26px}
+.top__logo i{color:var(--red-2);font-style:normal}
+.top .sep{flex:1}
+.chip{font-size:.72rem;font-weight:700;padding:5px 11px;border-radius:100px;background:#2a2a32;color:#c9c9d2}
+.chip.warn{background:#3a2408;color:#ffcb6b}
+.chip.ok{background:#0f2e1e;color:#7fd8a3}
+
+.layout{display:grid;grid-template-columns:214px 1fr;min-height:calc(100vh - 58px)}
+@media(max-width:820px){.layout{grid-template-columns:1fr}}
+.side{background:var(--black-2);padding:16px 12px;display:flex;flex-direction:column;gap:4px}
+@media(max-width:820px){.side{flex-direction:row;overflow-x:auto;padding:10px}}
+.side button{
+  display:flex;align-items:center;gap:10px;color:#b9b9c3;padding:11px 14px;border-radius:9px;
+  font-size:.9rem;font-weight:600;text-align:left;white-space:nowrap;width:100%;
+}
+.side button:hover{background:#22222a;color:#fff}
+.side button.on{background:var(--red);color:#fff}
+.side small{color:#5d5d68;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;padding:14px 14px 6px;font-weight:800}
+main{padding:26px;max-width:1100px}
+@media(max-width:600px){main{padding:16px}}
+
+/* ---------- UI ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border-radius:100px;
+  background:var(--black);color:#fff;font-weight:700;font-size:.84rem;transition:.15s;border:2px solid var(--black);
+}
+.btn:hover{transform:translateY(-1px)}
+.btn--red{background:var(--red);border-color:var(--red)}
+.btn--red:hover{background:var(--red-2);border-color:var(--red-2)}
+.btn--gh{background:#fff;color:var(--black);border-color:var(--line)}
+.btn--sm{padding:7px 13px;font-size:.76rem}
+.btn--ghost{background:transparent;color:var(--black);border-color:var(--line)}
+.btn--ghost:hover{background:#fff}
+.btn[disabled]{opacity:.45;pointer-events:none}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:18px}
+.head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.head h2{font-size:1.3rem;font-weight:800}
+.head .sep{flex:1}
+.muted{color:var(--gray);font-size:.86rem}
+.grid2{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+.grid3{display:grid;gap:14px;grid-template-columns:repeat(3,1fr)}
+@media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr}}
+label.f{display:block;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;color:var(--gray)}
+.in{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px 13px;background:#fff}
+.in:focus{outline:2px solid var(--red);outline-offset:-1px}
+textarea.in{min-height:90px;resize:vertical}
+.hint{font-size:.76rem;color:var(--gray);margin-top:5px}
+
+.list{display:grid;gap:10px}
+.row{
+  display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);
+  border-radius:var(--r);padding:11px 14px;
+}
+.row img{width:56px;height:56px;object-fit:cover;border-radius:8px;background:var(--paper);flex:none}
+.row .info{flex:1;min-width:0}
+.row .info b{display:block;font-size:.94rem}
+.row .info span{font-size:.78rem;color:var(--gray)}
+.row .acts{display:flex;gap:6px;flex:none}
+.ico{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;font-size:.9rem}
+.ico:hover{background:var(--black);color:#fff;border-color:var(--black)}
+.ico.del:hover{background:var(--red);border-color:var(--red)}
+
+.tagline{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.tg{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;background:var(--paper);color:var(--gray);padding:3px 8px;border-radius:100px}
+.tg.red{background:#fdeced;color:var(--red)}
+
+.fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.foto{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;position:relative}
+.foto img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.foto p{margin:0;padding:7px 9px;font-size:.7rem;word-break:break-all;color:var(--gray)}
+.foto .x{position:absolute;top:6px;right:6px;background:rgba(12,12,14,.8);color:#fff;width:24px;height:24px;border-radius:50%}
+.foto.pick{cursor:pointer}
+.foto.pick:hover{border-color:var(--red);box-shadow:0 0 0 2px #fdeced}
+
+.drop{
+  border:2px dashed var(--line);border-radius:var(--r);padding:26px;text-align:center;background:#fff;
+}
+.drop.over{border-color:var(--red);background:#fdeced}
+
+.log{background:#0c0c0e;color:#c9c9d2;border-radius:10px;padding:14px;font:12px/1.6 ui-monospace,Menlo,Consolas,monospace;max-height:230px;overflow:auto;white-space:pre-wrap}
+.log b{color:#7fd8a3}
+.log i{color:#ff8f95;font-style:normal}
+
+.toast{
+  position:fixed;right:18px;bottom:18px;z-index:60;background:var(--black);color:#fff;padding:13px 18px;
+  border-radius:10px;box-shadow:0 18px 40px rgba(0,0,0,.28);font-size:.86rem;border-left:4px solid var(--red-2);
+}
+.steps{counter-reset:s;display:grid;gap:14px}
+.steps li{list-style:none;display:flex;gap:12px;align-items:flex-start;font-size:.9rem}
+.steps li::before{
+  counter-increment:s;content:counter(s);background:var(--black);color:#fff;width:24px;height:24px;border-radius:50%;
+  display:grid;place-items:center;font-size:.74rem;font-weight:800;flex:none;
+}
+code{background:var(--paper);padding:2px 6px;border-radius:5px;font-size:.85em;border:1px solid var(--line)}
+pre.code{background:var(--black);color:#e8e8ee;padding:14px;border-radius:10px;overflow:auto;font-size:.8rem;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <span class="top__logo">
+    <svg viewBox="0 0 240 220" fill="none"><g stroke="currentColor" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"><path d="M24 115C62 58 178 58 216 115 178 172 62 172 24 115Z"/><circle cx="120" cy="115" r="36"/><path d="M120 59V31"/><path d="m172.8 69.1 17.2-22.9"/><path d="M67.2 69.1 50 46.2"/><path d="m203.4 91.3 27.2-11.8"/><path d="M36.6 91.3 9.4 79.5"/><path d="m203.4 138.7 27.2 11.8"/><path d="M36.6 138.7 9.4 150.5"/><path d="m172.8 160.9 17.2 22.9"/><path d="M67.2 160.9 50 183.8"/><path d="M120 171v28"/></g><circle cx="120" cy="115" r="15" fill="currentColor"/></svg>
+    Bacano<i>.</i>
+  </span>
+  <span class="chip" id="estado">Sin cambios</span>
+  <span class="sep"></span>
+  <a class="btn btn--ghost btn--sm" style="color:#fff;border-color:#2a2a32" href="index.html?preview=1" target="_blank">👁 Vista previa</a>
+  <button class="btn btn--gh btn--sm" onclick="descargarData()">⬇ Descargar data.js</button>
+  <button class="btn btn--red btn--sm" onclick="ir('publicar')">🚀 Publicar</button>
+</div>
+
+<div class="layout">
+  <nav class="side" id="side"></nav>
+  <main id="view"></main>
+</div>
+
+<script src="assets/js/data.js?v=5"></script>
+<script>
+/* ============================================================
+   PANEL BACANO — estado
+   ============================================================ */
+const KEY  = "bacano_admin_v1";
+const KGH  = "bacano_github";
+const clon = o => JSON.parse(JSON.stringify(o));
+
+let S = null, tab = "productos", edit = null, sucio = false;
+
+function semilla(){
+  return {
+    SITE: clon(SITE), FOTOS: clon(FOTOS), CATEGORIAS: clon(CATEGORIAS),
+    PRODUCTOS: clon(PRODUCTOS), TESTIMONIOS: clon(TESTIMONIOS), FAQS: clon(FAQS),
+    BIBLIOTECA: (typeof BIBLIOTECA !== "undefined" ? clon(BIBLIOTECA) : [])
+  };
+}
+function cargar(){
+  try{
+    const g = JSON.parse(localStorage.getItem(KEY));
+    S = g && g.PRODUCTOS ? g : semilla();
+  }catch(e){ S = semilla(); }
+}
+function guardar(marcar = true){
+  localStorage.setItem(KEY, JSON.stringify(S));
+  if(marcar){ sucio = true; estado(); }
+}
+function estado(){
+  const e = document.getElementById("estado");
+  e.textContent = sucio ? "● Cambios sin publicar" : "Sin cambios";
+  e.className = "chip " + (sucio ? "warn" : "");
+}
+function toast(msg){
+  const t = document.createElement("div");
+  t.className = "toast"; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2600);
+}
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const clp = n => "$" + Number(n || 0).toLocaleString("es-CL");
+const slug = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")
+  .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40);
+
+/* ============================================================
+   NAVEGACIÓN
+   ============================================================ */
+const TABS = [
+  ["productos",   "📦 Productos"],
+  ["categorias",  "🗂 Categorías"],
+  ["fotos",       "🖼 Fotos"],
+  ["sitio",       "⚙️ Datos del sitio"],
+  ["testimonios", "💬 Testimonios"],
+  ["faqs",        "❓ Preguntas"],
+  ["publicar",    "🚀 Publicar"],
+  ["ayuda",       "📘 Cómo funciona"]
+];
+function menu(){
+  document.getElementById("side").innerHTML =
+    `<small>Contenido</small>` +
+    TABS.slice(0,6).map(([k,t]) => `<button class="${tab===k?"on":""}" onclick="ir('${k}')">${t}</button>`).join("") +
+    `<small>Sitio</small>` +
+    TABS.slice(6).map(([k,t]) => `<button class="${tab===k?"on":""}" onclick="ir('${k}')">${t}</button>`).join("");
+}
+function ir(k){ tab = k; edit = null; menu(); pintar(); window.scrollTo(0,0); }
+
+function pintar(){
+  const v = document.getElementById("view");
+  v.innerHTML = ({
+    productos:   vProductos, categorias: vCategorias, fotos: vFotos, sitio: vSitio,
+    testimonios: vTestimonios, faqs: vFaqs, publicar: vPublicar, ayuda: vAyuda
+  })[tab]();
+}
+
+/* ============================================================
+   PRODUCTOS
+   ============================================================ */
+function vProductos(){
+  if(edit !== null) return formProducto();
+  return `
+  <div class="head">
+    <div><h2>Productos</h2><p class="muted" style="margin:4px 0 0">${S.PRODUCTOS.length} en el catálogo · los primeros 8 salen en la home</p></div>
+    <span class="sep"></span>
+    <button class="btn btn--red" onclick="edit='nuevo';pintar()">+ Nuevo producto</button>
+  </div>
+  <div class="list">
+    ${S.PRODUCTOS.map((p,i) => `
+      <div class="row">
+        <img src="${esc(p.img)}" alt="" onerror="this.style.opacity=.25">
+        <div class="info">
+          <b>${esc(p.nombre)}</b>
+          <span>${clp(p.precio)} · ${esc(p.unidad)} · ${esc(catNombre(p.cat))}</span>
+          <div class="tagline">
+            ${(p.flags||[]).map(f => `<span class="tg red">${esc(f)}</span>`).join("")}
+            ${i < 8 ? '<span class="tg">en la home</span>' : ""}
+          </div>
+        </div>
+        <div class="acts">
+          <button class="ico" title="Subir"   onclick="mover(${i},-1)">↑</button>
+          <button class="ico" title="Bajar"   onclick="mover(${i},1)">↓</button>
+          <button class="ico" title="Duplicar" onclick="duplicar(${i})">⧉</button>
+          <button class="ico" title="Editar"  onclick="edit=${i};pintar()">✎</button>
+          <button class="ico del" title="Eliminar" onclick="borrar(${i})">🗑</button>
+        </div>
+      </div>`).join("")}
+  </div>`;
+}
+const catNombre = s => (S.CATEGORIAS.find(c => c.slug === s) || {}).nombre || s;
+
+function formProducto(){
+  const nuevo = edit === "nuevo";
+  const p = nuevo
+    ? { id:"", nombre:"", cat:S.CATEGORIAS[0]?.slug || "", precio:0, antes:0, unidad:"", img:"",
+        flags:[], rating:5, reviews:0, desc:"", specs:[], plazo:"" }
+    : S.PRODUCTOS[edit];
+  return `
+  <div class="head">
+    <button class="btn btn--ghost btn--sm" onclick="edit=null;pintar()">← Volver</button>
+    <h2>${nuevo ? "Nuevo producto" : "Editar producto"}</h2>
+  </div>
+  <form class="card" onsubmit="return guardarProducto(event)">
+    <div class="grid2">
+      <div>
+        <label class="f">Nombre</label>
+        <input class="in" name="nombre" required value="${esc(p.nombre)}" placeholder="Ej: Stickers troquelados">
+      </div>
+      <div>
+        <label class="f">Categoría</label>
+        <select class="in" name="cat">
+          ${S.CATEGORIAS.map(c => `<option value="${c.slug}" ${c.slug===p.cat?"selected":""}>${esc(c.nombre)}</option>`).join("")}
+        </select>
+      </div>
+    </div>
+    <div class="grid3" style="margin-top:14px">
+      <div>
+        <label class="f">Precio (CLP)</label>
+        <input class="in" name="precio" type="number" min="0" required value="${p.precio}">
+        <p class="hint">Sin puntos: 24900</p>
+      </div>
+      <div>
+        <label class="f">Precio anterior (opcional)</label>
+        <input class="in" name="antes" type="number" min="0" value="${p.antes || ""}">
+        <p class="hint">Muestra el % de descuento</p>
+      </div>
+      <div>
+        <label class="f">Unidad</label>
+        <input class="in" name="unidad" required value="${esc(p.unidad)}" placeholder="100 unidades · 5 × 5 cm">
+      </div>
+    </div>
+    <div class="grid3" style="margin-top:14px">
+      <div>
+        <label class="f">Plazo de entrega</label>
+        <input class="in" name="plazo" value="${esc(p.plazo)}" placeholder="3 a 5 días hábiles">
+      </div>
+      <div>
+        <label class="f">Etiquetas</label>
+        <input class="in" name="flags" value="${esc((p.flags||[]).join(', '))}" placeholder="Top ventas, Novedad">
+        <p class="hint">Separadas por coma</p>
+      </div>
+      <div>
+        <label class="f">Estrellas / opiniones</label>
+        <div style="display:flex;gap:8px">
+          <input class="in" name="rating" type="number" step="0.1" min="1" max="5" value="${p.rating}">
+          <input class="in" name="reviews" type="number" min="0" value="${p.reviews}">
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <label class="f">Foto</label>
+      <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <img id="prevImg" src="${esc(p.img)}" style="width:96px;height:96px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:var(--paper)" onerror="this.style.opacity=.25">
+        <div style="flex:1;min-width:240px">
+          <input class="in" name="img" id="campoImg" value="${esc(p.img)}" oninput="document.getElementById('prevImg').src=this.value"
+                 placeholder="assets/img/fotos/mi-foto.jpg  ·  o una URL">
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+            <button type="button" class="btn btn--ghost btn--sm" onclick="ir('fotos')">Ir a mis fotos</button>
+            ${S.BIBLIOTECA.length ? `<select class="in" style="max-width:260px" onchange="if(this.value){document.getElementById('campoImg').value=this.value;document.getElementById('prevImg').src=this.value}">
+              <option value="">Elegir de mis fotos…</option>
+              ${S.BIBLIOTECA.map(f => `<option value="${esc(f.ruta)}">${esc(f.nombre)}</option>`).join("")}
+            </select>` : ""}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <label class="f">Descripción</label>
+      <textarea class="in" name="desc" required>${esc(p.desc)}</textarea>
+    </div>
+    <div style="margin-top:14px">
+      <label class="f">Características (una por línea)</label>
+      <textarea class="in" name="specs">${esc((p.specs||[]).join("\n"))}</textarea>
+    </div>
+    <div style="margin-top:14px">
+      <label class="f">Identificador interno</label>
+      <input class="in" name="id" value="${esc(p.id)}" placeholder="se genera solo con el nombre">
+      <p class="hint">Solo cambialo si sabés lo que hacés: identifica el producto en el carrito.</p>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:22px">
+      <button class="btn btn--red" type="submit">Guardar producto</button>
+      <button class="btn btn--ghost" type="button" onclick="edit=null;pintar()">Cancelar</button>
+    </div>
+  </form>`;
+}
+
+function guardarProducto(ev){
+  ev.preventDefault();
+  const f = new FormData(ev.target), g = k => (f.get(k) || "").toString().trim();
+  const p = {
+    id: g("id") || slug(g("nombre")),
+    nombre: g("nombre"), cat: g("cat"),
+    precio: +g("precio") || 0,
+    unidad: g("unidad"), img: g("img"),
+    flags: g("flags") ? g("flags").split(",").map(s => s.trim()).filter(Boolean) : [],
+    rating: +g("rating") || 5, reviews: +g("reviews") || 0,
+    desc: g("desc"),
+    specs: g("specs") ? g("specs").split("\n").map(s => s.trim()).filter(Boolean) : [],
+    plazo: g("plazo")
+  };
+  if(+g("antes") > 0) p.antes = +g("antes");
+  if(edit === "nuevo") S.PRODUCTOS.push(p); else S.PRODUCTOS[edit] = p;
+  guardar(); edit = null; pintar(); toast("Producto guardado");
+  return false;
+}
+function mover(i, d){
+  const j = i + d;
+  if(j < 0 || j >= S.PRODUCTOS.length) return;
+  [S.PRODUCTOS[i], S.PRODUCTOS[j]] = [S.PRODUCTOS[j], S.PRODUCTOS[i]];
+  guardar(); pintar();
+}
+function duplicar(i){
+  const c = clon(S.PRODUCTOS[i]);
+  c.id += "-2"; c.nombre += " (copia)";
+  S.PRODUCTOS.splice(i + 1, 0, c); guardar(); pintar();
+}
+function borrar(i){
+  if(!confirm(`¿Eliminar «${S.PRODUCTOS[i].nombre}»?`)) return;
+  S.PRODUCTOS.splice(i, 1); guardar(); pintar(); toast("Producto eliminado");
+}
+
+/* ============================================================
+   CATEGORÍAS
+   ============================================================ */
+function vCategorias(){
+  return `
+  <div class="head">
+    <div><h2>Categorías</h2><p class="muted" style="margin:4px 0 0">Se usan en los filtros del catálogo y en el pie de página</p></div>
+    <span class="sep"></span>
+    <button class="btn btn--red" onclick="nuevaCat()">+ Nueva</button>
+  </div>
+  ${S.CATEGORIAS.map((c,i) => `
+    <div class="card">
+      <div class="grid3">
+        <div><label class="f">Nombre</label><input class="in" value="${esc(c.nombre)}" onchange="S.CATEGORIAS[${i}].nombre=this.value;guardar()"></div>
+        <div><label class="f">Identificador</label><input class="in" value="${esc(c.slug)}" onchange="S.CATEGORIAS[${i}].slug=this.value;guardar()"></div>
+        <div><label class="f">Foto</label><input class="in" value="${esc(c.img)}" onchange="S.CATEGORIAS[${i}].img=this.value;guardar()"></div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-end">
+        <div style="flex:1"><label class="f">Descripción corta</label><input class="in" value="${esc(c.desc)}" onchange="S.CATEGORIAS[${i}].desc=this.value;guardar()"></div>
+        <button class="ico del" onclick="if(confirm('¿Eliminar categoría?')){S.CATEGORIAS.splice(${i},1);guardar();pintar()}">🗑</button>
+      </div>
+    </div>`).join("")}`;
+}
+function nuevaCat(){
+  S.CATEGORIAS.push({ slug:"nueva-" + Date.now().toString().slice(-4), nombre:"Nueva categoría", desc:"", img:"" });
+  guardar(); pintar();
+}
+
+/* ============================================================
+   FOTOS
+   ============================================================ */
+function vFotos(){
+  return `
+  <div class="head"><div><h2>Fotos</h2><p class="muted" style="margin:4px 0 0">Optimizá tus imágenes acá: se achican a 1400 px y se convierten a JPG liviano</p></div></div>
+
+  <div class="card">
+    <div class="drop" id="drop">
+      <p style="margin:0 0 12px;font-weight:700">Arrastrá tus fotos acá</p>
+      <p class="muted" style="margin:0 0 14px">o</p>
+      <input type="file" id="fileFotos" accept="image/*" multiple hidden onchange="procesarFotos(this.files)">
+      <button class="btn btn--red" onclick="document.getElementById('fileFotos').click()">Elegir archivos</button>
+      <p class="hint" style="margin-top:12px">Se guardan en <code>assets/img/fotos/</code>. Con GitHub configurado se suben solas; si no, se descargan para que las subas a mano.</p>
+    </div>
+  </div>
+
+  <div class="head" style="margin-top:26px"><h2 style="font-size:1.05rem">Mis fotos (${S.BIBLIOTECA.length})</h2></div>
+  ${S.BIBLIOTECA.length ? `<div class="fotos">
+    ${S.BIBLIOTECA.map((f,i) => `
+      <figure class="foto" style="margin:0">
+        <button class="x" title="Quitar de la lista" onclick="S.BIBLIOTECA.splice(${i},1);guardar();pintar()">×</button>
+        <img src="${esc(f.ruta)}" onerror="this.style.opacity=.2">
+        <p>${esc(f.nombre)}</p>
+      </figure>`).join("")}
+  </div>` : `<p class="muted">Todavía no cargaste fotos propias. Mientras tanto el sitio usa fotos de stock con licencia libre.</p>`}
+
+  <div class="card" style="margin-top:26px">
+    <h3 style="font-size:1rem;margin-bottom:12px">Fotos fijas del sitio</h3>
+    <p class="muted" style="margin-bottom:14px">Son las de portada, taller y trabajo en terreno.</p>
+    <div class="list">
+      ${Object.keys(S.FOTOS).map(k => `
+        <div class="row">
+          <img src="${esc(S.FOTOS[k])}" onerror="this.style.opacity=.25">
+          <div class="info">
+            <b>${esc(k)}</b>
+            <input class="in" style="margin-top:6px" value="${esc(S.FOTOS[k])}" onchange="S.FOTOS['${k}']=this.value;guardar();pintar()">
+          </div>
+        </div>`).join("")}
+    </div>
+  </div>`;
+}
+
+async function procesarFotos(files){
+  const gh = ghCfg();
+  for(const file of files){
+    if(!file.type.startsWith("image/")) continue;
+    const nombre = slug(file.name.replace(/\.[^.]+$/, "")) + ".jpg";
+    const ruta   = "assets/img/fotos/" + nombre;
+    const b64    = await comprimir(file);
+    if(gh.token && gh.repo){
+      try{
+        await ghPut(ruta, b64, "Panel: foto " + nombre);
+        toast("Subida a GitHub: " + nombre);
+      }catch(e){ alert("No se pudo subir " + nombre + ": " + e.message); continue; }
+    }else{
+      const a = document.createElement("a");
+      a.href = "data:image/jpeg;base64," + b64;
+      a.download = nombre; a.click();
+    }
+    if(!S.BIBLIOTECA.some(f => f.ruta === ruta)) S.BIBLIOTECA.push({ nombre, ruta });
+    guardar();
+  }
+  pintar();
+  if(!ghCfg().token) toast("Fotos descargadas: subilas a assets/img/fotos/");
+}
+
+function comprimir(file, max = 1400, q = 0.82){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const e = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = Math.round(img.width * e); c.height = Math.round(img.height * e);
+        const x = c.getContext("2d");
+        x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height);
+        x.drawImage(img, 0, 0, c.width, c.height);
+        res(c.toDataURL("image/jpeg", q).split(",")[1]);
+      };
+      img.onerror = rej; img.src = r.result;
+    };
+    r.onerror = rej; r.readAsDataURL(file);
+  });
+}
+
+/* ============================================================
+   DATOS DEL SITIO
+   ============================================================ */
+const CAMPOS_SITE = [
+  ["nombre","Nombre"],["dominio","Dominio"],["slogan","Eslogan"],
+  ["telefono","Teléfono visible"],["telefonoLink","Teléfono para llamar"],["whatsapp","WhatsApp (56912345678)"],
+  ["email","Correo"],["direccion","Dirección del taller"],["horario","Horario"],
+  ["rut","RUT"],["anios","Años en el rubro"],["envioGratisDesde","Envío gratis desde (CLP)"]
+];
+function vSitio(){
+  return `
+  <div class="head"><div><h2>Datos del sitio</h2><p class="muted" style="margin:4px 0 0">Aparecen en el pie de página, contacto, WhatsApp y el carrito</p></div></div>
+  <div class="card"><div class="grid2">
+    ${CAMPOS_SITE.map(([k,t]) => `
+      <div>
+        <label class="f">${t}</label>
+        <input class="in" value="${esc(S.SITE[k])}" onchange="S.SITE['${k}']=${["anios","envioGratisDesde"].includes(k)?"+this.value":"this.value"};guardar()">
+      </div>`).join("")}
+  </div></div>`;
+}
+
+/* ============================================================
+   TESTIMONIOS Y FAQ
+   ============================================================ */
+function vTestimonios(){
+  return `
+  <div class="head">
+    <div><h2>Testimonios</h2><p class="muted" style="margin:4px 0 0">El primero se muestra en la home</p></div>
+    <span class="sep"></span>
+    <button class="btn btn--red" onclick="S.TESTIMONIOS.push({nombre:'Nombre',empresa:'Empresa',inicial:'N',estrellas:5,texto:''});guardar();pintar()">+ Nuevo</button>
+  </div>
+  ${S.TESTIMONIOS.map((t,i) => `
+    <div class="card">
+      <div class="grid3">
+        <div><label class="f">Nombre</label><input class="in" value="${esc(t.nombre)}" onchange="S.TESTIMONIOS[${i}].nombre=this.value;S.TESTIMONIOS[${i}].inicial=this.value[0]||'B';guardar()"></div>
+        <div><label class="f">Empresa / comuna</label><input class="in" value="${esc(t.empresa)}" onchange="S.TESTIMONIOS[${i}].empresa=this.value;guardar()"></div>
+        <div><label class="f">Estrellas</label><input class="in" type="number" min="1" max="5" value="${t.estrellas}" onchange="S.TESTIMONIOS[${i}].estrellas=+this.value;guardar()"></div>
+      </div>
+      <div style="margin-top:12px"><label class="f">Texto</label><textarea class="in" onchange="S.TESTIMONIOS[${i}].texto=this.value;guardar()">${esc(t.texto)}</textarea></div>
+      <button class="btn btn--ghost btn--sm" style="margin-top:12px" onclick="if(confirm('¿Eliminar?')){S.TESTIMONIOS.splice(${i},1);guardar();pintar()}">Eliminar</button>
+    </div>`).join("")}`;
+}
+function vFaqs(){
+  return `
+  <div class="head">
+    <div><h2>Preguntas frecuentes</h2><p class="muted" style="margin:4px 0 0">Se muestran en la página Nosotros</p></div>
+    <span class="sep"></span>
+    <button class="btn btn--red" onclick="S.FAQS.push({q:'Nueva pregunta',a:''});guardar();pintar()">+ Nueva</button>
+  </div>
+  ${S.FAQS.map((f,i) => `
+    <div class="card">
+      <label class="f">Pregunta</label>
+      <input class="in" value="${esc(f.q)}" onchange="S.FAQS[${i}].q=this.value;guardar()">
+      <label class="f" style="margin-top:12px">Respuesta</label>
+      <textarea class="in" onchange="S.FAQS[${i}].a=this.value;guardar()">${esc(f.a)}</textarea>
+      <button class="btn btn--ghost btn--sm" style="margin-top:12px" onclick="if(confirm('¿Eliminar?')){S.FAQS.splice(${i},1);guardar();pintar()}">Eliminar</button>
+    </div>`).join("")}`;
+}
+
+/* ============================================================
+   GENERAR data.js
+   ============================================================ */
+function generarData(){
+  const j = (n, v) => `let ${n} = ${JSON.stringify(v, null, 2)};\n\n`;
+  return `/* ============================================================
+   BACANO.CL — Datos del sitio y catálogo
+   Generado desde el panel (admin.html) el ${new Date().toLocaleString("es-CL")}
+   Podés editarlo a mano, pero si volvés a publicar desde el panel
+   se reemplaza por completo.
+   ============================================================ */
+
+const U = (id, w = 900, h = 0) =>
+  \`https://images.unsplash.com/\${id}?auto=format&fit=crop&w=\${w}\${h ? "&h=" + h : ""}&q=80\`;
+
+`
+  + j("FOTOS", S.FOTOS) + j("SITE", S.SITE) + j("CATEGORIAS", S.CATEGORIAS)
+  + j("PRODUCTOS", S.PRODUCTOS) + j("TESTIMONIOS", S.TESTIMONIOS) + j("FAQS", S.FAQS)
+  + j("BIBLIOTECA", S.BIBLIOTECA)
+  + `/* Vista previa del panel: abrí cualquier página con ?preview=1 */
+if(location.search.includes("preview=1") || location.hash.includes("preview")){
+  try{
+    const p = JSON.parse(localStorage.getItem("bacano_admin_v1"));
+    if(p){
+      if(p.SITE) SITE = p.SITE;
+      if(p.FOTOS) FOTOS = p.FOTOS;
+      if(p.CATEGORIAS) CATEGORIAS = p.CATEGORIAS;
+      if(p.PRODUCTOS) PRODUCTOS = p.PRODUCTOS;
+      if(p.TESTIMONIOS) TESTIMONIOS = p.TESTIMONIOS;
+      if(p.FAQS) FAQS = p.FAQS;
+      document.addEventListener("DOMContentLoaded", () => {
+        const b = document.createElement("a");
+        b.href = "admin.html";
+        b.textContent = "◀ Vista previa del panel — volver a editar";
+        b.style.cssText = "position:fixed;left:0;right:0;bottom:0;z-index:999;background:#8b0f14;color:#fff;text-align:center;padding:9px;font:600 13px/1.2 system-ui;text-decoration:none";
+        document.body.appendChild(b);
+      });
+    }
+  }catch(e){ console.warn("preview:", e); }
+}
+`;
+}
+function descargarData(){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([generarData()], { type:"text/javascript" }));
+  a.download = "data.js"; a.click();
+  toast("data.js descargado — subilo a assets/js/");
+}
+
+/* ============================================================
+   GITHUB
+   ============================================================ */
+function ghCfg(){
+  try{ return JSON.parse(localStorage.getItem(KGH)) || {}; }catch(e){ return {}; }
+}
+function ghGuardar(){
+  const v = id => document.getElementById(id).value.trim();
+  localStorage.setItem(KGH, JSON.stringify({
+    usuario:v("ghUser"), repo:v("ghRepo"), rama:v("ghRama") || "main", token:v("ghToken")
+  }));
+  toast("Conexión guardada en este navegador");
+  pintar();
+}
+function ghOlvidar(){
+  if(!confirm("¿Borrar el token guardado en este navegador?")) return;
+  const c = ghCfg(); delete c.token;
+  localStorage.setItem(KGH, JSON.stringify(c)); pintar(); toast("Token borrado");
+}
+async function ghApi(ruta, opts = {}){
+  const c = ghCfg();
+  const r = await fetch(`https://api.github.com/repos/${c.usuario}/${c.repo}${ruta}`, {
+    ...opts,
+    headers: { Authorization:`Bearer ${c.token}`, Accept:"application/vnd.github+json", ...(opts.headers||{}) }
+  });
+  if(r.status === 404 && (opts.method || "GET") === "GET") return null;
+  const j = await r.json().catch(() => ({}));
+  if(!r.ok) throw new Error(j.message || ("HTTP " + r.status));
+  return j;
+}
+async function ghPut(ruta, contenidoB64, mensaje){
+  const c = ghCfg();
+  const actual = await ghApi(`/contents/${ruta}?ref=${c.rama}`);
+  return ghApi(`/contents/${ruta}`, {
+    method:"PUT",
+    body: JSON.stringify({
+      message: mensaje, content: contenidoB64, branch: c.rama,
+      ...(actual && actual.sha ? { sha: actual.sha } : {})
+    })
+  });
+}
+const b64txt = t => btoa(String.fromCharCode(...new TextEncoder().encode(t)));
+
+function log(msg, tipo){
+  const l = document.getElementById("log");
+  if(!l) return;
+  l.innerHTML += (tipo === "ok" ? `<b>✓ ${msg}</b>` : tipo === "err" ? `<i>✕ ${msg}</i>` : `· ${msg}`) + "\n";
+  l.scrollTop = l.scrollHeight;
+}
+async function publicar(){
+  const c = ghCfg();
+  if(!c.usuario || !c.repo || !c.token){ alert("Completá usuario, repositorio y token."); return; }
+  const btn = document.getElementById("btnPub");
+  btn.disabled = true;
+  document.getElementById("log").innerHTML = "";
+  log("Conectando con " + c.usuario + "/" + c.repo + " (rama " + c.rama + ")…");
+  try{
+    const repo = await ghApi("");
+    if(!repo) throw new Error("No se encontró el repositorio (revisá usuario, nombre y permisos del token).");
+    log("Repositorio encontrado", "ok");
+    await ghPut("assets/js/data.js", b64txt(generarData()), "Panel: actualiza catálogo y textos");
+    log("assets/js/data.js publicado", "ok");
+    sucio = false; estado();
+    log("Listo. GitHub Pages tarda entre 30 s y 2 min en mostrar los cambios.");
+    toast("¡Publicado!");
+  }catch(e){
+    log(e.message, "err");
+    log("Si dice 'Bad credentials', el token venció o está mal copiado.");
+  }
+  btn.disabled = false;
+}
+async function probarConexion(){
+  document.getElementById("log").innerHTML = "";
+  try{
+    const r = await ghApi("");
+    log(r ? "Conexión correcta con " + r.full_name : "Repositorio no encontrado", r ? "ok" : "err");
+    if(r) log("Permiso de escritura: " + (r.permissions && r.permissions.push ? "sí" : "NO — el token no puede escribir"), r.permissions && r.permissions.push ? "ok" : "err");
+  }catch(e){ log(e.message, "err"); }
+}
+
+function vPublicar(){
+  const c = ghCfg();
+  return `
+  <div class="head"><div><h2>Publicar</h2><p class="muted" style="margin:4px 0 0">Dos formas: automática con GitHub, o manual descargando el archivo</p></div></div>
+
+  <div class="card">
+    <h3 style="font-size:1.05rem;margin-bottom:6px">Opción A · Publicar desde el panel</h3>
+    <p class="muted" style="margin-bottom:18px">El panel escribe <code>assets/js/data.js</code> directamente en tu repositorio. El token queda guardado solo en este navegador, nunca se sube al sitio.</p>
+    <div class="grid3">
+      <div><label class="f">Usuario de GitHub</label><input class="in" id="ghUser" value="${esc(c.usuario||"")}" placeholder="mi-usuario"></div>
+      <div><label class="f">Repositorio</label><input class="in" id="ghRepo" value="${esc(c.repo||"")}" placeholder="bacano"></div>
+      <div><label class="f">Rama</label><input class="in" id="ghRama" value="${esc(c.rama||"main")}"></div>
+    </div>
+    <div style="margin-top:14px">
+      <label class="f">Token de acceso (fine-grained, permiso Contents: Read and write)</label>
+      <input class="in" id="ghToken" type="password" value="${esc(c.token||"")}" placeholder="github_pat_…">
+      <p class="hint">Creálo en GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens, y dale acceso <b>solo a este repositorio</b>.</p>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
+      <button class="btn btn--ghost btn--sm" onclick="ghGuardar()">Guardar conexión</button>
+      <button class="btn btn--ghost btn--sm" onclick="probarConexion()">Probar conexión</button>
+      <button class="btn btn--ghost btn--sm" onclick="ghOlvidar()">Olvidar token</button>
+      <span class="sep" style="flex:1"></span>
+      <button class="btn btn--red" id="btnPub" onclick="publicar()">🚀 Publicar cambios</button>
+    </div>
+    <div class="log" id="log" style="margin-top:16px">Esperando…</div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:1.05rem;margin-bottom:6px">Opción B · Subir el archivo a mano</h3>
+    <p class="muted" style="margin-bottom:16px">Descargá <code>data.js</code> y reemplazalo en GitHub dentro de <code>assets/js/</code> (botón <i>Add file → Upload files</i>). Igual de válido y sin tokens.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" onclick="descargarData()">⬇ Descargar data.js</button>
+      <button class="btn btn--ghost" onclick="navigator.clipboard.writeText(generarData()).then(()=>toast('Copiado al portapapeles'))">Copiar contenido</button>
+      <a class="btn btn--ghost" href="index.html?preview=1" target="_blank">👁 Ver cómo queda</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:1.05rem;margin-bottom:12px">Zona de riesgo</h3>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn--ghost btn--sm" onclick="if(confirm('Descarta los cambios del panel y vuelve al contenido publicado. ¿Seguir?')){localStorage.removeItem(KEY);location.reload()}">Descartar cambios del panel</button>
+      <button class="btn btn--ghost btn--sm" onclick="exportarRespaldo()">Descargar respaldo (.json)</button>
+      <input type="file" id="fileBk" accept=".json" hidden onchange="importarRespaldo(this.files[0])">
+      <button class="btn btn--ghost btn--sm" onclick="document.getElementById('fileBk').click()">Restaurar respaldo</button>
+    </div>
+  </div>`;
+}
+function exportarRespaldo(){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(S, null, 2)], { type:"application/json" }));
+  a.download = "bacano-respaldo-" + new Date().toISOString().slice(0,10) + ".json"; a.click();
+}
+function importarRespaldo(file){
+  const r = new FileReader();
+  r.onload = () => {
+    try{ S = JSON.parse(r.result); guardar(); pintar(); toast("Respaldo restaurado"); }
+    catch(e){ alert("Archivo inválido"); }
+  };
+  r.readAsText(file);
+}
+
+/* ============================================================
+   AYUDA
+   ============================================================ */
+function vAyuda(){
+  return `
+  <div class="head"><div><h2>Cómo funciona</h2><p class="muted" style="margin:4px 0 0">Guía corta para no perderte</p></div></div>
+
+  <div class="card">
+    <h3 style="font-size:1.05rem;margin-bottom:14px">Subir el sitio a GitHub por primera vez</h3>
+    <ol class="steps">
+      <li>Entrá a <b>github.com</b> → <b>New repository</b>. Nombre: <code>bacano</code>. Marcá <b>Public</b> y creá.</li>
+      <li>En el repo vacío: <b>uploading an existing file</b> y arrastrá <u>todo</u> el contenido de la carpeta <code>Web Bacano</code> (los .html, la carpeta <code>assets</code> completa). Confirmá con <b>Commit changes</b>.</li>
+      <li>Andá a <b>Settings → Pages</b>. En <i>Source</i> elegí <b>Deploy from a branch</b>, rama <code>main</code>, carpeta <code>/ (root)</code>. Guardá.</li>
+      <li>En un minuto tu sitio queda en <code>https://tu-usuario.github.io/bacano/</code>.</li>
+      <li>Cuando tengas el dominio <b>bacano.cl</b>, ponelo en <b>Settings → Pages → Custom domain</b> y apuntá el DNS a GitHub.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:1.05rem;margin-bottom:14px">Día a día</h3>
+    <ol class="steps">
+      <li>Abrí <code>admin.html</code> (desde tu PC o desde <code>tu-sitio/admin.html</code>).</li>
+      <li>Editá productos, precios, fotos o textos. Se guarda solo en tu navegador.</li>
+      <li>Tocá <b>Vista previa</b> para ver el sitio real con tus cambios antes de publicar.</li>
+      <li>Tocá <b>Publicar</b> (o descargá <code>data.js</code> y subilo a mano).</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:1.05rem;margin-bottom:10px">Fotos</h3>
+    <p class="muted">Arrastralas en la pestaña <b>Fotos</b>: el panel las achica a 1400 px y las convierte a JPG para que el sitio cargue rápido. Con GitHub conectado se suben solas a <code>assets/img/fotos/</code>; si no, se descargan y las subís a esa misma carpeta.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:1.05rem;margin-bottom:10px">Preguntas típicas</h3>
+    <p class="muted"><b>¿Alguien puede entrar a mi panel?</b> Puede abrir la página, pero no puede publicar nada: para escribir en el repositorio hace falta tu token, que está solo en tu navegador. Si preferís que ni se vea, no subas <code>admin.html</code> a GitHub y usalo desde tu PC.</p>
+    <p class="muted" style="margin-top:10px"><b>¿Se cobran las compras?</b> No todavía. El carrito arma el pedido y lo manda por WhatsApp. Para cobrar en línea hay que conectar Webpay, Flow o Mercado Pago, y eso necesita un servidor.</p>
+    <p class="muted" style="margin-top:10px"><b>Publiqué y no veo el cambio.</b> Esperá un minuto y recargá con Ctrl+F5. GitHub Pages tiene su propia caché.</p>
+  </div>`;
+}
+
+/* ============================================================
+   ARRANQUE
+   ============================================================ */
+cargar(); menu(); pintar(); estado();
+
+document.addEventListener("dragover", e => {
+  const d = document.getElementById("drop");
+  if(d){ e.preventDefault(); d.classList.add("over"); }
+});
+document.addEventListener("dragleave", () => document.getElementById("drop")?.classList.remove("over"));
+document.addEventListener("drop", e => {
+  const d = document.getElementById("drop");
+  if(!d) return;
+  e.preventDefault(); d.classList.remove("over");
+  if(e.dataTransfer.files.length) procesarFotos(e.dataTransfer.files);
+});
+window.addEventListener("beforeunload", e => { if(sucio){ e.preventDefault(); e.returnValue = ""; } });
+</script>
+</body>
+</html>

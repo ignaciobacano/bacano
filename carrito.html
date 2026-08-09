@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carrito y checkout | Bacano.cl</title>
+<meta name="description" content="Revisá tu pedido y completá tus datos. Compra segura, prueba digital antes de imprimir y despacho a todo Chile.">
+<link rel="icon" href="assets/img/logo-mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=5">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<section class="page-hero" style="padding:44px 0">
+  <div class="wrap">
+    <p class="crumb"><a href="index.html">Inicio</a> / <a href="productos.html">Productos</a> / Carrito</p>
+    <h1 class="display">Tu pedido</h1>
+  </div>
+</section>
+
+<section class="section section--tight">
+  <div class="wrap" id="checkoutWrap">
+
+    <div class="stepbar">
+      <div class="is-active"><b>1</b> Carrito</div>
+      <div class="is-active"><b>2</b> Tus datos</div>
+      <div><b>3</b> Confirmación</div>
+    </div>
+
+    <div class="cart-page">
+      <div style="display:grid;gap:26px">
+
+        <div class="panel">
+          <h3>Productos en tu pedido</h3>
+          <div id="cartLines"></div>
+        </div>
+
+        <div class="panel" id="datos">
+          <h3>Tus datos y despacho</h3>
+          <form class="form" id="checkoutForm" novalidate>
+            <div class="form-row form-row--2">
+              <div>
+                <label class="lb" for="nombre">Nombre y apellido</label>
+                <input class="input" id="nombre" name="nombre" required placeholder="Ej: Camila Torres">
+              </div>
+              <div>
+                <label class="lb" for="email">Correo electrónico</label>
+                <input class="input" id="email" name="email" type="email" required placeholder="tucorreo@ejemplo.cl">
+              </div>
+            </div>
+
+            <div class="form-row form-row--2">
+              <div>
+                <label class="lb" for="telefono">Teléfono / WhatsApp</label>
+                <input class="input" id="telefono" name="telefono" required placeholder="+56 9 ...">
+              </div>
+              <div>
+                <label class="lb" for="documento">Documento</label>
+                <select class="input" id="documento" name="documento">
+                  <option>Boleta</option>
+                  <option>Factura (empresa)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="lb">Tipo de entrega</label>
+              <div style="display:grid;gap:10px">
+                <label class="check" style="border:1px solid var(--line);border-radius:9px;padding:12px 14px">
+                  <input type="radio" name="entrega" value="Despacho a domicilio" checked>
+                  <span><b>Despacho a domicilio</b><br><small style="color:var(--gray)">Courier con seguimiento · gratis sobre $80.000 en RM</small></span>
+                </label>
+                <label class="check" style="border:1px solid var(--line);border-radius:9px;padding:12px 14px">
+                  <input type="radio" name="entrega" value="Retiro en taller">
+                  <span><b>Retiro en taller</b><br><small style="color:var(--gray)" data-site="direccion"></small></span>
+                </label>
+                <label class="check" style="border:1px solid var(--line);border-radius:9px;padding:12px 14px">
+                  <input type="radio" name="entrega" value="Instalación en terreno">
+                  <span><b>Instalación en terreno</b><br><small style="color:var(--gray)">Coordinamos visita y montaje con nuestro equipo</small></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-row form-row--2" id="bloqueDespacho">
+              <div>
+                <label class="lb" for="direccion">Dirección</label>
+                <input class="input" id="direccion" name="direccion" placeholder="Calle, número, depto.">
+              </div>
+              <div>
+                <label class="lb" for="comuna">Comuna / Ciudad</label>
+                <input class="input" id="comuna" name="comuna" placeholder="Ej: Ñuñoa, Santiago">
+              </div>
+            </div>
+
+            <div>
+              <label class="lb" for="notas">Notas del pedido (opcional)</label>
+              <textarea class="input" id="notas" name="notas" placeholder="Medidas especiales, colores, fecha en que lo necesitás…"></textarea>
+              <p class="hint">Después de confirmar te enviamos un enlace para subir tu archivo de diseño.</p>
+            </div>
+
+            <label class="check" style="align-items:flex-start">
+              <input type="checkbox" required>
+              <span style="font-size:.86rem;color:var(--gray)">Acepto que se me envíe una prueba digital para aprobación antes de imprimir y los <a href="#" style="text-decoration:underline">términos y condiciones</a>.</span>
+            </label>
+
+            <button class="btn btn--red btn--block" type="submit">Confirmar pedido</button>
+            <p class="form-note center">No se realiza ningún cobro en este paso. Un ejecutivo confirma stock, plazo y forma de pago antes de cobrar.</p>
+          </form>
+        </div>
+
+      </div>
+
+      <aside class="panel panel--sticky">
+        <h3>Resumen</h3>
+        <div id="cartSummary"></div>
+      </aside>
+    </div>
+
+  </div>
+</section>
+
+<section class="section section--tight section--paper">
+  <div class="wrap">
+    <div class="steps">
+      <div class="step"><h3>Confirmás el pedido</h3><p>Recibís un número de seguimiento y el detalle por correo.</p></div>
+      <div class="step"><h3>Subís tu diseño</h3><p>Por enlace o WhatsApp. Si no tenés, lo diseñamos por vos.</p></div>
+      <div class="step"><h3>Aprobás la prueba</h3><p>Revisás medidas, textos y colores antes de producir.</p></div>
+      <div class="step"><h3>Recibís tu trabajo</h3><p>Despacho con seguimiento o instalación en terreno.</p></div>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/data.js?v=5"></script>
+<script src="assets/js/app.js?v=5"></script>
+</body>
+</html>

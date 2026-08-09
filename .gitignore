@@ -1,0 +1,19 @@
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editores y herramientas
+.vscode/
+.idea/
+*.swp
+.claude/
+.claude.zip
+
+# Respaldos del panel
+bacano-respaldo-*.json
+
+# Temporales
+*.tmp
+*.bak
+_hoja.html
