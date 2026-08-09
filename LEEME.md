@@ -30,13 +30,25 @@ Los cambios se guardan en tu navegador hasta que publicás. Dos formas de public
 
 > El panel no protege nada por sí solo: cualquiera que abra la URL puede verlo, pero **no puede publicar** porque necesita tu token. Si preferís que ni se vea, no subas `admin.html` a GitHub y usalo desde tu PC.
 
-## Subir el sitio a GitHub
+## Repositorio
 
-1. github.com → **New repository** → nombre `bacano`, Public → **Create**.
-2. **uploading an existing file** → arrastrá todo el contenido de la carpeta (los `.html`, `LEEME.md` y la carpeta `assets` completa) → **Commit changes**.
-3. **Settings → Pages** → Source: *Deploy from a branch*, rama `main`, carpeta `/ (root)` → **Save**.
-4. En un minuto queda publicado en `https://tu-usuario.github.io/bacano/`.
-5. Con el dominio comprado: **Settings → Pages → Custom domain** → `bacano.cl`, y en tu proveedor de dominio apuntás los DNS a GitHub.
+El sitio vive en **https://github.com/ignaciobacano/bacano** (rama `main`).
+
+Para activar la web:
+
+1. En el repo: **Settings → Pages**.
+2. *Source*: **Deploy from a branch** · rama `main` · carpeta `/ (root)` → **Save**.
+3. En 1–2 minutos queda publicado en **https://ignaciobacano.github.io/bacano/**.
+4. Con el dominio comprado: **Settings → Pages → Custom domain** → `bacano.cl`, y en tu proveedor de dominio creás estos registros DNS:
+   - `A` → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+   - `CNAME` para `www` → `ignaciobacano.github.io`
+5. Marcá **Enforce HTTPS** cuando GitHub emita el certificado.
+
+Desde la PC, para subir cambios hechos a mano:
+
+```bash
+git add -A && git commit -m "actualizo el sitio" && git push
+```
 
 ## Dónde se edita cada cosa
 
