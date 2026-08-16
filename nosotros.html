@@ -8,10 +8,27 @@
 <link rel="icon" href="assets/img/logo-mark.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=5">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=7">
+<noscript><style>.pre,.pt{display:none!important}</style></noscript>
 </head>
 <body>
+<script>
+try{document.documentElement.classList.add(sessionStorage.getItem("bacano_seen_v1")?"is-visited":"is-loading")}
+catch(e){document.documentElement.classList.add("is-loading")}
+/* red de seguridad: si el JS del sitio nunca arranca, el preloader se retira solo */
+setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is-loading")){h.classList.remove("is-loading");var p=document.getElementById("pre");if(p)p.remove();}},9000);
+</script>
+
+<div class="pre" id="pre" aria-hidden="true">
+  <span class="pre__word"><i>Bacano.</i></span>
+  <div class="pre__meta">
+    <span>Letreros &middot; Impresión &middot; Santiago de Chile</span>
+    <span class="pre__count" id="preCount">000</span>
+  </div>
+  <div class="pre__bar"><i id="preBar"></i></div>
+</div>
+<div class="pt" id="pt" aria-hidden="true"></div>
 
 <div id="site-header"></div>
 
@@ -37,13 +54,13 @@
         <span class="badge-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg> Boleta y factura</span>
       </div>
     </div>
-    <div class="reveal"><img data-foto="ploter" alt="Plóter de impresión en el taller de Bacano" loading="lazy" style="aspect-ratio:4/3;object-fit:cover"></div>
+    <div class="reveal"><img data-foto="ploter" alt="Pliego de gran formato impreso en el taller de Bacano" loading="lazy" style="aspect-ratio:4/3;object-fit:cover"></div>
   </div>
 </section>
 
 <section class="section section--dark" id="terreno">
   <div class="wrap split">
-    <div class="reveal" style="order:2"><img data-foto="terreno2" alt="Instalación de letrero en terreno" loading="lazy" style="aspect-ratio:4/3;object-fit:cover"></div>
+    <div class="reveal" style="order:2"><img data-foto="terreno2" alt="Fachada completa con letrero y gráfica instalados por Bacano" loading="lazy" style="aspect-ratio:4/3;object-fit:cover"></div>
     <div class="reveal" style="order:1">
       <span class="eyebrow">Trabajo en terreno</span>
       <h2 class="display">Salimos a<br><span class="txt-red">instalar</span></h2>
@@ -70,15 +87,15 @@
     </div>
     <div class="cats">
       <div class="cat reveal">
-        <div class="cat__img"><img data-foto="ploter" alt="Plóter de impresión ecosolvente" loading="lazy"></div>
+        <div class="cat__img"><img data-foto="ploter" alt="Impresión de gran formato terminada" loading="lazy"></div>
         <div class="cat__body"><h3>Plóter de impresión</h3><p>Gran formato hasta 1,60 m de ancho, tinta ecosolvente 1440 dpi y perfiles de color calibrados.</p></div>
       </div>
       <div class="cat reveal">
-        <div class="cat__img"><img data-foto="ploterCorte" alt="Plóter de corte y troquelado" loading="lazy"></div>
+        <div class="cat__img"><img data-foto="ploterCorte" alt="Trabajo de corte y troquelado sobre la mesa del taller" loading="lazy"></div>
         <div class="cat__body"><h3>Plóter de corte y troquelado</h3><p>Corte de contorno con lectura óptica de marcas: stickers con tu forma exacta, pieza por pieza.</p></div>
       </div>
       <div class="cat reveal">
-        <div class="cat__img"><img data-foto="taller" alt="Router CNC para letras corpóreas" loading="lazy"></div>
+        <div class="cat__img"><img data-foto="taller" alt="Letras corpóreas montadas en muro" loading="lazy"></div>
         <div class="cat__body"><h3>Router CNC</h3><p>Corte de acrílico, PVC y MDF para letras corpóreas y estructuras a medida con acabado limpio.</p></div>
       </div>
       <div class="cat reveal">
@@ -144,7 +161,7 @@
 
 <div id="site-footer"></div>
 
-<script src="assets/js/data.js?v=5"></script>
-<script src="assets/js/app.js?v=5"></script>
+<script src="assets/js/data.js?v=7"></script>
+<script src="assets/js/app.js?v=7"></script>
 </body>
 </html>

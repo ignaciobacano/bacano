@@ -7,6 +7,12 @@ const $  = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => [...c.querySelectorAll(s)];
 
 const money = n => "$" + Math.round(n).toLocaleString("es-CL");
+
+/* Posición de scroll real: si algún navegador deja al body como contenedor
+   de scroll, window.scrollY se queda en 0 y hay que leerlo del body. */
+const scrollTop = () =>
+  window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+
 const waLink = (txt = "Hola Bacano, quiero cotizar un trabajo.") =>
   `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(txt)}`;
 
@@ -17,7 +23,7 @@ const I = {
   arrowR:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12 5l7 7-7 7"/></svg>`,
   arrowL:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H6M12 19l-7-7 7-7"/></svg>`,
   x:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>`,
-  menu:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>`,
+  menu:`<svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg>`,
   check:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
   shield:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z"/><path d="m9 12 2 2 4-4"/></svg>`,
   truck:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h11v11H2zM13 9h4l4 4v4h-8z"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17" cy="18.5" r="1.6"/></svg>`,
@@ -114,9 +120,18 @@ function buildHeader(){
   $("#closeMenu").onclick = () => $("#mobileNav").classList.remove("is-open");
   $("#openCart").onclick  = () => Cart.open();
 
+  /* el header se fija al desplazar y se esconde al bajar */
   const hdr = $("#hdr");
-  const onScroll = () => hdr.classList.toggle("is-stuck", window.scrollY > 8);
+  let last = scrollTop();
+  const onScroll = () => {
+    const y = scrollTop();
+    hdr.classList.toggle("is-stuck", y > 12);
+    const blocked = $("#mobileNav")?.classList.contains("is-open") || $("#drawer")?.classList.contains("is-open");
+    hdr.classList.toggle("is-hidden", !blocked && y > 260 && y > last + 4);
+    last = y;
+  };
   window.addEventListener("scroll", onScroll, { passive:true });
+  document.addEventListener("scroll", onScroll, { passive:true, capture:true });
   onScroll();
 }
 
@@ -191,6 +206,7 @@ function buildFooter(){
         <span>Sitio con compra segura · Datos protegidos</span>
       </div>
     </div>
+    <div class="footer__mark"><span class="wordmark">Bacano.</span></div>
   </footer>`;
 }
 
@@ -650,7 +666,7 @@ function renderCartPage(){
     host.innerHTML = `<div class="empty">${I.cart}
       <h4>Todavía no agregaste productos</h4>
       <p>Explorá el catálogo o pedinos una cotización a medida: letreros, stickers, pendones y más.</p>
-      <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap">
+      <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
         <a class="btn btn--red btn--sm" href="productos.html">Ver productos</a>
         <a class="btn btn--ghost btn--sm" href="contacto.html">Cotizar a medida</a>
       </div></div>`;
@@ -747,20 +763,214 @@ function initContacto(){
 }
 
 /* ============================================================
-   REVEAL + CONTADORES
+   MOVIMIENTO — revelados, palabras enmascaradas, cintas y cursor
    ============================================================ */
+const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* selectores que entran con máscara/desplazamiento al aparecer */
+const ANIM_SEL = ".reveal, .mask-img, .rule-draw, .heroX__mark, [data-split='done']";
+
+/* títulos que se parten palabra por palabra */
+const SPLIT_SEL = [
+  "h1.display", "h2.display", ".heroX h1", ".picks__head h2",
+  ".ctacard h3", ".testi__quote p", "[data-split]"
+].join(",");
+
+/* Envuelve cada palabra en <span class="rv"><i>palabra</i></span> */
+function splitWords(el){
+  if(!el || el.dataset.split === "done") return;
+
+  const walk = node => {
+    [...node.childNodes].forEach(n => {
+      if(n.nodeType === 3){
+        if(!n.textContent.trim()) return;
+        const frag = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(part => {
+          if(!part) return;
+          if(/^\s+$/.test(part)){ frag.append(document.createTextNode(" ")); return; }
+          const w = document.createElement("span");
+          w.className = "rv";
+          const i = document.createElement("i");
+          i.textContent = part;
+          w.append(i);
+          frag.append(w);
+        });
+        n.replaceWith(frag);
+      } else if(n.nodeType === 1 && n.tagName !== "BR" && !n.classList.contains("rv")){
+        walk(n);
+      }
+    });
+  };
+
+  walk(el);
+  el.dataset.split = "done";
+  $$(".rv > i", el).forEach((i, k) => i.style.transitionDelay = (k * 0.042).toFixed(3) + "s");
+}
+
 let revealObs = null;
+let ANIM_READY = false;   /* nada se anima hasta que cae el preloader */
+
 function observeReveal(){
-  if(!("IntersectionObserver" in window)){
-    $$(".reveal").forEach(el => el.classList.add("is-in"));
+  if(!ANIM_READY) return;
+  if(REDUCED || !("IntersectionObserver" in window)){
+    $$(ANIM_SEL).forEach(el => el.classList.add("is-in"));
     return;
   }
   revealObs = revealObs || new IntersectionObserver((entries, o) => {
     entries.forEach(en => {
       if(en.isIntersecting){ en.target.classList.add("is-in"); o.unobserve(en.target); }
     });
-  }, { threshold:.12, rootMargin:"0px 0px -40px" });
-  $$(".reveal:not(.is-in)").forEach(el => revealObs.observe(el));
+  }, { threshold:.14, rootMargin:"0px 0px -60px" });
+
+  $$(SPLIT_SEL).forEach(splitWords);
+  $$(ANIM_SEL).forEach(el => { if(!el.classList.contains("is-in")) revealObs.observe(el); });
+}
+
+/* Cintas infinitas: duplica el contenido hasta cubrir el ancho */
+function initMarquee(){
+  $$(".marquee").forEach(m => {
+    const row = $(".marquee__row", m);
+    if(!row || row.dataset.ready) return;
+    const base = row.innerHTML;
+    let guard = 0;
+    while(row.scrollWidth < m.offsetWidth * 2 && guard++ < 12) row.innerHTML += base;
+    const clone = row.cloneNode(true);
+    clone.setAttribute("aria-hidden", "true");
+    m.append(clone);
+    row.dataset.ready = "1";
+  });
+}
+
+/* Cursor propio (sólo puntero fino) */
+function initCursor(){
+  if(REDUCED || !window.matchMedia("(hover:hover) and (pointer:fine)").matches) return;
+  const c = document.createElement("div");
+  c.className = "cursor is-off";
+  document.body.append(c);
+
+  let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y;
+  addEventListener("mousemove", e => {
+    x = e.clientX; y = e.clientY;
+    c.classList.remove("is-off");
+    const hit = e.target.closest("a,button,input,select,textarea,.card,.pcard,.cat,label");
+    c.classList.toggle("is-big", !!hit);
+  }, { passive:true });
+  addEventListener("mouseleave", () => c.classList.add("is-off"));
+
+  (function loop(){
+    cx += (x - cx) * .18;
+    cy += (y - cy) * .18;
+    c.style.transform = `translate3d(${cx}px,${cy}px,0)`;
+    requestAnimationFrame(loop);
+  })();
+}
+
+/* Paralaje suave en medios marcados */
+function initParallax(){
+  const els = $$("[data-parallax]");
+  if(!els.length || REDUCED) return;
+  const run = () => {
+    els.forEach(el => {
+      const r = el.getBoundingClientRect();
+      if(r.bottom < 0 || r.top > innerHeight) return;
+      const p = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
+      const amt = parseFloat(el.dataset.parallax) || 40;
+      el.style.transform = `translate3d(0, ${(-p * amt).toFixed(2)}px, 0)`;
+    });
+    requestAnimationFrame(run);
+  };
+  requestAnimationFrame(run);
+}
+
+/* ============================================================
+   PRELOADER + TRANSICIÓN ENTRE PÁGINAS
+   ============================================================ */
+const SEEN_KEY = "bacano_seen_v1";
+const seen = () => { try { return !!sessionStorage.getItem(SEEN_KEY); } catch { return false; } };
+const markSeen = () => { try { sessionStorage.setItem(SEEN_KEY, "1"); } catch {} };
+
+function initPreloader(onDone){
+  const pre = $("#pre");
+  document.documentElement.classList.remove("is-loading");
+
+  if(!pre || seen() || REDUCED){
+    pre?.remove();
+    markSeen();
+    onDone();
+    return;
+  }
+
+  document.documentElement.classList.add("is-loading");
+  const cnt = $("#preCount", pre), bar = $("#preBar", pre);
+  const MIN = 1600;
+  const t0 = performance.now();
+  let p = 0, loaded = document.readyState === "complete";
+
+  addEventListener("load", () => loaded = true);
+
+  const finish = () => {
+    markSeen();
+    document.documentElement.classList.remove("is-loading");
+    pre.classList.add("is-done");
+    onDone();
+    setTimeout(() => pre.remove(), 1200);
+  };
+
+  const tick = ts => {
+    const e = ts - t0;
+    const target = (loaded && e > MIN) ? 100 : Math.min(94, (e / MIN) * 94);
+    p += (target - p) * .1;
+    if(target === 100 && p > 99.2) p = 100;
+    const v = Math.round(p);
+    if(cnt) cnt.textContent = String(v).padStart(3, "0");
+    if(bar) bar.style.width = v + "%";
+    if(v >= 100){ setTimeout(finish, 320); return; }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+function initPageTransition(){
+  const pt = $("#pt");
+  if(!pt) return;
+  const EASE = "cubic-bezier(.76,0,.24,1)";
+
+  /* la entrada la resuelve la animación CSS (@keyframes ptOut) */
+  const internal = a => {
+    if(!a || a.target === "_blank" || a.hasAttribute("download")) return false;
+    const href = a.getAttribute("href") || "";
+    if(!href || href.startsWith("#") || /^(mailto:|tel:|https?:)/i.test(href)) return false;
+    return /\.html(\?|#|$)/i.test(href) || href === "/";
+  };
+
+  document.addEventListener("click", e => {
+    if(e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    const a = e.target.closest("a");
+    if(!internal(a)) return;
+    const href = a.getAttribute("href");
+    if(href.split("#")[0] === PAGE) return;
+
+    e.preventDefault();
+    markSeen();
+    if(REDUCED){ location.href = href; return; }
+
+    pt.style.animation = "none";          /* anula la animación de entrada */
+    pt.style.transition = "none";
+    pt.style.transform = "translateY(100%)";
+    void pt.offsetWidth;
+    pt.style.transition = `transform .6s ${EASE}`;
+    pt.style.transform = "translateY(0)";
+    setTimeout(() => { location.href = href; }, 580);
+  });
+
+  /* volver con el botón atrás no debe dejar la cortina puesta */
+  addEventListener("pageshow", ev => {
+    if(ev.persisted){
+      pt.style.animation = "none";
+      pt.style.transition = "none";
+      pt.style.transform = "translateY(100%)";
+    }
+  });
 }
 
 function initCounters(){
@@ -800,8 +1010,18 @@ document.addEventListener("DOMContentLoaded", () => {
   initCheckout();
   initContacto();
   $$(".slider").forEach(initSlider);
-  observeReveal();
-  initCounters();
+
+  initMarquee();
+  initCursor();
+  initParallax();
+  initPageTransition();
+
+  /* el contenido no se anima hasta que el preloader termina */
+  initPreloader(() => {
+    ANIM_READY = true;
+    observeReveal();
+    initCounters();
+  });
 
   /* año dinámico y datos de contacto en el HTML */
   $$("[data-site]").forEach(el => {

@@ -1,27 +1,35 @@
 /* ============================================================
    BACANO.CL — Datos del sitio y catálogo
-   Fotografías: Unsplash (licencia libre, uso comercial permitido).
-   Para usar TUS propias fotos: reemplazá la URL por
-   "assets/img/fotos/mi-foto.jpg"
+
+   FOTOS  → trabajos reales de Bacano tomados de @bacanocl (Instagram).
+            Están en assets/img/fotos/, ya pasadas a blanco y negro con
+            el contraste del sitio. Para cambiarlas, reemplazá el archivo
+            manteniendo el nombre, o apuntá a otra ruta.
+   PRODUCTOS y CATEGORIAS → siguen con fotos de Unsplash (licencia libre).
    ============================================================ */
 
 /* helper: arma la URL de Unsplash con recorte y peso optimizado */
 const U = (id, w = 900, h = 0) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}${h ? "&h=" + h : ""}&q=80`;
 
+/* helper: foto propia dentro del repositorio */
+const F = name => `assets/img/fotos/${name}.jpg`;
+
 let FOTOS = {
-  heroPrincipal : U("photo-1550711273-843b73169f58", 1100),   // letrero LED luminoso
-  heroSecundaria: U("photo-1625768376503-68d2495d78c5", 600), // stickers
-  heroTerciaria : U("photo-1770017863955-56a1501a3c93", 600), // plóter gran formato
-  terreno       : U("photo-1749239043993-cf4f0315d42b", 1200), // persona pintando/instalando gráfica en muro
-  terreno2      : U("photo-1557333636-d06c0774b091", 1000),    // trabajo en altura sobre andamio
-  terreno3      : U("photo-1646011674845-f5c6e2cf50a4", 1000), // operario con equipo de seguridad
-  ploter        : U("photo-1770017863955-56a1501a3c93", 1000), // plóter de gran formato
-  ploterCorte   : U("photo-1596552571892-2dda2c594670", 1000), // cabezal de corte / troquelado
-  taller        : U("photo-1758708536058-142d64336046", 1000),
-  estampado     : U("photo-1773525912476-213bff96b8a4", 1000), // serigrafía / estampado textil
-  cliente       : U("photo-1753351055062-55b6bc51bb4f", 900),
-  local         : U("photo-1768225324952-07dc4e64a875", 1000)
+  heroPrincipal : F("bacano-letrero-taller"),    // letrero propio de Bacano en la fachada del taller
+  heroSecundaria: F("grafica-vehicular"),        // gráfica sobre camioneta
+  heroTerciaria : F("grafica-vehicular-2"),      // gráfica vehicular con QR
+  terreno       : F("letrero-fachada-alto"),     // letrero visto desde la vereda (vertical)
+  terreno2      : F("fachada-completa"),         // fachada completa con gráfica integral
+  terreno3      : F("plano-impreso"),            // plano de loteo impreso en gran formato
+  ploter        : F("impresion-gran-formato"),   // pliego impreso listo para entrega
+  ploterCorte   : F("corte-troquelado"),         // trabajo terminado sobre la mesa de corte
+  taller        : F("letras-corporeas"),         // letras corpóreas montadas en muro
+  cliente       : F("lona-local"),               // lona instalada en local
+  local         : F("local-grafica-vitrina"),    // local con gráfica en vitrina
+
+  /* sin equivalente en el Instagram: queda foto de stock hasta tener una propia */
+  estampado     : U("photo-1773525912476-213bff96b8a4", 1000) // serigrafía / estampado textil
 };
 
 let SITE = {
@@ -275,7 +283,7 @@ if(location.search.includes("preview=1") || location.hash.includes("preview")){
         const b = document.createElement("a");
         b.href = "admin.html";
         b.textContent = "◀ Vista previa del panel — volver a editar";
-        b.style.cssText = "position:fixed;left:0;right:0;bottom:0;z-index:999;background:#8b0f14;color:#fff;text-align:center;padding:9px;font:600 13px/1.2 system-ui;text-decoration:none";
+        b.style.cssText = "position:fixed;left:0;right:0;bottom:0;z-index:999;background:#000;color:#fff;text-align:center;padding:9px;font:600 13px/1.2 system-ui;text-decoration:none";
         document.body.appendChild(b);
       });
     }
