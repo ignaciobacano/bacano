@@ -17,3 +17,10 @@ bacano-respaldo-*.json
 *.tmp
 *.bak
 _hoja.html
+
+# Paquete para hosting
+_publicar/
+*.zip
+
+# NUNCA subir: tiene la contraseña de la base de datos
+config.php

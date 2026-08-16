@@ -1,0 +1,83 @@
+# ============================================================
+#  Bacano.cl — configuración del servidor
+#  Funciona en Apache y LiteSpeed (la mayoría de los hostings).
+#  Si tu hosting usa Nginx, este archivo se ignora: pedile al
+#  soporte que active compresión y caché.
+# ============================================================
+
+# ---------- Codificación ----------
+AddDefaultCharset UTF-8
+AddType image/svg+xml .svg
+AddType font/woff2 .woff2
+
+# ---------- No listar carpetas ----------
+Options -Indexes
+
+# ---------- Página de inicio ----------
+DirectoryIndex index.html
+
+# ---------- Forzar HTTPS ----------
+# Descomentá estas 3 líneas SOLO cuando el certificado SSL esté activo.
+# Si las activás sin certificado, el sitio deja de abrir.
+# RewriteEngine On
+# RewriteCond %{HTTPS} !=on
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# ---------- Compresión ----------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# ---------- Caché del navegador ----------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg               "access plus 1 year"
+  ExpiresByType image/png                "access plus 1 year"
+  ExpiresByType image/webp               "access plus 1 year"
+  ExpiresByType image/svg+xml            "access plus 1 year"
+  ExpiresByType font/woff2               "access plus 1 year"
+  ExpiresByType text/css                 "access plus 1 day"
+  ExpiresByType application/javascript   "access plus 1 day"
+  ExpiresByType text/html                "access plus 10 minutes"
+</IfModule>
+
+# ---------- El catálogo nunca se cachea ----------
+# Así, cuando subís un data.js nuevo, se ve al instante.
+<Files "data.js">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "no-store, must-revalidate"
+  </IfModule>
+</Files>
+
+# ---------- Archivos que no deben verse desde internet ----------
+<FilesMatch "\.(ps1|md|json|log|bak|sql|gitignore|gitattributes)$">
+  Require all denied
+</FilesMatch>
+<Files "launch.json">
+  Require all denied
+</Files>
+
+# ---------- La conexión a la base de datos, jamás accesible ----------
+<Files "config.php">
+  Require all denied
+</Files>
+
+# ---------- El instalador: borralo apenas termines ----------
+# Mientras exista, cualquiera que sepa la dirección puede abrirlo.
+# Si preferís dejarlo, descomentá esto y poné tu IP:
+# <Files "instalar.php">
+#   Require ip 200.100.50.25
+# </Files>
+
+# ---------- Panel de administración ----------
+# Para pedir usuario y contraseña al abrir /admin.html:
+# en cPanel entrá a "Directory Privacy" (o "Protect Directories"),
+# o descomentá esto y creá el .htpasswd con la herramienta del hosting.
+# <Files "admin.html">
+#   AuthType Basic
+#   AuthName "Panel Bacano"
+#   AuthUserFile /home/USUARIO/.htpasswd
+#   Require valid-user
+# </Files>

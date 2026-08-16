@@ -198,7 +198,9 @@ const TABS = [
   ["sitio",       "⚙️ Datos del sitio"],
   ["testimonios", "💬 Testimonios"],
   ["faqs",        "❓ Preguntas"],
-  ["publicar",    "🚀 Publicar"],
+  ["publicar",    "🚀 Publicar contenido"],
+  ["versiones",   "📤 Versiones del sitio"],
+  ["basedatos",   "🗄 Base de datos"],
   ["ayuda",       "📘 Cómo funciona"]
 ];
 function menu(){
@@ -214,8 +216,11 @@ function pintar(){
   const v = document.getElementById("view");
   v.innerHTML = ({
     productos:   vProductos, categorias: vCategorias, fotos: vFotos, sitio: vSitio,
-    testimonios: vTestimonios, faqs: vFaqs, publicar: vPublicar, ayuda: vAyuda
+    testimonios: vTestimonios, faqs: vFaqs, publicar: vPublicar, versiones: vVersiones,
+    basedatos: vBaseDatos, ayuda: vAyuda
   })[tab]();
+  if(tab === "versiones") cargarHistorial();
+  if(tab === "basedatos") cargarEstadoBD();
 }
 
 /* ============================================================
@@ -612,32 +617,64 @@ function descargarData(){
 /* ============================================================
    GITHUB
    ============================================================ */
+/* Lee la configuración. Si el formulario está en pantalla, mandan sus valores:
+   así no hace falta apretar "Guardar conexión" para que funcione. */
 function ghCfg(){
-  try{ return JSON.parse(localStorage.getItem(KGH)) || {}; }catch(e){ return {}; }
+  let g = {};
+  try{ g = JSON.parse(localStorage.getItem(KGH)) || {}; }catch(e){ g = {}; }
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ""; };
+  const limpio = t => t.replace(/\s+/g, "").replace(/^["']|["']$/g, "");
+  return {
+    usuario: v("ghUser")  || g.usuario || "",
+    repo:    v("ghRepo")  || g.repo    || "",
+    rama:    v("ghRama")  || g.rama    || "main",
+    token:   limpio(v("ghToken") || g.token || "")
+  };
 }
-function ghGuardar(){
-  const v = id => document.getElementById(id).value.trim();
-  localStorage.setItem(KGH, JSON.stringify({
-    usuario:v("ghUser"), repo:v("ghRepo"), rama:v("ghRama") || "main", token:v("ghToken")
-  }));
-  toast("Conexión guardada en este navegador");
-  pintar();
+function ghGuardar(aviso = true){
+  localStorage.setItem(KGH, JSON.stringify(ghCfg()));
+  if(aviso){ toast("Conexión guardada en este navegador"); pintar(); }
 }
+/* guarda solo al salir de cada campo, sin repintar */
+function ghAuto(){ ghGuardar(false); }
 function ghOlvidar(){
   if(!confirm("¿Borrar el token guardado en este navegador?")) return;
   const c = ghCfg(); delete c.token;
   localStorage.setItem(KGH, JSON.stringify(c)); pintar(); toast("Token borrado");
 }
+/* Traduce los errores típicos de GitHub a algo accionable */
+function ghError(status, mensaje){
+  if(status === 401) return "Token inválido o vencido (GitHub: «" + mensaje + "»). Generá uno nuevo y pegalo de nuevo, completo y sin espacios.";
+  if(status === 403) return "El token es válido pero no tiene permiso sobre este repositorio. Necesita «Contents: Read and write» (GitHub: «" + mensaje + "»).";
+  if(status === 404) return "No encuentro el repositorio, o el token no lo tiene incluido en «Repository access». Revisá usuario y nombre exacto.";
+  if(status === 409) return "El repositorio está vacío o la rama no existe todavía.";
+  if(status === 422) return "GitHub rechazó los datos: " + mensaje;
+  return "HTTP " + status + " — " + mensaje;
+}
+async function ghFetch(url, opts = {}){
+  const c = ghCfg();
+  if(!c.token) throw new Error("Falta el token. Pegalo en el campo «Token de acceso».");
+  if(!c.usuario || !c.repo) throw new Error("Faltan el usuario o el nombre del repositorio.");
+  let r;
+  try{
+    r = await fetch(url, {
+      ...opts,
+      headers: {
+        Authorization: "Bearer " + c.token,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        ...(opts.headers || {})
+      }
+    });
+  }catch(e){ throw new Error("Sin conexión con GitHub: " + e.message); }
+  if(r.status === 404 && (opts.method || "GET") === "GET" && !opts.estricto) return null;
+  const j = await r.json().catch(() => ({}));
+  if(!r.ok) throw new Error(ghError(r.status, j.message || ""));
+  return j;
+}
 async function ghApi(ruta, opts = {}){
   const c = ghCfg();
-  const r = await fetch(`https://api.github.com/repos/${c.usuario}/${c.repo}${ruta}`, {
-    ...opts,
-    headers: { Authorization:`Bearer ${c.token}`, Accept:"application/vnd.github+json", ...(opts.headers||{}) }
-  });
-  if(r.status === 404 && (opts.method || "GET") === "GET") return null;
-  const j = await r.json().catch(() => ({}));
-  if(!r.ok) throw new Error(j.message || ("HTTP " + r.status));
-  return j;
+  return ghFetch(`https://api.github.com/repos/${c.usuario}/${c.repo}${ruta}`, opts);
 }
 async function ghPut(ruta, contenidoB64, mensaje){
   const c = ghCfg();
@@ -676,17 +713,52 @@ async function publicar(){
     toast("¡Publicado!");
   }catch(e){
     log(e.message, "err");
-    log("Si dice 'Bad credentials', el token venció o está mal copiado.");
+    if(/permiso|403|Read and write/i.test(e.message)){
+      log("Arreglo: GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens.");
+      log("Abrí el token → Permissions → Repository permissions → Contents → «Read and write» → botón «Update token» al final.");
+      log("El token no cambia: no hace falta volver a copiarlo, solo recargar esta página.");
+    }
   }
   btn.disabled = false;
 }
 async function probarConexion(){
+  const c = ghCfg();
   document.getElementById("log").innerHTML = "";
+  ghGuardar(false);
+
+  log("Token recibido: " + (c.token ? c.token.slice(0,11) + "… (" + c.token.length + " caracteres)" : "VACÍO"));
+  if(!c.token){ log("Pegá el token en el campo de arriba.", "err"); return; }
+  if(!/^(github_pat_|ghp_)/.test(c.token))
+    log("Ojo: no empieza con github_pat_ ni ghp_. ¿Copiaste el token completo?", "err");
+
+  /* 1 · ¿el token existe y está vigente? */
+  let quien = null;
   try{
-    const r = await ghApi("");
-    log(r ? "Conexión correcta con " + r.full_name : "Repositorio no encontrado", r ? "ok" : "err");
-    if(r) log("Permiso de escritura: " + (r.permissions && r.permissions.push ? "sí" : "NO — el token no puede escribir"), r.permissions && r.permissions.push ? "ok" : "err");
-  }catch(e){ log(e.message, "err"); }
+    quien = await ghFetch("https://api.github.com/user", { estricto:true });
+    log("Token válido — cuenta: " + quien.login, "ok");
+  }catch(e){
+    log(e.message, "err");
+    log("Causas típicas: el token venció, fue revocado, o se copió cortado.");
+    return;
+  }
+
+  /* 2 · ¿ve el repositorio? */
+  try{
+    const r = await ghApi("", { estricto:true });
+    log("Repositorio encontrado: " + r.full_name + " (" + r.visibility + ")", "ok");
+    if(quien.login.toLowerCase() !== c.usuario.toLowerCase())
+      log("El token pertenece a «" + quien.login + "» pero el usuario configurado es «" + c.usuario + "».");
+    if(r.permissions && r.permissions.push) log("Permiso de escritura: sí", "ok");
+    else log("Permiso de escritura: NO. Editá el token y dale «Contents: Read and write».", "err");
+
+    /* 3 · ¿existe la rama? */
+    const ref = await ghApi("/git/ref/heads/" + c.rama);
+    if(ref) log("Rama " + c.rama + " lista (" + ref.object.sha.slice(0,7) + ")", "ok");
+    else log("La rama «" + c.rama + "» no existe en el repositorio.", "err");
+  }catch(e){
+    log(e.message, "err");
+    log("Si el token es fine-grained, revisá que en «Repository access» esté incluido este repositorio.");
+  }
 }
 
 function vPublicar(){
@@ -698,14 +770,14 @@ function vPublicar(){
     <h3 style="font-size:1.05rem;margin-bottom:6px">Opción A · Publicar desde el panel</h3>
     <p class="muted" style="margin-bottom:18px">El panel escribe <code>assets/js/data.js</code> directamente en tu repositorio. El token queda guardado solo en este navegador, nunca se sube al sitio.</p>
     <div class="grid3">
-      <div><label class="f">Usuario de GitHub</label><input class="in" id="ghUser" value="${esc(c.usuario||"ignaciobacano")}" placeholder="mi-usuario"></div>
-      <div><label class="f">Repositorio</label><input class="in" id="ghRepo" value="${esc(c.repo||"bacano")}" placeholder="bacano"></div>
-      <div><label class="f">Rama</label><input class="in" id="ghRama" value="${esc(c.rama||"main")}"></div>
+      <div><label class="f">Usuario de GitHub</label><input class="in" id="ghUser" onblur="ghAuto()" value="${esc(c.usuario||"ignaciobacano")}" placeholder="mi-usuario"></div>
+      <div><label class="f">Repositorio</label><input class="in" id="ghRepo" onblur="ghAuto()" value="${esc(c.repo||"bacano")}" placeholder="bacano"></div>
+      <div><label class="f">Rama</label><input class="in" id="ghRama" onblur="ghAuto()" value="${esc(c.rama||"main")}"></div>
     </div>
     <div style="margin-top:14px">
       <label class="f">Token de acceso (fine-grained, permiso Contents: Read and write)</label>
-      <input class="in" id="ghToken" type="password" value="${esc(c.token||"")}" placeholder="github_pat_…">
-      <p class="hint">Creálo en GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens, y dale acceso <b>solo a este repositorio</b>.</p>
+      <input class="in" id="ghToken" type="password" onblur="ghAuto()" value="${esc(c.token||"")}" placeholder="github_pat_…">
+      <p class="hint">Creálo en GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens, y dale acceso <b>solo a este repositorio</b> con permiso <b>Contents: Read and write</b>. Se guarda solo en este navegador: no lo pegues en chats ni correos, y si se te escapa, revocalo y generá otro.</p>
     </div>
     <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
       <button class="btn btn--ghost btn--sm" onclick="ghGuardar()">Guardar conexión</button>
@@ -715,6 +787,7 @@ function vPublicar(){
       <button class="btn btn--red" id="btnPub" onclick="publicar()">🚀 Publicar cambios</button>
     </div>
     <div class="log" id="log" style="margin-top:16px">Esperando…</div>
+    <p class="hint" style="margin-top:12px">Esto sube solo el catálogo y los textos. Para publicar páginas, estilos o fotos nuevas usá <a href="#" onclick="ir('versiones');return false" style="text-decoration:underline"><b>Versiones del sitio</b></a>.</p>
   </div>
 
   <div class="card">
@@ -752,6 +825,452 @@ function importarRespaldo(file){
 }
 
 /* ============================================================
+   VERSIONES — publicar el sitio completo en GitHub
+   ============================================================ */
+let ARCHIVOS = [], DIFF = null;
+
+const IGNORAR = [
+  /^\.git\//, /^\.claude(\/|\.zip$)/, /^\.vscode\//, /^\.idea\//,
+  /(^|\/)Thumbs\.db$/i, /(^|\/)desktop\.ini$/i, /(^|\/)\.DS_Store$/i,
+  /\.(tmp|bak|swp)$/i, /(^|\/)bacano-respaldo-.*\.json$/i, /^_hoja\.html$/
+];
+const rutaRel = f => {
+  const p = f.webkitRelativePath || f.name;
+  return p.includes("/") ? p.split("/").slice(1).join("/") : p;
+};
+const kb = n => n < 1024 ? n + " B" : (n / 1024).toFixed(n < 102400 ? 1 : 0) + " KB";
+
+async function sha1Git(buf){
+  const cab  = new TextEncoder().encode("blob " + buf.byteLength + "\0");
+  const todo = new Uint8Array(cab.length + buf.byteLength);
+  todo.set(cab, 0); todo.set(new Uint8Array(buf), cab.length);
+  const h = await crypto.subtle.digest("SHA-1", todo);
+  return [...new Uint8Array(h)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+function b64buf(buf){
+  const b = new Uint8Array(buf); let s = "", t = 0x8000;
+  for(let i = 0; i < b.length; i += t) s += String.fromCharCode.apply(null, b.subarray(i, i + t));
+  return btoa(s);
+}
+
+async function leerCarpeta(files){
+  const c = ghCfg();
+  if(!c.token || !c.repo){ alert("Primero configurá la conexión en «Publicar contenido»."); return; }
+  const el = document.getElementById("vLog");
+  el.innerHTML = ""; log2("Leyendo carpeta…");
+  ARCHIVOS = [];
+  const lista = [...files].filter(f => { const p = rutaRel(f); return p && !IGNORAR.some(r => r.test(p)); });
+  for(const f of lista){
+    const buf = await f.arrayBuffer();
+    ARCHIVOS.push({ ruta: rutaRel(f), buf, tam: f.size, sha: await sha1Git(buf) });
+  }
+  log2(ARCHIVOS.length + " archivos leídos", "ok");
+  try{
+    await compararGitHub();
+    pintarDiff();
+  }catch(e){ log2(e.message, "err"); }
+}
+
+async function compararGitHub(){
+  const c = ghCfg();
+  log2("Comparando con GitHub…");
+  const ref    = await ghApi(`/git/ref/heads/${c.rama}`);
+  if(!ref) throw new Error("No encuentro la rama " + c.rama + " en el repositorio.");
+  const head   = ref.object.sha;
+  const commit = await ghApi(`/git/commits/${head}`);
+  const arbol  = await ghApi(`/git/trees/${commit.tree.sha}?recursive=1`);
+  const remoto = new Map(arbol.tree.filter(t => t.type === "blob").map(t => [t.path, t.sha]));
+
+  const nuevos = [], cambiados = [], iguales = [];
+  ARCHIVOS.forEach(a => {
+    if(!remoto.has(a.ruta)) nuevos.push(a);
+    else if(remoto.get(a.ruta) !== a.sha) cambiados.push(a);
+    else iguales.push(a);
+    remoto.delete(a.ruta);
+  });
+  DIFF = { nuevos, cambiados, iguales, borrados: [...remoto.keys()], head, tree: commit.tree.sha };
+  log2(`${nuevos.length} nuevos · ${cambiados.length} modificados · ${iguales.length} sin cambios · ${DIFF.borrados.length} solo en GitHub`, "ok");
+}
+
+function pintarDiff(){
+  const z = document.getElementById("vDiff");
+  if(!DIFF){ z.innerHTML = ""; return; }
+  const fila = (a, tipo) => `<div class="row" style="padding:8px 12px">
+      <span class="tg ${tipo === 'nuevo' ? 'red' : ''}" style="flex:none">${tipo}</span>
+      <div class="info"><b style="font-size:.85rem;font-weight:600">${esc(a.ruta || a)}</b></div>
+      <span class="muted" style="flex:none;font-size:.76rem">${a.tam !== undefined ? kb(a.tam) : ""}</span>
+    </div>`;
+  const total = DIFF.nuevos.length + DIFF.cambiados.length;
+  z.innerHTML = `
+    <div class="card">
+      <div class="head" style="margin-bottom:12px">
+        <h3 style="font-size:1rem">Cambios detectados</h3><span class="sep"></span>
+        <span class="chip ${total ? "warn" : "ok"}" style="background:${total ? "#fff4e0" : "#e6f4ec"};color:${total ? "#8a5a00" : "#1c7a4b"}">
+          ${total ? total + " archivo(s) a subir" : "Todo al día"}
+        </span>
+      </div>
+      <div class="list">
+        ${DIFF.cambiados.map(a => fila(a, "modificado")).join("")}
+        ${DIFF.nuevos.map(a => fila(a, "nuevo")).join("")}
+        ${DIFF.borrados.map(p => fila(p, "solo en GitHub")).join("")}
+      </div>
+      ${DIFF.iguales.length ? `<p class="hint" style="margin-top:12px">${DIFF.iguales.length} archivo(s) idénticos, no se vuelven a subir.</p>` : ""}
+      ${DIFF.borrados.length ? `<label class="check" style="margin-top:12px;display:flex;gap:9px;align-items:center">
+        <input type="checkbox" id="vBorrar"> <span style="font-size:.86rem">Eliminar del repositorio los archivos que ya no están en mi carpeta</span>
+      </label>` : ""}
+    </div>
+
+    <div class="card">
+      <label class="f">Nombre de esta versión</label>
+      <input class="in" id="vMsg" value="Nueva versión del sitio" placeholder="Ej: rediseño de la home">
+      <div class="grid2" style="margin-top:14px">
+        <div>
+          <label class="f">Etiqueta (opcional)</label>
+          <input class="in" id="vTag" placeholder="v1.0">
+          <p class="hint">Queda como punto de restauración con nombre propio.</p>
+        </div>
+        <div>
+          <label class="f">data.js</label>
+          <label class="check" style="display:flex;gap:9px;align-items:center;padding-top:10px">
+            <input type="checkbox" id="vPanel" ${sucio ? "checked" : ""}>
+            <span style="font-size:.86rem">Usar el contenido editado en el panel</span>
+          </label>
+          <p class="hint">Si lo dejás sin marcar, se sube el archivo tal cual está en tu carpeta.</p>
+        </div>
+      </div>
+      <button class="btn btn--red" id="btnVer" style="margin-top:18px" onclick="publicarSitio()" ${total || DIFF.borrados.length ? "" : "disabled"}>
+        📤 Publicar esta versión
+      </button>
+    </div>`;
+}
+
+function log2(msg, tipo){
+  const l = document.getElementById("vLog");
+  if(!l) return;
+  l.innerHTML += (tipo === "ok" ? `<b>✓ ${msg}</b>` : tipo === "err" ? `<i>✕ ${msg}</i>` : `· ${msg}`) + "\n";
+  l.scrollTop = l.scrollHeight;
+}
+
+async function publicarSitio(){
+  const c = ghCfg();
+  const btn = document.getElementById("btnVer");
+  btn.disabled = true;
+  const msg    = document.getElementById("vMsg").value.trim() || "Nueva versión del sitio";
+  const tag    = document.getElementById("vTag").value.trim();
+  const borrar = document.getElementById("vBorrar")?.checked;
+  const usarPanel = document.getElementById("vPanel")?.checked;
+
+  try{
+    const subir = [...DIFF.cambiados, ...DIFF.nuevos];
+    const arbol = [];
+
+    for(const a of subir){
+      let contenido;
+      if(usarPanel && a.ruta === "assets/js/data.js"){
+        contenido = b64txt(generarData());
+        log2("data.js → contenido del panel");
+      }else{
+        contenido = b64buf(a.buf);
+      }
+      const blob = await ghApi("/git/blobs", { method:"POST", body: JSON.stringify({ content: contenido, encoding:"base64" }) });
+      arbol.push({ path: a.ruta, mode:"100644", type:"blob", sha: blob.sha });
+      log2("subido " + a.ruta);
+    }
+
+    /* si el panel tiene cambios y data.js no estaba entre los modificados, se agrega igual */
+    if(usarPanel && !subir.some(a => a.ruta === "assets/js/data.js")){
+      const blob = await ghApi("/git/blobs", { method:"POST", body: JSON.stringify({ content: b64txt(generarData()), encoding:"base64" }) });
+      arbol.push({ path:"assets/js/data.js", mode:"100644", type:"blob", sha: blob.sha });
+      log2("subido assets/js/data.js (contenido del panel)");
+    }
+
+    if(borrar) DIFF.borrados.forEach(p => arbol.push({ path:p, mode:"100644", type:"blob", sha:null }));
+
+    if(!arbol.length){ log2("No hay nada que publicar.", "err"); btn.disabled = false; return; }
+
+    log2("Armando la versión…");
+    const nuevoArbol = await ghApi("/git/trees", { method:"POST", body: JSON.stringify({ base_tree: DIFF.tree, tree: arbol }) });
+    const commit     = await ghApi("/git/commits", { method:"POST", body: JSON.stringify({ message: msg, tree: nuevoArbol.sha, parents:[DIFF.head] }) });
+    await ghApi(`/git/refs/heads/${c.rama}`, { method:"PATCH", body: JSON.stringify({ sha: commit.sha }) });
+    log2("Versión publicada: " + commit.sha.slice(0,7) + " — " + msg, "ok");
+
+    if(tag){
+      await ghApi("/git/refs", { method:"POST", body: JSON.stringify({ ref:"refs/tags/" + tag, sha: commit.sha }) });
+      log2("Etiqueta " + tag + " creada", "ok");
+    }
+
+    sucio = false; estado();
+    log2("GitHub Pages tarda entre 30 s y 2 min en mostrar los cambios.");
+    toast("¡Versión publicada!");
+    DIFF = null; ARCHIVOS = [];
+    document.getElementById("vDiff").innerHTML =
+      `<div class="card"><p style="margin:0">Versión <b>${commit.sha.slice(0,7)}</b> publicada. Volvé a elegir la carpeta si hacés más cambios.</p></div>`;
+    cargarHistorial();
+  }catch(e){
+    log2(e.message, "err");
+    if(/permiso|403|Read and write/i.test(e.message)){
+      log2("Abrí el token en GitHub → Permissions → Repository permissions → Contents → «Read and write» → «Update token».");
+      log2("El token sigue siendo el mismo: alcanza con recargar esta página.");
+    }
+    if(/not fast forward|is at/i.test(e.message)) log2("Alguien más publicó mientras editabas: volvé a elegir la carpeta para comparar de nuevo.");
+    btn.disabled = false;
+  }
+}
+
+async function cargarHistorial(){
+  const z = document.getElementById("histo");
+  if(!z) return;
+  const c = ghCfg();
+  if(!c.token || !c.repo){ z.innerHTML = `<p class="muted">Configurá la conexión en «Publicar contenido» para ver el historial.</p>`; return; }
+  z.innerHTML = `<p class="muted">Cargando…</p>`;
+  try{
+    const lista = await ghApi(`/commits?sha=${c.rama}&per_page=12`);
+    if(!lista || !lista.length){ z.innerHTML = `<p class="muted">Sin versiones todavía.</p>`; return; }
+    z.innerHTML = `<div class="list">${lista.map((v,i) => `
+      <div class="row">
+        <div class="info">
+          <b>${esc(v.commit.message.split("\n")[0])}</b>
+          <span>${new Date(v.commit.author.date).toLocaleString("es-CL")} · ${esc(v.commit.author.name)} · <code>${v.sha.slice(0,7)}</code>${i===0?" · <b style='color:var(--ok)'>versión actual</b>":""}</span>
+        </div>
+        <div class="acts">
+          <a class="ico" title="Ver en GitHub" href="${v.html_url}" target="_blank" rel="noopener">↗</a>
+          ${i === 0 ? "" : `<button class="ico" title="Restaurar esta versión" onclick="restaurar('${v.sha}')">⟲</button>`}
+        </div>
+      </div>`).join("")}</div>`;
+  }catch(e){ z.innerHTML = `<p class="muted">No se pudo leer el historial: ${esc(e.message)}</p>`; }
+}
+
+async function restaurar(sha){
+  if(!confirm("Se publica una versión nueva con el contenido de " + sha.slice(0,7) + ".\nNo se borra nada del historial. ¿Seguir?")) return;
+  const c = ghCfg();
+  try{
+    const viejo = await ghApi(`/git/commits/${sha}`);
+    const ref   = await ghApi(`/git/ref/heads/${c.rama}`);
+    const nuevo = await ghApi("/git/commits", { method:"POST", body: JSON.stringify({
+      message: "Restaura la versión " + sha.slice(0,7), tree: viejo.tree.sha, parents: [ref.object.sha]
+    })});
+    await ghApi(`/git/refs/heads/${c.rama}`, { method:"PATCH", body: JSON.stringify({ sha: nuevo.sha }) });
+    toast("Versión restaurada");
+    cargarHistorial();
+  }catch(e){ alert("No se pudo restaurar: " + e.message); }
+}
+
+function vVersiones(){
+  const c = ghCfg();
+  const conectado = c.token && c.repo;
+  return `
+  <div class="head">
+    <div><h2>Versiones del sitio</h2><p class="muted" style="margin:4px 0 0">Subí a GitHub el sitio completo — páginas, estilos, fotos — en una sola versión</p></div>
+  </div>
+
+  ${conectado ? `<div class="card" style="border-color:#cfe8da;background:#f4fbf7">
+      <p style="margin:0;font-size:.9rem">Conectado a <b>${esc(c.usuario)}/${esc(c.repo)}</b> · rama <b>${esc(c.rama)}</b></p>
+    </div>`
+   : `<div class="card" style="border-color:#f2c9cb;background:#fdf3f3">
+      <p style="margin:0 0 12px">Todavía no configuraste la conexión con GitHub.</p>
+      <button class="btn btn--red btn--sm" onclick="ir('publicar')">Configurar ahora</button>
+    </div>`}
+
+  <div class="card">
+    <h3 style="font-size:1.05rem;margin-bottom:6px">1 · Elegí la carpeta del sitio</h3>
+    <p class="muted" style="margin-bottom:16px">Seleccioná la carpeta <code>Web Bacano</code> completa. El panel compara archivo por archivo con GitHub y sube solo lo que cambió.</p>
+    <input type="file" id="dirSitio" webkitdirectory directory multiple hidden onchange="leerCarpeta(this.files)">
+    <button class="btn" onclick="document.getElementById('dirSitio').click()" ${conectado ? "" : "disabled"}>📁 Elegir carpeta</button>
+    <p class="hint" style="margin-top:10px">El navegador te va a pedir permiso para leer la carpeta. Nada sale de tu equipo salvo los archivos que decidas publicar.</p>
+    <div class="log" id="vLog" style="margin-top:16px">Esperando…</div>
+  </div>
+
+  <div id="vDiff"></div>
+
+  <div class="head" style="margin-top:26px">
+    <h2 style="font-size:1.15rem">Historial</h2><span class="sep"></span>
+    <button class="btn btn--ghost btn--sm" onclick="cargarHistorial()">Actualizar</button>
+  </div>
+  <div id="histo"></div>`;
+}
+
+/* ============================================================
+   BASE DE DATOS (hosting con PHP + MySQL)
+   ============================================================ */
+async function api(accion, datos){
+  const o = { headers: { "X-Bacano":"1" } };
+  if(datos !== undefined){
+    o.method = "POST";
+    o.headers["Content-Type"] = "application/json";
+    o.body = JSON.stringify(datos);
+  }
+  let r;
+  try{ r = await fetch("api.php?accion=" + accion, o); }
+  catch(e){ throw new Error("No se pudo contactar api.php: " + e.message); }
+  const txt = await r.text();
+  let j;
+  try{ j = JSON.parse(txt); }
+  catch(e){
+    throw new Error("El servidor no ejecutó api.php. Esto funciona solo con el sitio subido a un hosting con PHP, no abriendo el archivo desde tu PC.");
+  }
+  if(!j.ok) throw new Error(j.error || ("Error " + r.status));
+  return j;
+}
+
+async function cargarEstadoBD(){
+  const z = document.getElementById("bdEstado");
+  if(!z) return;
+  z.innerHTML = `<div class="card"><p class="muted" style="margin:0">Consultando el servidor…</p></div>`;
+  let e;
+  try{ e = await api("estado"); }
+  catch(err){
+    z.innerHTML = `<div class="card" style="border-color:#f2c9cb;background:#fdf3f3">
+      <h3 style="font-size:1rem;margin-bottom:8px">Sin conexión con el servidor</h3>
+      <p class="muted" style="margin:0 0 12px">${esc(err.message)}</p>
+      <p class="hint" style="margin:0">La base de datos es opcional: sin ella el panel sigue funcionando con archivos, publicando <code>data.js</code>.</p>
+    </div>`;
+    return;
+  }
+
+  if(!e.instalado){
+    z.innerHTML = `<div class="card">
+      <h3 style="font-size:1.05rem;margin-bottom:8px">Base de datos sin instalar</h3>
+      <p class="muted" style="margin-bottom:16px">El asistente te guía en 5 pasos: revisa el servidor, conecta la base, crea tu usuario, carga el catálogo actual y guarda la configuración.</p>
+      <a class="btn btn--red" href="instalar.php" target="_blank">Abrir el instalador →</a>
+    </div>`;
+    return;
+  }
+
+  if(!e.sesion){
+    z.innerHTML = `<div class="card" style="max-width:420px">
+      <h3 style="font-size:1.05rem;margin-bottom:6px">Iniciar sesión</h3>
+      <p class="muted" style="margin-bottom:16px">Con el usuario que creaste en el instalador.</p>
+      <form onsubmit="return entrarBD(event)">
+        <label class="f">Usuario</label>
+        <input class="in" name="usuario" autocomplete="username" required>
+        <label class="f" style="margin-top:12px">Contraseña</label>
+        <input class="in" name="clave" type="password" autocomplete="current-password" required>
+        <button class="btn btn--red" style="margin-top:18px" type="submit">Entrar</button>
+      </form>
+      <div class="log" id="bdLog" style="margin-top:16px;display:none"></div>
+    </div>`;
+    return;
+  }
+
+  const c = e.contadores || {};
+  z.innerHTML = `
+    <div class="card" style="border-color:#cfe8da;background:#f4fbf7">
+      <p style="margin:0;font-size:.9rem">Conectado como <b>${esc(e.usuario)}</b> · ${c.productos ?? "?"} productos, ${c.categorias ?? "?"} categorías en la base
+      ${e.data_js ? ` · <span class="muted">data.js publicado el ${esc(e.data_js)}</span>` : ""}</p>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:1.05rem;margin-bottom:6px">Sincronizar</h3>
+      <p class="muted" style="margin-bottom:16px">El panel edita en tu navegador; la base guarda la versión oficial; <code>data.js</code> es lo que ve el público.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" onclick="bajarBD()">⬇ Traer desde la base</button>
+        <button class="btn btn--ghost" onclick="subirBD()">⬆ Guardar en la base</button>
+        <button class="btn btn--red" onclick="publicarBD()">🚀 Guardar y publicar</button>
+        <button class="btn btn--ghost btn--sm" onclick="salirBD()">Cerrar sesión</button>
+      </div>
+      <div class="log" id="bdLog" style="margin-top:16px">Esperando…</div>
+    </div>
+
+    <div class="head" style="margin-top:26px">
+      <h2 style="font-size:1.15rem">Pedidos ${c.pendientes ? `<span class="tg red">${c.pendientes} nuevos</span>` : ""}</h2>
+      <span class="sep"></span>
+      <button class="btn btn--ghost btn--sm" onclick="cargarPedidos()">Ver pedidos</button>
+    </div>
+    <div id="bdPedidos"></div>`;
+}
+
+function bdLog(m, t){
+  const l = document.getElementById("bdLog");
+  if(!l) return;
+  l.style.display = "block";
+  l.innerHTML += (t === "ok" ? `<b>✓ ${m}</b>` : t === "err" ? `<i>✕ ${m}</i>` : `· ${m}`) + "\n";
+  l.scrollTop = l.scrollHeight;
+}
+
+async function entrarBD(ev){
+  ev.preventDefault();
+  const f = new FormData(ev.target);
+  try{
+    await api("login", { usuario: f.get("usuario"), clave: f.get("clave") });
+    toast("Sesión iniciada");
+    cargarEstadoBD();
+  }catch(e){ bdLog(e.message, "err"); }
+  return false;
+}
+async function salirBD(){ try{ await api("salir"); }catch(e){} cargarEstadoBD(); }
+
+async function bajarBD(){
+  if(sucio && !confirm("Tenés cambios sin publicar en el panel. Traer desde la base los reemplaza. ¿Seguir?")) return;
+  try{
+    const r = await api("leer");
+    S = Object.assign(semilla(), r.datos);
+    guardar(false); sucio = false; estado();
+    bdLog("Contenido traído desde la base de datos", "ok");
+    toast("Panel actualizado desde la base");
+  }catch(e){ bdLog(e.message, "err"); }
+}
+async function subirBD(){
+  try{
+    await api("guardar", S);
+    bdLog("Guardado en la base de datos", "ok");
+    toast("Guardado en la base");
+  }catch(e){ bdLog(e.message, "err"); }
+}
+async function publicarBD(){
+  try{
+    bdLog("Guardando en la base…");
+    const r = await api("publicar", S);
+    bdLog("data.js regenerado (" + r.bytes + " bytes) el " + r.fecha, "ok");
+    sucio = false; estado();
+    toast("¡Sitio publicado!");
+    cargarEstadoBD();
+  }catch(e){ bdLog(e.message, "err"); }
+}
+
+async function cargarPedidos(){
+  const z = document.getElementById("bdPedidos");
+  z.innerHTML = `<p class="muted">Cargando…</p>`;
+  try{
+    const r = await api("pedidos");
+    if(!r.pedidos.length){ z.innerHTML = `<p class="muted">Todavía no hay pedidos.</p>`; return; }
+    z.innerHTML = `<div class="list">${r.pedidos.map(p => `
+      <div class="row">
+        <div class="info">
+          <b>${esc(p.numero)} · ${esc(p.nombre || "sin nombre")}</b>
+          <span>${clp(p.total)} · ${esc(p.entrega || "")} · ${esc(p.creado)}</span>
+          <div class="tagline">
+            <span class="tg ${p.estado === "nuevo" ? "red" : ""}">${esc(p.estado)}</span>
+            ${(p.items || []).map(i => `<span class="tg">${esc(i.qty + "× " + (i.nombre || i.id))}</span>`).join("")}
+          </div>
+        </div>
+        <div class="acts">
+          ${p.email ? `<a class="ico" title="Escribir" href="mailto:${esc(p.email)}">✉</a>` : ""}
+          <button class="ico" title="Marcar como listo" onclick="marcarPedido('${esc(p.numero)}','listo')">✓</button>
+        </div>
+      </div>`).join("")}</div>`;
+  }catch(e){ z.innerHTML = `<p class="muted">${esc(e.message)}</p>`; }
+}
+async function marcarPedido(numero, estado){
+  try{ await api("estado_pedido", { numero, estado }); cargarPedidos(); toast("Pedido actualizado"); }
+  catch(e){ alert(e.message); }
+}
+
+function vBaseDatos(){
+  return `
+  <div class="head">
+    <div><h2>Base de datos</h2><p class="muted" style="margin:4px 0 0">Opcional. Con un hosting con PHP y MySQL, el panel publica solo y guarda los pedidos del carrito.</p></div>
+  </div>
+  <div id="bdEstado"></div>
+
+  <div class="card" style="margin-top:22px">
+    <h3 style="font-size:1rem;margin-bottom:10px">Cómo encaja cada pieza</h3>
+    <p class="muted" style="margin:0 0 8px"><b>Panel</b> — donde editás. Guarda un borrador en tu navegador.</p>
+    <p class="muted" style="margin:0 0 8px"><b>Base de datos</b> — la versión oficial del catálogo, con historial de pedidos.</p>
+    <p class="muted" style="margin:0"><b>data.js</b> — el archivo que lee el sitio público. Se regenera solo al publicar, por eso el sitio sigue siendo rápido aunque haya base de datos.</p>
+  </div>`;
+}
+
+/* ============================================================
    AYUDA
    ============================================================ */
 function vAyuda(){
@@ -767,6 +1286,13 @@ function vAyuda(){
       <li>En un minuto tu sitio queda en <code>https://tu-usuario.github.io/bacano/</code>.</li>
       <li>Cuando tengas el dominio <b>bacano.cl</b>, ponelo en <b>Settings → Pages → Custom domain</b> y apuntá el DNS a GitHub.</li>
     </ol>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:1.05rem;margin-bottom:14px">Dos formas de publicar</h3>
+    <p class="muted"><b>Publicar contenido</b> — sube solo <code>assets/js/data.js</code>: productos, precios, textos, testimonios. Es lo del día a día y tarda un segundo.</p>
+    <p class="muted" style="margin-top:10px"><b>Versiones del sitio</b> — sube el sitio entero: páginas, estilos, JavaScript y fotos. Elegís la carpeta, el panel compara con GitHub, te muestra qué cambió y publica todo en una sola versión con su nombre. Sirve cuando cambiaste diseño o agregaste páginas.</p>
+    <p class="muted" style="margin-top:10px">Cada versión queda en el historial: podés ver cuándo se publicó y volver a cualquiera con el botón <b>⟲</b>, que crea una versión nueva con ese contenido sin borrar nada.</p>
   </div>
 
   <div class="card">
