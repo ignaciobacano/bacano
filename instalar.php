@@ -219,8 +219,9 @@ $listo = isset($_GET['listo']);
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);font-family:Inter,system-ui,sans-serif;color:var(--black)}
 .top{background:var(--black);color:#fff;padding:16px 22px;display:flex;align-items:center;gap:10px}
-.top b{font-family:Anton,sans-serif;font-size:1.3rem;text-transform:uppercase;letter-spacing:.02em}
-.top b i{color:var(--red2);font-style:normal}
+.top b{display:block;height:30px;aspect-ratio:1065/456;background:#fff;
+       -webkit-mask:url(assets/img/logo-bacano.png) center/contain no-repeat;
+               mask:url(assets/img/logo-bacano.png) center/contain no-repeat}
 .top span{margin-left:auto;font-size:.78rem;color:#9a9aa5}
 main{max-width:760px;margin:0 auto;padding:30px 20px 70px}
 .pasos{display:flex;gap:8px;margin-bottom:26px;flex-wrap:wrap}
@@ -254,7 +255,7 @@ code{background:var(--paper);padding:2px 6px;border-radius:5px;border:1px solid 
 </style>
 </head>
 <body>
-<div class="top"><b>Bacano<i>.</i></b> <span>Instalador de la base de datos</span></div>
+<div class="top"><b role="img" aria-label="Bacano Estudio Creativo"></b><span>Instalador de la base de datos</span></div>
 <main>
 
 <?php if ($paso === 0): ?>

@@ -55,15 +55,6 @@ const I = {
   medal:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5.5"/><path d="m8.5 13.8-1.6 7 5.1-2.8 5.1 2.8-1.6-7"/></svg>`
 };
 
-const LOGO_SVG = `<svg viewBox="0 0 240 220" fill="none" aria-hidden="true">
-  <g stroke="currentColor" stroke-width="15" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M24 115C62 58 178 58 216 115 178 172 62 172 24 115Z"/><circle cx="120" cy="115" r="36"/>
-    <path d="M120 59V31"/><path d="m172.8 69.1 17.2-22.9"/><path d="M67.2 69.1 50 46.2"/>
-    <path d="m203.4 91.3 27.2-11.8"/><path d="M36.6 91.3 9.4 79.5"/><path d="m203.4 138.7 27.2 11.8"/>
-    <path d="M36.6 138.7 9.4 150.5"/><path d="m172.8 160.9 17.2 22.9"/><path d="M67.2 160.9 50 183.8"/>
-    <path d="M120 171v28"/>
-  </g><circle cx="120" cy="115" r="15" fill="currentColor"/></svg>`;
-
 const NAV = [
   { href: "index.html",     txt: "Inicio" },
   { href: "productos.html", txt: "Productos" },
@@ -77,9 +68,8 @@ const PAGE = (location.pathname.split("/").pop() || "index.html").toLowerCase();
    HEADER / FOOTER / DRAWER
    ============================================================ */
 function logoHTML(){
-  return `<a class="logo" href="index.html" aria-label="Bacano, inicio">
-    <span class="logo__mark">${LOGO_SVG}</span>
-    <span class="logo__text">Bacano<span>.</span></span>
+  return `<a class="logo" href="index.html" aria-label="Bacano Estudio Creativo, inicio">
+    <span class="logo__img" aria-hidden="true"></span>
   </a>`;
 }
 

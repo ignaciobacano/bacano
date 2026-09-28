@@ -26,9 +26,11 @@ h1,h2,h3,h4{margin:0;line-height:1.2}
   position:sticky;top:0;z-index:20;background:var(--black);color:#fff;
   display:flex;align-items:center;gap:14px;padding:12px 20px;flex-wrap:wrap;
 }
-.top__logo{display:flex;align-items:center;gap:9px;font-family:"Inter Tight",sans-serif;font-weight:800;letter-spacing:-.04em;font-size:1.25rem;text-transform:uppercase}
-.top__logo svg{width:26px;height:26px}
-.top__logo i{color:var(--red-2);font-style:normal}
+.top__logo{
+  display:block;height:32px;aspect-ratio:1065/456;background:#fff;
+  -webkit-mask:url(assets/img/logo-bacano.png) center/contain no-repeat;
+          mask:url(assets/img/logo-bacano.png) center/contain no-repeat;
+}
 .top .sep{flex:1}
 .chip{font-size:.72rem;font-weight:700;padding:5px 11px;border-radius:100px;background:#2a2a32;color:#c9c9d2}
 .chip.warn{background:#2a2a2a;color:#fff}
@@ -128,10 +130,7 @@ pre.code{background:var(--black);color:#e8e8ee;padding:14px;border-radius:10px;o
 <body>
 
 <div class="top">
-  <span class="top__logo">
-    <svg viewBox="0 0 240 220" fill="none"><g stroke="currentColor" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"><path d="M24 115C62 58 178 58 216 115 178 172 62 172 24 115Z"/><circle cx="120" cy="115" r="36"/><path d="M120 59V31"/><path d="m172.8 69.1 17.2-22.9"/><path d="M67.2 69.1 50 46.2"/><path d="m203.4 91.3 27.2-11.8"/><path d="M36.6 91.3 9.4 79.5"/><path d="m203.4 138.7 27.2 11.8"/><path d="M36.6 138.7 9.4 150.5"/><path d="m172.8 160.9 17.2 22.9"/><path d="M67.2 160.9 50 183.8"/><path d="M120 171v28"/></g><circle cx="120" cy="115" r="15" fill="currentColor"/></svg>
-    Bacano<i>.</i>
-  </span>
+  <span class="top__logo" role="img" aria-label="Bacano Estudio Creativo"></span>
   <span class="chip" id="estado">Sin cambios</span>
   <span class="sep"></span>
   <a class="btn btn--ghost btn--sm" style="color:#fff;border-color:#2a2a32" href="index.html?preview=1" target="_blank">👁 Vista previa</a>
