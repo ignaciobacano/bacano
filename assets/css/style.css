@@ -245,11 +245,11 @@ html.is-loading,html.is-loading body{overflow:hidden; height:100%}
   animation:preWord 1.15s var(--ease) .1s forwards;
 }
 @keyframes preWord{to{transform:translateY(0)}}
-/* logo de la pantalla de carga (misma máscara que el header) */
+/* pantalla de carga: solo la palabra BACANO del logotipo */
 .pre__word > i.pre__logo{
-  height:clamp(80px,16vw,200px); aspect-ratio:1065/456; background:#fff;
-  -webkit-mask:url(../img/logo-bacano.png) center/contain no-repeat;
-          mask:url(../img/logo-bacano.png) center/contain no-repeat;
+  height:clamp(56px,11vw,150px); aspect-ratio:1041/331; background:#fff;
+  -webkit-mask:url(../img/logo-bacano-palabra.png) center/contain no-repeat;
+          mask:url(../img/logo-bacano-palabra.png) center/contain no-repeat;
 }
 .pre.is-done .pre__word > i{
   transform:translateY(-106%); animation:none;
