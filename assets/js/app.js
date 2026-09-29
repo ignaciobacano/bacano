@@ -339,13 +339,14 @@ function buildFloating(){
       ${I.wa}<span>Escríbenos</span>
     </a>
     <div class="overlay" id="overlay"></div>
-    <aside class="drawer" id="drawer" aria-label="Carrito de compras">
-      <div class="drawer__head">
-        <h3>Tu carrito <span id="drawerCount" style="color:var(--red)"></span></h3>
-        <button class="icon-btn" id="closeCart" aria-label="Cerrar carrito">${I.x}</button>
+    <aside class="drawer cd" id="drawer" aria-label="Carrito de compras">
+      <div class="cd__ship">
+        <div class="cd__shipTxt" id="cdShip"></div>
+        <button class="cd__close" id="closeCart" aria-label="Cerrar carrito">${I.x}</button>
+        <div class="cd__bar"><i id="cdBar"></i></div>
       </div>
-      <div class="drawer__body" id="drawerBody"></div>
-      <div class="drawer__foot" id="drawerFoot"></div>
+      <div class="cd__body" id="drawerBody"></div>
+      <div class="cd__foot" id="drawerFoot"></div>
     </aside>
     <div class="toast-wrap" id="toasts"></div>
     <div class="modal" id="modal" role="dialog" aria-modal="true"><div class="modal__box" id="modalBox"></div></div>`;
@@ -392,8 +393,10 @@ const Cart = {
     const line = this.items.find(i => i.id === id);
     if(line) line.qty += qty;
     else this.items.push({ id, qty });
+    if(!silent) this.lastAdded = { id, t: Date.now() };
     this.save();
-    if(!silent) toast(`«${p.nombre}» agregado al carrito`);
+    /* igual que en las tiendas grandes: al agregar se abre el carrito con la confirmación */
+    if(!silent){ closeModal(); this.open(); }
   },
   setQty(id, qty){
     const line = this.items.find(i => i.id === id);
@@ -420,7 +423,23 @@ const Cart = {
     if(s === 0) return 0;
     return s >= SITE.envioGratisDesde ? 0 : 4990;
   },
-  total(){ return this.subtotal() + this.envio(); },
+  /* códigos de descuento: se definen en data.js como SITE.cupones = { "CODIGO": 10 } (porcentaje) */
+  cupon: (() => { try { return localStorage.getItem("bacano_cupon_v1") || ""; } catch { return ""; } })(),
+  cupones(){ return (typeof SITE !== "undefined" && SITE.cupones) || {}; },
+  descuento(){
+    const pct = this.cupones()[this.cupon];
+    return pct ? Math.round(this.subtotal() * pct / 100) : 0;
+  },
+  aplicarCupon(txt){
+    const c = (txt || "").trim().toUpperCase();
+    if(!c) return "Escribe un código.";
+    if(!this.cupones()[c]) return "Ese código no es válido.";
+    this.cupon = c;
+    try { localStorage.setItem("bacano_cupon_v1", c); } catch {}
+    this.render();
+    return "";
+  },
+  total(){ return this.subtotal() - this.descuento() + this.envio(); },
 
   open(){
     $("#drawer").classList.add("is-open");
@@ -462,30 +481,109 @@ const Cart = {
 
     const body = $("#drawerBody"), foot = $("#drawerFoot");
     if(body){
+      /* barra de despacho gratis */
+      const sub = this.subtotal(), meta = SITE.envioGratisDesde, falta = meta - sub;
+      $("#cdShip").innerHTML = !this.items.length
+        ? `Despacho gratis desde <b>${money(meta)}</b>`
+        : falta > 0 ? `Agrega <b>${money(falta)}</b> para tener <b>despacho gratis</b>`
+                    : `${I.check}<b>¡Tienes despacho gratis!</b>`;
+      $("#cdBar").style.width = Math.min(100, sub / meta * 100) + "%";
+      $("#cdBar").classList.toggle("is-full", falta <= 0 && sub > 0);
+
       if(!this.items.length){
-        body.innerHTML = `<div class="empty">
-          ${I.cart}
-          <h4>Tu carrito está vacío</h4>
-          <p>Agregá productos y armá tu pedido. Te enviamos una prueba digital antes de imprimir.</p>
-          <a class="btn btn--ghost btn--sm" href="productos.html" style="margin-top:14px">Ver productos</a>
-        </div>`;
+        body.innerHTML = `<div class="cd__empty">
+          <h3>Tu carrito está vacío</h3>
+          <p>Arma tu pedido y te enviamos una prueba digital antes de imprimir.</p>
+          <a class="cd__buy" href="productos.html">Ver productos</a>
+        </div>
+        ${this.sugerenciasHTML("Lo más pedido")}`;
         foot.innerHTML = "";
       } else {
-        body.innerHTML = this.items.map(i => this.lineHTML(i)).join("");
-        const falta = SITE.envioGratisDesde - this.subtotal();
+        const la = this.lastAdded && Date.now() - this.lastAdded.t < 4000 ? this.find(this.lastAdded.id) : null;
+        body.innerHTML = `
+          ${la ? `<div class="cd__ok">${I.check}<span><b>${la.nombre}</b> se agregó al carrito</span></div>` : ""}
+          <div class="cd__title"><h3>Tu carrito</h3><span>${n} ${n === 1 ? "producto" : "productos"}</span></div>
+          <div class="cd__lines">${this.items.map(i => this.drawerLineHTML(i)).join("")}</div>
+          ${this.sugerenciasHTML("Complementa tu pedido")}`;
+
+        const d = this.descuento();
         foot.innerHTML = `
-          ${falta > 0 ? `<p class="form-note" style="margin:0">Te faltan <b>${money(falta)}</b> para el despacho gratis.</p>`
-                      : `<p class="form-note" style="margin:0;color:var(--ok)"><b>¡Despacho gratis conseguido!</b></p>`}
-          <div class="totals">
-            <div><span>Subtotal</span><b>${money(this.subtotal())}</b></div>
+          <details class="cd__code"${this.cupon ? " open" : ""}>
+            <summary>¿Tienes un código de descuento?</summary>
+            <form class="cd__cupon" id="cdCupon" novalidate>
+              <input name="c" placeholder="Código de descuento" aria-label="Código de descuento" value="${this.cupon}" autocomplete="off">
+              <button type="submit">Aplicar</button>
+            </form>
+            <p class="cd__msg" id="cdMsg" role="status"></p>
+          </details>
+          <div class="cd__sum">
+            <div><span>Subtotal</span><b>${money(sub)}</b></div>
+            ${d ? `<div><span>Descuento (${this.cupon})</span><b>−${money(d)}</b></div>` : ""}
             <div><span>Despacho</span><b>${this.envio() ? money(this.envio()) : "Gratis"}</b></div>
-            <div class="grand"><span>Total</span><span>${money(this.total())}</span></div>
           </div>
-          <a class="btn btn--red btn--block" href="carrito.html">Finalizar compra ${I.arrowR}</a>
-          <div class="secure-note">${I.shield}<span>Compra protegida. Si el trabajo sale con falla nuestra, lo reimprimimos sin costo.</span></div>`;
+          <div class="cd__total"><span>Total</span><b>${money(this.total())}</b></div>
+          <a class="cd__see" href="carrito.html">Ver carrito</a>
+          <a class="cd__buy" href="carrito.html">Comprar</a>
+          <p class="cd__trust">${I.shield}<span>Prueba digital antes de imprimir · Reimpresión sin costo si la falla es nuestra</span></p>`;
+
+        $("#cdCupon").addEventListener("submit", e => {
+          e.preventDefault();
+          const err = this.aplicarCupon(e.target.c.value);
+          if(err) $("#cdMsg").textContent = err;
+        });
       }
+
+      /* flechas del carrusel de sugerencias */
+      const rail = $(".cd__rail", body);
+      $$(".cd__arrow", body).forEach(b => b.onclick = () =>
+        rail.scrollBy({ left: (b.dataset.dir === "prev" ? -1 : 1) * rail.clientWidth * .85, behavior:"smooth" }));
     }
     renderCartPage();
+  },
+
+  drawerLineHTML(i){
+    const p = this.find(i.id);
+    if(!p) return "";
+    const c = CATEGORIAS.find(x => x.slug === p.cat);
+    return `<div class="cd__line">
+      <div class="cd__img"><img src="${p.img}" alt="${p.nombre}" loading="lazy"></div>
+      <div class="cd__info">
+        <small>${c ? c.nombre : ""}</small>
+        <h4>${p.nombre}</h4>
+        <span>${p.unidad}</span>
+        <b>${money(p.precio * i.qty)}</b>
+      </div>
+      <div class="cd__side">
+        <button class="cd__del" data-del="${p.id}" aria-label="Eliminar ${p.nombre}">${I.trash}</button>
+        <div class="cd__qty">
+          <button data-minus="${p.id}" aria-label="Quitar uno">−</button>
+          <input type="text" inputmode="numeric" value="${i.qty}" data-qty="${p.id}" aria-label="Cantidad">
+          <button data-plus="${p.id}" aria-label="Agregar uno">+</button>
+        </div>
+      </div>
+    </div>`;
+  },
+
+  /* sugerencias: primero de las mismas categorías que ya están en el carrito */
+  sugerenciasHTML(titulo){
+    const enCarro = new Set(this.items.map(i => i.id));
+    const cats = new Set(this.items.map(i => this.find(i.id)?.cat));
+    const lista = PRODUCTOS.filter(p => !enCarro.has(p.id))
+      .sort((a, b) => (cats.has(b.cat) - cats.has(a.cat)) || (b.flags.length - a.flags.length))
+      .slice(0, 6);
+    if(!lista.length) return "";
+    return `<div class="cd__sug">
+      <div class="cd__sugHead"><h4>${titulo}</h4>
+        <span><button class="cd__arrow" data-dir="prev" aria-label="Anterior">${I.arrowR}</button><button class="cd__arrow" data-dir="next" aria-label="Siguiente">${I.arrowR}</button></span>
+      </div>
+      <div class="cd__rail">${lista.map(p => `
+        <div class="cd__card">
+          <div class="cd__cimg"><img src="${p.img}" alt="" loading="lazy"></div>
+          <div class="cd__cinfo"><h5>${p.nombre}</h5><b>${money(p.precio)}</b><small>${p.unidad}</small>
+            <button class="cd__add" data-add="${p.id}">Agregar</button></div>
+        </div>`).join("")}
+      </div>
+    </div>`;
   }
 };
 

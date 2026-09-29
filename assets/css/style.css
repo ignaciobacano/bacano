@@ -1187,3 +1187,122 @@ select.input{cursor:pointer}
 .wadd:hover{background:var(--ink); color:var(--paper)}
 .wadd svg{width:16px; height:16px}
 .wsec__more{margin-top:34px; display:flex; justify-content:center}
+
+/* ============================================================
+   CARRITO LATERAL (experiencia inspirada en nike.cl)
+   Barra de despacho gratis · confirmación · líneas · sugerencias · cupón · total
+   ============================================================ */
+.drawer.cd{width:min(480px,100%); border-left:0; border-radius:22px 0 0 22px; overflow:hidden;
+  box-shadow:-30px 0 60px -30px rgba(0,0,0,.35)}
+@media(max-width:520px){.drawer.cd{border-radius:0}}
+
+.cd__ship{position:relative; flex:none; background:var(--g-04); border-bottom:1px solid var(--line);
+  padding:22px 60px 22px 26px; text-align:center}
+.cd__shipTxt{font-size:.92rem; color:var(--gray); display:flex; justify-content:center; align-items:center; gap:6px; flex-wrap:wrap}
+.cd__shipTxt b{color:var(--ink); font-weight:600}
+.cd__shipTxt svg{width:16px; height:16px; color:var(--ink)}
+.cd__bar{position:relative; height:6px; border-radius:6px; background:var(--g-15); margin:14px 0 0}
+.cd__bar i{position:absolute; left:0; top:0; bottom:0; width:0; border-radius:6px; background:var(--ink);
+  transition:width .8s var(--ease)}
+.cd__bar i::after{content:""; position:absolute; right:-8px; top:50%; width:16px; height:16px; margin-top:-8px;
+  border-radius:50%; background:var(--ink); border:3px solid var(--g-04)}
+.cd__bar i.is-full::after{display:none}
+.cd__close{position:absolute; right:14px; top:14px; width:40px; height:40px; border-radius:50%; display:grid; place-items:center;
+  background:none; border:0; color:var(--ink); cursor:pointer}
+.cd__close:hover{background:var(--g-15)}
+.cd__close svg{width:20px; height:20px}
+
+.cd__body{flex:1; overflow-y:auto; padding:0 26px 10px}
+.cd__ok{display:flex; align-items:center; gap:10px; margin:18px 0 0; padding:12px 14px; border-radius:12px;
+  background:var(--ink); color:var(--paper); font-size:.9rem; animation:cdOk .6s var(--ease)}
+.cd__ok svg{width:18px; height:18px; flex:none; background:var(--paper); color:var(--ink); border-radius:50%; padding:3px}
+.cd__ok b{font-weight:600}
+@keyframes cdOk{from{opacity:0; transform:translateY(-6px)}}
+
+.cd__title{display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:22px 0 6px}
+.cd__title h3{font:700 2rem/1 var(--font-cond); text-transform:uppercase; margin:0}
+.cd__title span{color:var(--gray); font-size:.86rem}
+
+.cd__line{display:grid; grid-template-columns:96px minmax(0,1fr) auto; gap:16px; padding:18px 0; border-bottom:1px solid var(--line)}
+.cd__line:last-child{border-bottom:0}
+.cd__img{width:96px; height:96px; border-radius:12px; overflow:hidden; background:var(--g-08)}
+.cd__img img{width:100%; height:100%; object-fit:cover}
+.cd__info{min-width:0; display:flex; flex-direction:column; gap:3px}
+.cd__info small{font-size:.62rem; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--gray)}
+.cd__info h4{font-size:.98rem; font-weight:600; letter-spacing:-.01em; line-height:1.25; margin:0}
+.cd__info span{font-size:.8rem; color:var(--gray)}
+.cd__info b{margin-top:auto; padding-top:6px; font-weight:600; font-variant-numeric:tabular-nums}
+.cd__side{display:flex; flex-direction:column; align-items:flex-end; justify-content:space-between; gap:10px}
+.cd__del{width:34px; height:34px; border-radius:50%; display:grid; place-items:center; background:none; border:0; color:var(--gray); cursor:pointer}
+.cd__del:hover{background:var(--g-08); color:var(--ink)}
+.cd__del svg{width:17px; height:17px}
+.cd__qty{display:inline-flex; align-items:center; border:1px solid var(--line); border-radius:100px; height:38px}
+.cd__qty button{width:34px; height:36px; border:0; background:none; font-size:1.1rem; color:var(--ink); cursor:pointer; border-radius:100px}
+.cd__qty button:hover{background:var(--g-08)}
+.cd__qty input{width:28px; text-align:center; border:0; outline:0; background:none; font:600 .9rem var(--font-body); font-variant-numeric:tabular-nums}
+
+.cd__sug{margin:14px 0 6px; padding-top:18px; border-top:1px solid var(--line)}
+.cd__sugHead{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px}
+.cd__sugHead h4{font-size:.86rem; font-weight:600; margin:0}
+.cd__sugHead span{display:flex; gap:6px}
+.cd__arrow{width:32px; height:32px; border-radius:50%; border:1px solid var(--line); background:var(--paper); display:grid; place-items:center; cursor:pointer; color:var(--ink)}
+.cd__arrow:hover{border-color:var(--ink)}
+.cd__arrow svg{width:14px; height:14px}
+.cd__arrow[data-dir="prev"] svg{transform:rotate(180deg)}
+.cd__rail{display:grid; grid-auto-flow:column; grid-auto-columns:88%; gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; padding-bottom:4px}
+.cd__rail::-webkit-scrollbar{display:none}
+.cd__card{scroll-snap-align:start; display:grid; grid-template-columns:88px minmax(0,1fr); gap:14px; align-items:center;
+  background:var(--g-04); border-radius:14px; padding:12px}
+.cd__cimg{width:88px; height:88px; border-radius:10px; overflow:hidden; background:var(--g-08)}
+.cd__cimg img{width:100%; height:100%; object-fit:cover}
+.cd__cinfo{min-width:0; display:flex; flex-direction:column; gap:2px}
+.cd__cinfo h5{font-size:.9rem; font-weight:600; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.cd__cinfo b{font-weight:600; font-variant-numeric:tabular-nums}
+.cd__cinfo small{color:var(--gray); font-size:.76rem}
+.cd__add{justify-self:start; align-self:flex-start; margin-top:6px; border:1px solid var(--ink); background:var(--paper); color:var(--ink);
+  border-radius:100px; padding:7px 14px; font:600 .8rem var(--font-body); cursor:pointer}
+.cd__add:hover{background:var(--ink); color:var(--paper)}
+
+.cd__empty{text-align:center; padding:48px 10px 20px}
+.cd__empty h3{font:700 2rem/1 var(--font-cond); text-transform:uppercase; margin:0 0 10px}
+.cd__empty p{color:var(--gray); margin:0 auto 20px; max-width:30ch}
+.cd__empty .cd__buy{display:inline-flex; width:auto; padding-inline:30px}
+
+.cd__foot{flex:none; border-top:1px solid var(--line); padding:16px 26px calc(20px + env(safe-area-inset-bottom,0px)); background:var(--paper); display:grid; gap:10px}
+.cd__code summary{cursor:pointer; font-size:.86rem; font-weight:600; list-style:none; display:flex; justify-content:space-between; align-items:center}
+.cd__code summary::-webkit-details-marker{display:none}
+.cd__code summary::after{content:"+"; font-size:1.2rem; font-weight:400}
+.cd__code[open] summary::after{content:"−"}
+.cd__code[open] summary{margin-bottom:10px}
+.cd__cupon{display:flex; gap:8px}
+.cd__cupon input{flex:1; min-width:0; height:46px; border:1px solid var(--g-25); border-radius:12px; padding:0 14px; font:500 .92rem var(--font-body); outline:none; background:var(--paper)}
+.cd__cupon input:focus{border-color:var(--ink)}
+.cd__cupon button{height:46px; padding:0 20px; border-radius:100px; border:0; background:var(--ink); color:var(--paper); font:600 .9rem var(--font-body); cursor:pointer}
+.cd__msg{margin:8px 0 0; font-size:.8rem; color:var(--gray); min-height:0}
+.cd__msg:empty{display:none}
+.cd__sum{display:grid; gap:6px; font-size:.88rem}
+.cd__sum div{display:flex; justify-content:space-between; gap:12px}
+.cd__sum span{color:var(--gray)}
+.cd__sum b{font-weight:500; font-variant-numeric:tabular-nums}
+.cd__total{display:flex; justify-content:space-between; align-items:baseline; gap:12px; padding-top:6px}
+.cd__total span{font:700 1.5rem/1 var(--font-cond); text-transform:uppercase}
+.cd__total b{font:700 1.7rem/1 var(--font-cond); font-variant-numeric:tabular-nums}
+.cd__buy{display:flex; justify-content:center; align-items:center; width:100%; height:56px; border-radius:100px; background:var(--ink); color:var(--paper);
+  font-weight:600; font-size:1.05rem; transition:opacity .25s}
+.cd__buy:hover{opacity:.85}
+.cd__see{text-align:center; font-weight:600; font-size:.92rem; padding:4px 0; text-decoration:underline; text-underline-offset:4px}
+.cd__trust{display:flex; justify-content:center; align-items:center; gap:8px; margin:0; font-size:.74rem; color:var(--gray); text-align:center}
+.cd__trust svg{width:14px; height:14px; flex:none; color:var(--ink)}
+
+.cd__foot:empty{display:none}
+@media(max-width:520px){
+  .cd__ship{padding:18px 56px 18px 18px}
+  .cd__body{padding:0 18px 10px}
+  .cd__foot{padding-inline:18px}
+  .cd__line{grid-template-columns:76px minmax(0,1fr) auto; gap:12px}
+  .cd__img{width:76px; height:76px}
+  .cd__info small{letter-spacing:.08em}
+  .cd__qty{height:34px}
+  .cd__qty button{width:30px; height:32px}
+  .cd__qty input{width:24px}
+}
