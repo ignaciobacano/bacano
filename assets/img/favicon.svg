@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <!--
+        Favicon de bacano.cl: el mismo isotipo de bacanocore.cl.
+
+        El asterisco es un hueco, no un trazo blanco. Así el icono se ve tanto
+        en una barra de pestañas clara como en una oscura, y el cuadrado cambia
+        de color solo según el tema del sistema.
+    -->
+    <style>
+        .marca { fill: #0B0B0B; }
+        @media (prefers-color-scheme: dark) { .marca { fill: #FFFFFF; } }
+    </style>
+    <mask id="asterisco">
+        <rect width="100" height="100" fill="#fff"/>
+        <g fill="#000">
+            <rect x="43.4" y="19" width="13.2" height="62"/>
+            <rect x="43.4" y="19" width="13.2" height="62" transform="rotate(60 50 50)"/>
+            <rect x="43.4" y="19" width="13.2" height="62" transform="rotate(120 50 50)"/>
+        </g>
+    </mask>
+    <rect class="marca" width="100" height="100" rx="23" mask="url(#asterisco)"/>
+</svg>

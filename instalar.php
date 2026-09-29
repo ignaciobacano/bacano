@@ -212,7 +212,7 @@ $listo = isset($_GET['listo']);
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Instalar · Bacano.cl</title>
-<link rel="icon" href="assets/img/logo-mark.svg" type="image/svg+xml">
+<link rel="icon" href="assets/img/favicon.svg?v=2" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--black:#0c0c0e;--line:#e2e2e8;--paper:#f5f5f7;--gray:#6c6c78;--red:#8b0f14;--red2:#a8151b;--ok:#1c7a4b}
