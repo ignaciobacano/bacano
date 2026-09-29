@@ -143,6 +143,9 @@ function buildHeader(){
     </div>`;
   const svc = s => `<a class="msvc" href="${s.href}"><b>${s.titulo}</b><em>${s.precio}</em><span>${s.texto}</span></a>`;
   const P = MENU.prod, D = MENU.dig;
+  const chevR = `<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>`;
+  const chevL = `<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>`;
+  const burgerIco = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`;
 
   host.innerHTML = `
   <header class="hdr" id="hdr">
@@ -156,14 +159,24 @@ function buildHeader(){
         </nav>
         <div class="hdr__act">
           <a class="hdr__txt ${PAGE === "contacto.html" ? "is-active" : ""}" href="contacto.html">Contacto</a>
+          <button class="icon-btn hdr__find" id="openSearch" type="button" aria-label="Buscar" aria-expanded="false">${I.search}</button>
           <button class="icon-btn" id="openCart" aria-label="Abrir carrito">
             ${I.cart}<span class="cart-count" id="cartCount">0</span>
           </button>
           <a class="hdr__cta" href="contacto.html">Pedir cotización</a>
-          <button class="icon-btn hdr__burger" id="openMenu" aria-label="Abrir menú" aria-expanded="false">${I.menu}</button>
+          <button class="icon-btn hdr__burger" id="openMenu" aria-label="Abrir menú" aria-expanded="false">${burgerIco}</button>
         </div>
       </div>
     </div>
+
+    <div class="hdr__promo" aria-live="polite">
+      <button class="hdr__pbtn" type="button" data-p="-1" aria-label="Aviso anterior">${chevL}</button>
+      <div class="hdr__ptxt" id="promoTxt"></div>
+      <button class="hdr__pbtn" type="button" data-p="1" aria-label="Aviso siguiente">${chevR}</button>
+    </div>
+    <form class="hdr__msearch" id="mSearch" action="productos.html" role="search" hidden>
+      ${I.search}<input name="q" type="search" placeholder="Buscar letreros, stickers, pendones…" aria-label="Buscar productos">
+    </form>
 
     <div class="hdr__l2">
       <div class="wrap hdr__row2">
@@ -195,11 +208,48 @@ function buildHeader(){
       </div>
     </div>
 
-    <nav class="mega__foot" aria-label="Más secciones">
-      <a href="nosotros.html">Nosotros</a><a href="contacto.html">Contacto</a>
-      <a class="hdr__cta" href="contacto.html">Pedir cotización</a>
-    </nav>
-  </header>`;
+  </header>
+
+  <div class="mnav" id="mnav" aria-hidden="true">
+    <div class="mnav__scrim" data-mclose></div>
+    <aside class="mnav__panel" aria-label="Menú">
+      <div class="mnav__top">
+        ${logoHTML()}
+        <button class="xclose" type="button" data-mclose>${I.x}<span>Cerrar</span></button>
+      </div>
+      <div class="mnav__views" id="mnavViews">
+        <div class="mnav__view is-on" data-view="main">
+          <nav class="mnav__list">
+            <button type="button" data-go="prod">${P.nombre}${chevR}</button>
+            <button type="button" data-go="dig">${D.nombre}${chevR}</button>
+            <a href="nosotros.html">Nosotros</a>
+            <a href="contacto.html">Contacto</a>
+          </nav>
+          <p class="mnav__note">Diseñamos, fabricamos e instalamos. Te enviamos una prueba digital antes de imprimir.</p>
+          <a class="mnav__cta" href="contacto.html">Pedir cotización</a>
+          <div class="mnav__links">
+            <button type="button" data-mcart>${I.cart}<span>Mi carrito</span></button>
+            <a href="${waLink()}" target="_blank" rel="noopener">${I.wa}<span>WhatsApp</span></a>
+            <a href="index.html#faq">${I.headset}<span>Ayuda</span></a>
+          </div>
+        </div>
+        <div class="mnav__view" data-view="prod">
+          <button class="mnav__back" type="button" data-go="main">${chevL}Todo</button>
+          <h3 class="mnav__h">${P.nombre}</h3>
+          ${P.columnas.flat().map(g => `<a class="mnav__group" href="${g.href}">${g.titulo}${chevR}</a>
+            <p class="mnav__items">${g.items.join(" · ")}</p>`).join("")}
+        </div>
+        <div class="mnav__view" data-view="dig">
+          <button class="mnav__back" type="button" data-go="main">${chevL}Todo</button>
+          <h3 class="mnav__h">${D.nombre}</h3>
+          <h4 class="mnav__sub">Con pago mensual</h4>
+          <div class="msvcs">${D.mensuales.map(svc).join("")}</div>
+          <h4 class="mnav__sub">Proyectos a medida</h4>
+          <div class="msvcs">${D.proyectos.map(svc).join("")}</div>
+        </div>
+      </div>
+    </aside>
+  </div>`;
 
   const hdr = $("#hdr");
   const tops = $$(".hdr__nav button", hdr);
@@ -217,10 +267,7 @@ function buildHeader(){
 
   const cerrar = () => {
     tops.forEach(b => { b.setAttribute("aria-expanded", "false"); $("#" + b.getAttribute("aria-controls")).hidden = true; });
-    burger.setAttribute("aria-expanded", "false");
-    burger.innerHTML = I.menu; burger.setAttribute("aria-label", "Abrir menú"); burger.classList.remove("xclose");
-    hdr.classList.remove("is-menu");
-    document.body.style.overflow = "";
+    cerrarMnav();
   };
   tops.forEach(b => b.addEventListener("click", e => {
     e.stopPropagation();
@@ -229,19 +276,53 @@ function buildHeader(){
     setArea(b.dataset.area);
     if(!abierto){ b.setAttribute("aria-expanded", "true"); $("#" + b.getAttribute("aria-controls")).hidden = false; }
   }));
+  /* menú lateral de celular (entra desde la derecha, con segundo nivel) */
+  const mnav = $("#mnav");
+  const verVista = v => $$(".mnav__view", mnav).forEach(x => x.classList.toggle("is-on", x.dataset.view === v));
+  function cerrarMnav(){
+    if(!mnav.classList.contains("is-open")) return;
+    mnav.classList.remove("is-open"); mnav.setAttribute("aria-hidden", "true");
+    burger.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
+  }
   burger.addEventListener("click", e => {
     e.stopPropagation();
-    const abierto = burger.getAttribute("aria-expanded") === "true";
-    cerrar();
-    if(!abierto){
-      burger.setAttribute("aria-expanded", "true");
-      burger.innerHTML = `${I.x}<span>Cerrar</span>`; burger.setAttribute("aria-label", "Cerrar menú"); burger.classList.add("xclose");
-      hdr.classList.add("is-menu");
-      $("#mega-prod").hidden = false; $("#mega-dig").hidden = false;
-      document.body.style.overflow = "hidden";
-    }
+    verVista("main");
+    mnav.classList.add("is-open"); mnav.setAttribute("aria-hidden", "false");
+    burger.setAttribute("aria-expanded", "true");
+    document.body.style.overflow = "hidden";
   });
-  document.addEventListener("click", e => { if(!e.target.closest(".mega") && !e.target.closest(".mega__foot")) cerrar(); });
+  mnav.addEventListener("click", e => {
+    const go = e.target.closest("[data-go]");
+    if(go){ verVista(go.dataset.go); $(".mnav__views", mnav).scrollTop = 0; return; }
+    if(e.target.closest("[data-mclose]")) cerrarMnav();
+    if(e.target.closest("[data-mcart]")){ cerrarMnav(); Cart.open(); }
+  });
+
+  /* buscador de celular */
+  const findBtn = $("#openSearch"), mSearch = $("#mSearch");
+  findBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    const abrir = mSearch.hidden;
+    mSearch.hidden = !abrir; findBtn.setAttribute("aria-expanded", abrir);
+    hdr.classList.toggle("is-search", abrir);
+    if(abrir) $("input", mSearch).focus();
+  });
+
+  /* franja de avisos que rota */
+  const AVISOS = [
+    `Despacho gratis desde <b>${money(SITE.envioGratisDesde)}</b>`,
+    `Te enviamos una <b>prueba digital</b> antes de imprimir`,
+    `Cotiza por <a href="${waLink()}" target="_blank" rel="noopener"><b>WhatsApp</b></a> y te respondemos rápido`
+  ];
+  let aviso = 0;
+  const pintarAviso = () => { $("#promoTxt").innerHTML = AVISOS[aviso]; };
+  $$(".hdr__pbtn", hdr).forEach(b => b.onclick = () => { aviso = (aviso + +b.dataset.p + AVISOS.length) % AVISOS.length; pintarAviso(); });
+  pintarAviso();
+  if(!REDUCED) setInterval(() => { aviso = (aviso + 1) % AVISOS.length; pintarAviso(); }, 5000);
+
+  /* clic fuera cierra los paneles; los toques dentro del menú lateral no */
+  document.addEventListener("click", e => { if(!e.target.closest(".mega, .mnav, #openMenu")) cerrar(); });
   document.addEventListener("keydown", e => { if(e.key === "Escape") cerrar(); });
   $$(".mega__x", hdr).forEach(b => b.onclick = e => { e.stopPropagation(); cerrar(); });
   $("#openCart").onclick = () => { cerrar(); Cart.open(); };
@@ -251,7 +332,7 @@ function buildHeader(){
   const onScroll = () => {
     const y = scrollTop();
     hdr.classList.toggle("is-stuck", y > 12);
-    const blocked = hdr.classList.contains("is-menu") || tops.some(b => b.getAttribute("aria-expanded") === "true") || $("#drawer")?.classList.contains("is-open");
+    const blocked = mnav.classList.contains("is-open") || hdr.classList.contains("is-search") || tops.some(b => b.getAttribute("aria-expanded") === "true") || $("#drawer")?.classList.contains("is-open");
     hdr.classList.toggle("is-hidden", !blocked && y > 260 && y > last + 4);
     last = y;
   };
@@ -810,6 +891,20 @@ function buildHome(){
       pintar(b.dataset.c);
     });
     pintar("");
+
+    /* barra de avance del carrusel (solo se ve en celular) */
+    const prog = $("#wProg");
+    const avance = () => {
+      if(!prog) return;
+      const max = wGrid.scrollWidth - wGrid.clientWidth;
+      const vis = wGrid.clientWidth / wGrid.scrollWidth;
+      prog.style.width = Math.max(12, vis * 100) + "%";
+      prog.style.left = (max > 0 ? wGrid.scrollLeft / max : 0) * (100 - Math.max(12, vis * 100)) + "%";
+    };
+    wGrid.addEventListener("scroll", avance, { passive:true });
+    addEventListener("resize", avance);
+    $("#wChips").addEventListener("click", () => { wGrid.scrollLeft = 0; requestAnimationFrame(avance); });
+    avance();
   }
 
   /* carrusel "lo más pedido" */

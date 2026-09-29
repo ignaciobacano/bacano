@@ -1338,3 +1338,96 @@ select.input{cursor:pointer}
 
 /* menú celular abierto: el botón muestra "Cerrar" */
 .hdr__burger.xclose{display:inline-flex; width:auto; height:40px}
+
+/* ============================================================
+   VERSIÓN CELULAR (inspirada en nike.cl)
+   Encabezado limpio con íconos, franja de avisos, menú lateral
+   con segundo nivel, portada a sangre y carrusel con barra de avance.
+   ============================================================ */
+.hdr__find{display:none}
+.hdr__promo{display:none}
+.hdr__msearch{display:none}
+.mnav{display:none}
+
+@media(max-width:900px){
+  :root{--header-h:104px}                 /* 60 barra + 44 avisos */
+  .hdr__l2{display:none}
+  .hdr__row1{height:60px; gap:8px}
+  .hdr .logo__img{height:30px}
+  .hdr__act{gap:2px}
+  .hdr__find{display:grid}
+  .hdr__act .icon-btn{width:42px; height:42px}
+  .hdr__act .icon-btn svg{width:22px; height:22px}
+  .hdr__burger.xclose{display:none}
+
+  .hdr__promo{display:flex; align-items:center; gap:4px; height:44px; padding:0 6px; background:var(--g-04); border-bottom:1px solid var(--line)}
+  .hdr__ptxt{flex:1; min-width:0; text-align:center; font-size:.82rem; line-height:1.25; color:var(--g-70)}
+  .hdr__ptxt b{color:var(--ink); font-weight:600}
+  .hdr__pbtn{flex:none; width:34px; height:34px; border:0; background:none; display:grid; place-items:center; color:var(--ink); cursor:pointer; border-radius:50%}
+  .hdr__pbtn svg{width:18px; height:18px}
+
+  .hdr__msearch:not([hidden]){display:flex; align-items:center; gap:10px; margin:0; padding:10px var(--gut); background:var(--paper); border-bottom:1px solid var(--line)}
+  .hdr__msearch svg{width:18px; height:18px; color:var(--gray); flex:none}
+  .hdr__msearch input{flex:1; min-width:0; height:44px; border:1px solid var(--line); border-radius:100px; padding:0 16px; font:500 1rem var(--font-body); outline:none; background:var(--g-04)}
+  .hdr__msearch input:focus{border-color:var(--ink)}
+
+  /* menú lateral */
+  .mnav{display:block; position:fixed; inset:0; z-index:995; pointer-events:none}
+  .mnav__scrim{position:absolute; inset:0; background:rgba(0,0,0,.4); opacity:0; transition:opacity .4s var(--ease)}
+  .mnav__panel{position:absolute; top:0; right:0; bottom:0; width:min(420px,86%); background:var(--paper); display:flex; flex-direction:column;
+    transform:translateX(100%); transition:transform .55s var(--ease-io); box-shadow:-20px 0 50px -20px rgba(0,0,0,.35)}
+  .mnav.is-open{pointer-events:auto}
+  .mnav.is-open .mnav__scrim{opacity:1}
+  .mnav.is-open .mnav__panel{transform:none}
+  .mnav__top{display:flex; align-items:center; justify-content:space-between; gap:10px; height:64px; padding:0 18px 0 22px; border-bottom:1px solid var(--line); flex:none}
+  .mnav__top .logo__img{height:28px}
+  .mnav__views{position:relative; flex:1; overflow-y:auto; overflow-x:hidden}
+  .mnav__view{padding:18px 22px 40px; display:none; animation:mnavIn .35s var(--ease)}
+  .mnav__view.is-on{display:block}
+  @keyframes mnavIn{from{opacity:0; transform:translateX(24px)}}
+  .mnav__list{display:grid}
+  .mnav__list > *{display:flex; align-items:center; justify-content:space-between; width:100%; padding:13px 0; border:0; background:none;
+    font:500 1.45rem/1.15 var(--font-body); letter-spacing:-.02em; color:var(--ink); text-align:left; cursor:pointer}
+  .chev{width:22px; height:22px; flex:none}
+  .mnav__note{color:var(--gray); font-size:.95rem; line-height:1.5; margin:22px 0 16px}
+  .mnav__cta{display:flex; justify-content:center; align-items:center; height:52px; border-radius:100px; background:var(--ink); color:var(--paper); font-weight:600}
+  .mnav__links{display:grid; gap:4px; margin-top:22px}
+  .mnav__links > *{display:flex; align-items:center; gap:12px; padding:10px 0; border:0; background:none; font:600 .92rem var(--font-body); color:var(--ink); cursor:pointer; text-align:left}
+  .mnav__links svg{width:20px; height:20px; flex:none}
+  .mnav__back{display:flex; align-items:center; gap:6px; border:0; background:none; padding:4px 0; font:600 .95rem var(--font-body); color:var(--ink); cursor:pointer}
+  .mnav__back .chev{width:20px; height:20px}
+  .mnav__h{font:700 2.2rem/1 var(--font-cond); text-transform:uppercase; margin:18px 0 14px}
+  .mnav__group{display:flex; align-items:center; justify-content:space-between; padding:14px 0 4px; font-weight:600; font-size:1.1rem; border-top:1px solid var(--line)}
+  .mnav__group .chev{width:18px; height:18px}
+  .mnav__items{margin:0 0 12px; color:var(--gray); font-size:.86rem; line-height:1.5}
+  .mnav__sub{font-size:.68rem; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--gray); margin:18px 0 10px}
+
+  /* el menú de escritorio no se usa en celular */
+  .mega{display:none !important}
+}
+
+/* ---------- portada en celular: imagen a sangre y título debajo ---------- */
+@media(max-width:700px){
+  .sotd{padding-top:var(--header-h)}
+  .sotd > .wrap{display:flex; flex-direction:column; align-items:center}
+  /* la figura se "abre": la foto sube arriba a sangre y las fichas bajan después del título */
+  .sotd__show{display:contents}
+  .sotd__show img{order:-1; width:calc(100% + 2 * var(--gut)); max-width:none; margin:0 calc(-1 * var(--gut)) 20px; aspect-ratio:1/1; border-radius:0}
+  .sotd__spec{order:5; position:static; display:flex; flex-wrap:nowrap; overflow-x:auto; gap:8px; width:calc(100% + 2 * var(--gut));
+    margin:18px calc(-1 * var(--gut)) 0; padding:0 var(--gut); scrollbar-width:none}
+  .sotd__spec::-webkit-scrollbar{display:none}
+  .sotd__spec div{flex:none; background:var(--g-08)}
+  .sotd__go{flex:none; margin-left:0}
+  .sotd__title{font-size:clamp(2.8rem,15vw,4.4rem); margin:14px 0 12px}
+  .sotd__meta{font-size:.88rem}
+
+  /* "lo más pedido" como carrusel con barra de avance */
+  .wsec__h{margin-bottom:18px}
+  .wgrid{display:grid; grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:80%; gap:14px;
+    overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; margin-inline:calc(-1 * var(--gut)); padding-inline:var(--gut); scroll-padding-inline:var(--gut)}
+  .wgrid::-webkit-scrollbar{display:none}
+  .wcard{scroll-snap-align:start}
+  .wprog{display:block}
+}
+.wprog{display:none; position:relative; height:3px; background:var(--g-15); margin-top:18px; border-radius:3px; overflow:hidden}
+.wprog i{position:absolute; left:0; top:0; bottom:0; width:25%; background:var(--ink); border-radius:3px; transition:left .15s linear, width .2s}
