@@ -9,8 +9,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://images.unsplash.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=10">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter+Tight:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=11">
 <noscript><style>.pre,.pt{display:none!important}</style></noscript>
 </head>
 <body>
@@ -35,38 +35,20 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
 <div id="site-header"></div>
 <nav id="rail" aria-label="Accesos rápidos"></nav>
 
-<!-- ============================ HERO ============================ -->
-<section class="heroX">
-  <div class="heroX__in">
-
-    <div class="heroX__copy">
-      <span class="pill-eyebrow">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
-        Publicidad de alto impacto
-      </span>
-      <h1>Casi todos<span>imprimen.</span><span>Nosotros</span><span>hacemos ver.</span></h1>
-      <p>Diseñamos, fabricamos e instalamos. Gráfica que se nota en la calle, hecha en nuestro propio taller.</p>
-      <a class="btn" href="productos.html">
-        Explorar productos
-        <span class="btn__arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12 5l7 7-7 7"/></svg></span>
-      </a>
+<!-- ============================ PRODUCTO DESTACADO ============================ -->
+<section class="sotd" data-producto="let-luminoso">
+  <div class="wrap">
+    <div class="sotd__meta">
+      <span>Producto destacado</span>
+      <span class="sotd__box" data-f="precio">Desde $189.000</span>
+      <span class="sotd__dim" data-f="unidad">por m² instalado</span>
     </div>
-
-    <div class="heroX__media">
-      <figure class="shot shot--main mask-img">
-        <img data-foto="heroPrincipal" alt="Letrero de caja de luz de Bacano montado en el muro del taller" loading="eager">
-      </figure>
-      <div class="heroX__facts">
-        <div><span>Taller propio</span><b>2014</b></div>
-        <div><span>Pedidos entregados</span><b>4.200+</b></div>
-        <div><span>Entregas a tiempo</span><b>98%</b></div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="heroX__mark">
-    <span class="wordmark">Bacano.</span>
+    <h1 class="sotd__title" data-f="nombre">Letrero luminoso LED</h1>
+    <div class="sotd__by"><i>B</i><b data-f="cat">Letreros y corpóreos</b><span>· diseño, fabricación e instalación</span></div>
+    <figure class="sotd__show">
+      <img data-f="img" alt="" loading="eager">
+      <div class="sotd__spec" data-f="spec"></div>
+    </figure>
   </div>
 </section>
 
@@ -131,21 +113,21 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
 </section>
 
 <!-- ============================ LO MÁS PEDIDO ============================ -->
-<section class="section">
-  <div class="wrap picks">
-
-    <div class="picks__head">
-      <span class="rule rule-draw"></span>
-      <h2>Explora lo más pedido</h2>
-      <p style="color:var(--gray);font-size:.88rem;max-width:30ch">Precios con IVA incluido. Agregá al carrito y subí tu diseño después de comprar.</p>
-      <div class="picks__nav">
-        <button id="picksPrev" aria-label="Anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H6M12 19l-7-7 7-7"/></svg></button>
-        <button id="picksNext" class="is-primary" aria-label="Siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12 5l7 7-7 7"/></svg></button>
+<section class="section" id="mas-pedido">
+  <div class="wrap">
+    <div class="wsec__h">
+      <div>
+        <span class="eyebrow">Catálogo con precios IVA incluido</span>
+        <h2 class="wsec__t">Lo más pedido<sup id="wCount"></sup></h2>
       </div>
+      <div class="wchips" id="wChips" role="group" aria-label="Filtrar por categoría"></div>
     </div>
-
-    <div class="picks__track" id="picksHost"></div>
-
+    <div class="wgrid" id="wGrid"></div>
+    <div class="wsec__more">
+      <a class="btn" href="productos.html">Ver todo el catálogo
+        <span class="btn__arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12 5l7 7-7 7"/></svg></span>
+      </a>
+    </div>
   </div>
 </section>
 
@@ -215,6 +197,6 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
 <div id="site-footer"></div>
 
 <script src="assets/js/data.js?v=7"></script>
-<script src="assets/js/app.js?v=8"></script>
+<script src="assets/js/app.js?v=9"></script>
 </body>
 </html>

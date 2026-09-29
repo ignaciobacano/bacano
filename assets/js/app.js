@@ -62,6 +62,66 @@ const NAV = [
   { href: "contacto.html",  txt: "Contacto" }
 ];
 
+/* Menú de dos niveles.
+   Nivel 1: las dos áreas grandes. Nivel 2: las secciones del área activa.
+   Los productos sin página en el catálogo llevan a cotizar (contacto.html?tipo=…). */
+const mCat = slug => `productos.html?cat=${slug}`;
+const mCotizar = tipo => `contacto.html?tipo=${encodeURIComponent(tipo)}`;
+const MENU = {
+  prod: {
+    nombre: "Productos impresos",
+    secciones: [
+      { txt:"Letreros",       href:mCat("letreros") },
+      { txt:"Gran formato",   href:mCat("granformato") },
+      { txt:"Stickers",       href:mCat("stickers") },
+      { txt:"Publicitarios",  href:mCotizar("Publicitarios") },
+      { txt:"Vehicular",      href:mCat("vehicular") },
+      { txt:"Papelería",      href:mCat("papeleria") },
+      { txt:"Estampados",     href:mCat("estampados") },
+      { txt:"Merchandising",  href:mCotizar("Merchandising") }
+    ],
+    columnas: [
+      [ { titulo:"Letreros y corpóreos", href:mCat("letreros"),
+          items:["Letrero luminoso LED","Letras corpóreas","Placa de acrílico","Señalética interior","Tótem publicitario"] },
+        { titulo:"Acrílico y sintra", href:mCotizar("Acrílico y sintra"),
+          items:["Acrílico 3 a 6 mm","Sintra 3 y 5 mm","Distanciadores"] } ],
+      [ { titulo:"Gran formato · por m²", href:mCat("granformato"),
+          items:["Vinilo adhesivo","Tela banner (lona)","Tela backlight","Microperforado","Frosted impreso y troquelado","Vinilo de alto tráfico"] },
+        { titulo:"Stickers", href:mCat("stickers"),
+          items:["Sticker adhesivo · 3×3 a 20×20 cm","Vinilo troquelado"] } ],
+      [ { titulo:"Publicitarios", href:mCotizar("Publicitarios"),
+          items:["Pendón roller 200×80 cm","Paloma 60×100 cm","Mini pendón A4","Tótem de mesa","Bastidor metálico y de madera"] },
+        { titulo:"Rotulación vehicular", href:mCat("vehicular"),
+          items:["Ploteo vehicular","Vinilo microperforado"] } ],
+      [ { titulo:"Papelería", href:mCat("papeleria"),
+          items:["Tarjetas de presentación","Volantes","Calendarios corporativos","Agendas y croqueras","Marca páginas"] },
+        { titulo:"Merchandising y estampados", href:mCotizar("Merchandising"),
+          items:["Tazas y shoperos","Mousepad y botellas","Llaveros y chapitas","Poleras y polerones","Jockeys y lanyards"] } ]
+    ],
+    destacado: { eyebrow:"Más pedido", titulo:"Vinilo adhesivo",
+      texto:"Impreso en 120 cm de ancho. Desde $15.000 el m² con IVA, con precio especial desde 10 m².",
+      cta:"Cotizar por m²", href:mCotizar("Gran formato (vinilo adhesivo)") }
+  },
+  dig: {
+    nombre: "Servicios digitales",
+    secciones: [
+      { txt:"Planes mensuales",     href:mCotizar("Servicios digitales: plan mensual") },
+      { txt:"Logotipo e identidad", href:mCotizar("Logotipo e identidad") },
+      { txt:"Diseño web",           href:mCotizar("Diseño web") }
+    ],
+    mensuales: [
+      { titulo:"Planes mensuales", precio:"/ mes", texto:"Servicios digitales con pago mes a mes. Pregúntanos por el plan que necesitas.", href:mCotizar("Servicios digitales: plan mensual") }
+    ],
+    proyectos: [
+      { titulo:"Logotipo e identidad", precio:"desde $120.000", texto:"Diseño de marca listo para imprimir y usar en digital.", href:mCotizar("Logotipo e identidad") },
+      { titulo:"Diseño web", precio:"desde $250.000", texto:"Sitio a medida, como el de Bacano.", href:mCotizar("Diseño web") }
+    ],
+    destacado: { eyebrow:"¿No sabes cuál elegir?", titulo:"Te asesoramos gratis",
+      texto:"Cuéntanos qué necesitas y te proponemos un plan mensual o un proyecto cerrado.",
+      cta:"Hablar con Bacano", href:mCotizar("Servicios digitales") }
+  }
+};
+
 const PAGE = (location.pathname.split("/").pop() || "index.html").toLowerCase();
 
 /* ============================================================
@@ -76,47 +136,119 @@ function logoHTML(){
 function buildHeader(){
   const host = $("#site-header");
   if(!host) return;
-  const links = NAV.map(n =>
-    `<a href="${n.href}" class="${PAGE === n.href ? "is-active" : ""}">${n.txt}</a>`).join("");
+  const chevron = `<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m2.5 4.5 3.5 3.5 3.5-3.5"/></svg>`;
+  const feat = d => `<div class="mfeat">
+      <small>${d.eyebrow}</small><strong>${d.titulo}</strong><p>${d.texto}</p>
+      <a class="mfeat__btn" href="${d.href}">${d.cta} →</a>
+    </div>`;
+  const svc = s => `<a class="msvc" href="${s.href}"><b>${s.titulo}</b><em>${s.precio}</em><span>${s.texto}</span></a>`;
+  const P = MENU.prod, D = MENU.dig;
 
   host.innerHTML = `
-  <header class="header" id="hdr">
-    <div class="wrap header__in">
-      ${logoHTML()}
-      <nav class="nav">${links}</nav>
-      <div class="header__actions">
-        <button class="icon-btn" id="openCart" aria-label="Abrir carrito">
-          ${I.cart}<span class="cart-count" id="cartCount">0</span>
-        </button>
-        <a class="btn btn--pill" href="productos.html">Comprar ahora <span class="btn__arrow">${I.arrowUpR}</span></a>
-        <button class="icon-btn burger" id="openMenu" aria-label="Abrir menú">${I.menu}</button>
+  <header class="hdr" id="hdr">
+    <div class="hdr__l1">
+      <div class="wrap hdr__row1">
+        ${logoHTML()}
+        <nav class="hdr__nav" aria-label="Principal">
+          <button type="button" aria-expanded="false" aria-controls="mega-prod" data-area="prod">${P.nombre} ${chevron}</button>
+          <button type="button" aria-expanded="false" aria-controls="mega-dig" data-area="dig">${D.nombre} ${chevron}</button>
+          <a href="nosotros.html" class="${PAGE === "nosotros.html" ? "is-active" : ""}">Nosotros</a>
+        </nav>
+        <div class="hdr__act">
+          <a class="hdr__txt ${PAGE === "contacto.html" ? "is-active" : ""}" href="contacto.html">Contacto</a>
+          <button class="icon-btn" id="openCart" aria-label="Abrir carrito">
+            ${I.cart}<span class="cart-count" id="cartCount">0</span>
+          </button>
+          <a class="hdr__cta" href="contacto.html">Pedir cotización</a>
+          <button class="icon-btn hdr__burger" id="openMenu" aria-label="Abrir menú" aria-expanded="false">${I.menu}</button>
+        </div>
       </div>
     </div>
-  </header>
 
-  <div class="mobile-nav" id="mobileNav">
-    <div class="mobile-nav__top">
-      ${logoHTML()}
-      <button class="icon-btn" id="closeMenu" aria-label="Cerrar menú" style="background:transparent;border-color:#2c2c34;color:#fff">${I.x}</button>
+    <div class="hdr__l2">
+      <div class="wrap hdr__row2">
+        <span class="hdr__area" id="hdrArea"></span>
+        <nav class="hdr__sub" id="hdrSub" aria-label="Secciones"></nav>
+        <form class="hdr__search" action="productos.html" role="search">
+          ${I.search}<input name="q" type="search" placeholder="Buscar productos" aria-label="Buscar productos">
+        </form>
+      </div>
     </div>
-    <nav>${NAV.map(n => `<a class="m-link" href="${n.href}">${n.txt}${I.arrowR}</a>`).join("")}</nav>
-    <div class="mobile-nav__foot">
-      <a class="btn btn--red btn--block" href="contacto.html">Pedir cotización</a>
-      <a class="btn btn--ghost btn--block" href="tel:${SITE.telefonoLink}">${SITE.telefono}</a>
-    </div>
-  </div>`;
 
-  $("#openMenu").onclick  = () => $("#mobileNav").classList.add("is-open");
-  $("#closeMenu").onclick = () => $("#mobileNav").classList.remove("is-open");
-  $("#openCart").onclick  = () => Cart.open();
+    <div class="mega mega--prod" id="mega-prod" hidden>
+      <div class="wrap mega__in">
+        ${P.columnas.map(col => `<div class="mega__col">${col.map(g => `
+          <h4><a href="${g.href}">${g.titulo}</a></h4>
+          <ul>${g.items.map(t => `<li><a href="${g.href}">${t}</a></li>`).join("")}</ul>`).join("")}
+        </div>`).join("")}
+        ${feat(P.destacado)}
+      </div>
+    </div>
+
+    <div class="mega mega--dig" id="mega-dig" hidden>
+      <div class="wrap mega__in">
+        <div class="mega__col"><h4>Con pago mensual</h4><div class="msvcs">${D.mensuales.map(svc).join("")}</div></div>
+        <div class="mega__col"><h4>Proyectos a medida</h4><div class="msvcs">${D.proyectos.map(svc).join("")}</div></div>
+        ${feat(D.destacado)}
+      </div>
+    </div>
+
+    <nav class="mega__foot" aria-label="Más secciones">
+      <a href="nosotros.html">Nosotros</a><a href="contacto.html">Contacto</a>
+      <a class="hdr__cta" href="contacto.html">Pedir cotización</a>
+    </nav>
+  </header>`;
+
+  const hdr = $("#hdr");
+  const tops = $$(".hdr__nav button", hdr);
+  const burger = $("#openMenu");
+
+  /* nivel 2: secciones del área activa */
+  const setArea = k => {
+    $("#hdrArea").textContent = MENU[k].nombre;
+    const actual = location.pathname.split("/").pop() + location.search;
+    $("#hdrSub").innerHTML = MENU[k].secciones.map(s =>
+      `<a href="${s.href}" class="${actual === s.href ? "is-active" : ""}">${s.txt}</a>`).join("");
+  };
+  const tipo = new URLSearchParams(location.search).get("tipo") || "";
+  setArea(/digital|logotipo|web/i.test(tipo) ? "dig" : "prod");
+
+  const cerrar = () => {
+    tops.forEach(b => { b.setAttribute("aria-expanded", "false"); $("#" + b.getAttribute("aria-controls")).hidden = true; });
+    burger.setAttribute("aria-expanded", "false");
+    burger.innerHTML = I.menu; burger.setAttribute("aria-label", "Abrir menú");
+    hdr.classList.remove("is-menu");
+    document.body.style.overflow = "";
+  };
+  tops.forEach(b => b.addEventListener("click", e => {
+    e.stopPropagation();
+    const abierto = b.getAttribute("aria-expanded") === "true";
+    cerrar();
+    setArea(b.dataset.area);
+    if(!abierto){ b.setAttribute("aria-expanded", "true"); $("#" + b.getAttribute("aria-controls")).hidden = false; }
+  }));
+  burger.addEventListener("click", e => {
+    e.stopPropagation();
+    const abierto = burger.getAttribute("aria-expanded") === "true";
+    cerrar();
+    if(!abierto){
+      burger.setAttribute("aria-expanded", "true");
+      burger.innerHTML = I.x; burger.setAttribute("aria-label", "Cerrar menú");
+      hdr.classList.add("is-menu");
+      $("#mega-prod").hidden = false; $("#mega-dig").hidden = false;
+      document.body.style.overflow = "hidden";
+    }
+  });
+  document.addEventListener("click", e => { if(!e.target.closest(".mega") && !e.target.closest(".mega__foot")) cerrar(); });
+  document.addEventListener("keydown", e => { if(e.key === "Escape") cerrar(); });
+  $("#openCart").onclick = () => { cerrar(); Cart.open(); };
 
   /* el header se fija al desplazar y se esconde al bajar */
-  const hdr = $("#hdr");
   let last = scrollTop();
   const onScroll = () => {
     const y = scrollTop();
     hdr.classList.toggle("is-stuck", y > 12);
-    const blocked = $("#mobileNav")?.classList.contains("is-open") || $("#drawer")?.classList.contains("is-open");
+    const blocked = hdr.classList.contains("is-menu") || tops.some(b => b.getAttribute("aria-expanded") === "true") || $("#drawer")?.classList.contains("is-open");
     hdr.classList.toggle("is-hidden", !blocked && y > 260 && y > last + 4);
     last = y;
   };
@@ -532,6 +664,53 @@ function buildHome(){
     destHost.innerHTML = dest.map(cardHTML).join("");
   }
 
+  /* portada: producto destacado (id en data-producto) */
+  const sotd = $(".sotd[data-producto]");
+  const pd = sotd && PRODUCTOS.find(p => p.id === sotd.dataset.producto);
+  if(pd){
+    const c = CATEGORIAS.find(x => x.slug === pd.cat);
+    $("[data-f='precio']", sotd).textContent = "Desde " + money(pd.precio);
+    $("[data-f='unidad']", sotd).textContent = pd.unidad;
+    $("[data-f='nombre']", sotd).textContent = pd.nombre;
+    $("[data-f='cat']", sotd).textContent = c ? c.nombre : "";
+    const img = $("[data-f='img']", sotd);
+    img.src = pd.img.replace(/w=\d+/, "w=1800"); img.alt = pd.nombre;
+    $("[data-f='spec']", sotd).innerHTML =
+      pd.specs.slice(0, 2).map((s, i) => `<div><small>${i ? "Detalle" : "Incluye"}</small><strong>${s}</strong></div>`).join("") +
+      `<div><small>Plazo</small><strong>${pd.plazo}</strong></div>` +
+      `<button class="sotd__go" type="button" data-view="${pd.id}">Ver detalle →</button>`;
+  }
+
+  /* "lo más pedido": grilla con filtro por categoría */
+  const wGrid = $("#wGrid");
+  if(wGrid){
+    const lista = PRODUCTOS.slice(0, 9);
+    const catsUsadas = CATEGORIAS.filter(c => lista.some(p => p.cat === c.slug));
+    const CORTO = { granformato:"Gran formato", papeleria:"Papelería", vehicular:"Vehicular" };
+    const corto = c => CORTO[c.slug] || c.nombre.split(" y ")[0];
+    $("#wChips").innerHTML = `<button type="button" aria-pressed="true" data-c="">Todo</button>` +
+      catsUsadas.map(c => `<button type="button" aria-pressed="false" data-c="${c.slug}">${corto(c)}</button>`).join("");
+    const pintar = slug => {
+      const l = slug ? lista.filter(p => p.cat === slug) : lista;
+      wGrid.innerHTML = l.map(p => {
+        const c = CATEGORIAS.find(x => x.slug === p.cat);
+        return `<article class="wcard">
+          <button class="wcard__img" type="button" data-view="${p.id}" aria-label="Ver ${p.nombre}"><img src="${p.img}" alt="" loading="lazy"></button>
+          <div class="wcard__row"><h3>${p.nombre}</h3><span class="wtag">${c ? corto(c) : ""}</span></div>
+          <div class="wcard__row"><p class="wprice"><b>${money(p.precio)}</b> ${p.unidad}</p>
+            <button class="wadd" type="button" data-add="${p.id}" aria-label="Agregar ${p.nombre} al carrito">${I.plus}</button></div>
+        </article>`;
+      }).join("");
+      $("#wCount").textContent = l.length;
+    };
+    $("#wChips").addEventListener("click", e => {
+      const b = e.target.closest("button"); if(!b) return;
+      $$("#wChips button").forEach(x => x.setAttribute("aria-pressed", x === b));
+      pintar(b.dataset.c);
+    });
+    pintar("");
+  }
+
   /* carrusel "lo más pedido" */
   const picksHost = $("#picksHost");
   if(picksHost){
@@ -596,7 +775,9 @@ function buildShop(){
       <span class="count">${PRODUCTOS.filter(p => p.cat === c.slug).length}</span>
     </label>`).join("");
 
-  const state = { q:"", cats:new Set(preCat ? [preCat] : []), precio:"", orden:"rel" };
+  const preQ = (params.get("q") || "").trim();
+  if(preQ) $("#buscar").value = preQ;
+  const state = { q:preQ, cats:new Set(preCat ? [preCat] : []), precio:"", orden:"rel" };
 
   function apply(){
     let list = PRODUCTOS.slice();
@@ -737,6 +918,16 @@ function initCheckout(){
 function initContacto(){
   const form = $("#contactoForm");
   if(!form) return;
+
+  /* si llega desde el menú (contacto.html?tipo=…), deja elegido ese tipo de trabajo */
+  const tipo = new URLSearchParams(location.search).get("tipo");
+  const sel = $("#c-tipo");
+  if(tipo && sel){
+    let opt = [...sel.options].find(o => o.text === tipo);
+    if(!opt){ opt = new Option(tipo, tipo); sel.add(opt, sel.options[sel.options.length - 1]); }
+    sel.value = opt.value;
+  }
+
   form.addEventListener("submit", e => {
     e.preventDefault();
     const d = Object.fromEntries(new FormData(form).entries());
