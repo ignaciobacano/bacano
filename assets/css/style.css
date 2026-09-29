@@ -1197,7 +1197,7 @@ select.input{cursor:pointer}
 @media(max-width:520px){.drawer.cd{border-radius:0}}
 
 .cd__ship{position:relative; flex:none; background:var(--g-04); border-bottom:1px solid var(--line);
-  padding:22px 60px 22px 26px; text-align:center}
+  padding:22px 26px; text-align:center}
 .cd__shipTxt{font-size:.92rem; color:var(--gray); display:flex; justify-content:center; align-items:center; gap:6px; flex-wrap:wrap}
 .cd__shipTxt b{color:var(--ink); font-weight:600}
 .cd__shipTxt svg{width:16px; height:16px; color:var(--ink)}
@@ -1306,3 +1306,30 @@ select.input{cursor:pointer}
   .cd__qty button{width:30px; height:32px}
   .cd__qty input{width:24px}
 }
+
+/* ============================================================
+   BOTÓN "CERRAR" — el mismo en todas las ventanas desplegables
+   (detalle de producto, carrito, paneles del menú, menú celular, filtros)
+   ============================================================ */
+.xclose{display:inline-flex; align-items:center; gap:7px; width:auto; height:40px; padding:0 16px 0 12px; border-radius:100px;
+  border:1px solid var(--line); background:var(--paper); color:var(--ink); font:600 .84rem var(--font-body);
+  cursor:pointer; white-space:nowrap; transition:background .25s, color .25s, border-color .25s}
+.xclose:hover{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.xclose svg{width:16px; height:16px; flex:none}
+
+/* detalle de producto: el botón queda fijo arriba aunque se haga scroll */
+.modal__close.xclose{position:sticky; top:14px; margin:14px 14px -54px auto; display:flex; width:max-content; z-index:3}
+.qv__eta{display:flex; align-items:center; gap:8px; font-size:.85rem; color:var(--gray); margin-bottom:16px}
+.qv__eta svg{width:16px; height:16px; flex:none}
+
+/* carrito: el botón pasa a su propia fila, arriba a la derecha */
+.cd__close.xclose{position:static; display:flex; margin:-8px -8px 12px auto; width:max-content; height:36px}
+.cd__close.xclose:hover{background:var(--ink)}
+
+/* paneles del menú */
+.mega__top{display:flex; justify-content:flex-end; padding-top:14px}
+.mega__in{padding-top:6px}
+@media(max-width:900px){.mega__top{display:none}}
+
+/* menú celular abierto: el botón muestra "Cerrar" */
+.hdr__burger.xclose{display:inline-flex; width:auto; height:40px}

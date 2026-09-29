@@ -176,6 +176,7 @@ function buildHeader(){
     </div>
 
     <div class="mega mega--prod" id="mega-prod" hidden>
+      <div class="wrap mega__top"><button class="xclose mega__x" type="button">${I.x}<span>Cerrar</span></button></div>
       <div class="wrap mega__in">
         ${P.columnas.map(col => `<div class="mega__col">${col.map(g => `
           <h4><a href="${g.href}">${g.titulo}</a></h4>
@@ -186,6 +187,7 @@ function buildHeader(){
     </div>
 
     <div class="mega mega--dig" id="mega-dig" hidden>
+      <div class="wrap mega__top"><button class="xclose mega__x" type="button">${I.x}<span>Cerrar</span></button></div>
       <div class="wrap mega__in">
         <div class="mega__col"><h4>Con pago mensual</h4><div class="msvcs">${D.mensuales.map(svc).join("")}</div></div>
         <div class="mega__col"><h4>Proyectos a medida</h4><div class="msvcs">${D.proyectos.map(svc).join("")}</div></div>
@@ -216,7 +218,7 @@ function buildHeader(){
   const cerrar = () => {
     tops.forEach(b => { b.setAttribute("aria-expanded", "false"); $("#" + b.getAttribute("aria-controls")).hidden = true; });
     burger.setAttribute("aria-expanded", "false");
-    burger.innerHTML = I.menu; burger.setAttribute("aria-label", "Abrir menú");
+    burger.innerHTML = I.menu; burger.setAttribute("aria-label", "Abrir menú"); burger.classList.remove("xclose");
     hdr.classList.remove("is-menu");
     document.body.style.overflow = "";
   };
@@ -233,7 +235,7 @@ function buildHeader(){
     cerrar();
     if(!abierto){
       burger.setAttribute("aria-expanded", "true");
-      burger.innerHTML = I.x; burger.setAttribute("aria-label", "Cerrar menú");
+      burger.innerHTML = `${I.x}<span>Cerrar</span>`; burger.setAttribute("aria-label", "Cerrar menú"); burger.classList.add("xclose");
       hdr.classList.add("is-menu");
       $("#mega-prod").hidden = false; $("#mega-dig").hidden = false;
       document.body.style.overflow = "hidden";
@@ -241,6 +243,7 @@ function buildHeader(){
   });
   document.addEventListener("click", e => { if(!e.target.closest(".mega") && !e.target.closest(".mega__foot")) cerrar(); });
   document.addEventListener("keydown", e => { if(e.key === "Escape") cerrar(); });
+  $$(".mega__x", hdr).forEach(b => b.onclick = e => { e.stopPropagation(); cerrar(); });
   $("#openCart").onclick = () => { cerrar(); Cart.open(); };
 
   /* el header se fija al desplazar y se esconde al bajar */
@@ -341,8 +344,8 @@ function buildFloating(){
     <div class="overlay" id="overlay"></div>
     <aside class="drawer cd" id="drawer" aria-label="Carrito de compras">
       <div class="cd__ship">
+        <button class="cd__close xclose" id="closeCart" type="button">${I.x}<span>Cerrar</span></button>
         <div class="cd__shipTxt" id="cdShip"></div>
-        <button class="cd__close" id="closeCart" aria-label="Cerrar carrito">${I.x}</button>
         <div class="cd__bar"><i id="cdBar"></i></div>
       </div>
       <div class="cd__body" id="drawerBody"></div>
@@ -663,7 +666,7 @@ function openQuickView(id){
   if(!p) return;
   const cat = CATEGORIAS.find(c => c.slug === p.cat);
   $("#modalBox").innerHTML = `
-    <button class="modal__close" id="modalClose" aria-label="Cerrar">${I.x}</button>
+    <button class="modal__close xclose" id="modalClose" type="button">${I.x}<span>Cerrar</span></button>
     <div class="modal__grid">
       <div class="modal__media"><img src="${p.img}" alt="${p.nombre}"></div>
       <div class="modal__body">
@@ -672,7 +675,7 @@ function openQuickView(id){
         <div class="card__rating" style="margin-bottom:14px">${stars(p.rating)}<span>${p.rating} · ${p.reviews} opiniones</span></div>
         <p style="color:var(--gray);font-size:.94rem">${p.desc}</p>
         <div class="spec">${p.specs.map(s => `<div>${I.check}<span>${s}</span></div>`).join("")}</div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--gray);margin-bottom:16px">
+        <div class="qv__eta">
           ${I.clock}<span>Entrega estimada: <b style="color:var(--black)">${p.plazo}</b></span>
         </div>
         <div class="price" style="font-size:2rem;margin-bottom:16px"><small>${p.unidad}</small>${money(p.precio)}${p.antes ? `<s>${money(p.antes)}</s>` : ""}</div>
