@@ -984,6 +984,11 @@ select.input{cursor:pointer}
 /* marca gigante al pie */
 .footer__mark{overflow:hidden; padding-inline:var(--gut); max-width:var(--wrap); margin-inline:auto}
 .footer__mark .wordmark{display:block; color:#fff; opacity:.14}
+/* palabra BACANO del logotipo, a todo el ancho del pie */
+.footer__logo{display:block; width:100%; max-width:100%; aspect-ratio:1041/331; background:#fff; opacity:.14;
+  margin-block:clamp(10px,2vw,24px) clamp(18px,3vw,40px);
+  -webkit-mask:url(../img/logo-bacano-palabra.png) center/contain no-repeat;
+          mask:url(../img/logo-bacano-palabra.png) center/contain no-repeat}
 
 /* ---------- Botón flotante ---------- */
 .wa{

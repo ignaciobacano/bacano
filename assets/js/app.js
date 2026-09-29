@@ -331,7 +331,7 @@ function buildFooter(){
         <span>Sitio con compra segura · Datos protegidos</span>
       </div>
     </div>
-    <div class="footer__mark"><span class="wordmark">Bacano.</span></div>
+    <div class="footer__mark"><span class="footer__logo" role="img" aria-label="Bacano"></span></div>
   </footer>`;
 }
 
