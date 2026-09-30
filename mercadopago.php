@@ -224,7 +224,7 @@ switch ($accion) {
     $cupon     = strtoupper(trim((string)($d['cupon'] ?? '')));
     $pct       = $cat['cupones'][$cupon] ?? 0;
     $descuento = $pct ? (int)round($subtotal * $pct / 100) : 0;
-    $envio     = $subtotal >= $cat['envioGratis'] ? 0 : ENVIO;
+    $envio     = ($subtotal >= $cat['envioGratis'] || $cliente['entrega'] === 'Retiro en taller') ? 0 : ENVIO;
     $total     = $subtotal - $descuento + $envio;
 
     $numero = 'BC-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(2)));

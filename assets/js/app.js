@@ -502,9 +502,11 @@ const Cart = {
       return a + (p ? p.precio * i.qty : 0);
     }, 0);
   },
+  /* tipo de entrega elegido en el checkout: el retiro en taller no paga despacho */
+  entrega: "Despacho a domicilio",
   envio(){
     const s = this.subtotal();
-    if(s === 0) return 0;
+    if(s === 0 || this.entrega === "Retiro en taller") return 0;
     return s >= SITE.envioGratisDesde ? 0 : 4990;
   },
   /* códigos de descuento: se definen en data.js como SITE.cupones = { "CODIGO": 10 } (porcentaje) */
@@ -1042,12 +1044,13 @@ function renderCartPage(){
   }
 
   host.innerHTML = Cart.items.map(i => Cart.lineHTML(i, false)).join("");
-  const falta = SITE.envioGratisDesde - Cart.subtotal();
+  const retira = Cart.entrega === "Retiro en taller";
+  const falta = retira ? 0 : SITE.envioGratisDesde - Cart.subtotal();
 
   $("#cartSummary").innerHTML = `
     <div class="totals">
       <div><span>Subtotal (${Cart.count()} ítems)</span><b>${money(Cart.subtotal())}</b></div>
-      <div><span>Despacho</span><b>${Cart.envio() ? money(Cart.envio()) : "Gratis"}</b></div>
+      <div><span>${retira ? "Retiro en taller" : "Despacho"}</span><b>${Cart.envio() ? money(Cart.envio()) : retira ? "Sin costo" : "Gratis"}</b></div>
       ${falta > 0 ? `<div style="font-size:.82rem;color:var(--gray)"><span>Faltan ${money(falta)} para envío gratis</span></div>` : ""}
       <div class="grand"><span>Total</span><span>${money(Cart.total())}</span></div>
     </div>
@@ -1191,6 +1194,8 @@ function initCheckout(){
       const retira = e.target.value === "Retiro en taller";
       $("#bloqueDespacho").style.display = retira ? "none" : "grid";
       $$("#bloqueDespacho .input").forEach(i => i.required = !retira);
+      Cart.entrega = e.target.value;
+      renderCartPage();
     }
   });
 }
