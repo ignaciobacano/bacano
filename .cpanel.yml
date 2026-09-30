@@ -3,10 +3,10 @@
 # Copia SOLO los archivos del sitio a la carpeta de bacano.cl.
 # No borra nada del servidor (config.php y otros archivos quedan intactos)
 # y no toca otros dominios (panel.bacano.cl vive en otra carpeta).
-# .htaccess y api.php no se copian: se manejan a mano en el hosting.
+# .htaccess, api.php y mercadopago-config.php no se copian: se manejan a mano en el hosting.
 deployment:
   tasks:
     - export DEPLOYPATH=/home1/bacanoc1/public_html/
-    - /bin/cp -f index.html productos.html carrito.html contacto.html nosotros.html admin.html instalar.php $DEPLOYPATH
+    - /bin/cp -f index.html productos.html carrito.html contacto.html nosotros.html admin.html instalar.php mercadopago.php $DEPLOYPATH
     - /bin/mkdir -p ${DEPLOYPATH}assets
     - /bin/cp -Rf assets/css assets/js assets/img ${DEPLOYPATH}assets/

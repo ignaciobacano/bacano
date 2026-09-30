@@ -64,6 +64,11 @@ DirectoryIndex index.html
   Require all denied
 </Files>
 
+# ---------- Las credenciales de Mercado Pago, tampoco ----------
+<FilesMatch "^mercadopago-config">
+  Require all denied
+</FilesMatch>
+
 # ---------- El instalador: borralo apenas termines ----------
 # Mientras exista, cualquiera que sepa la dirección puede abrirlo.
 # Si preferís dejarlo, descomentá esto y poné tu IP:

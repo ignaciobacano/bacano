@@ -1060,15 +1060,102 @@ function renderCartPage(){
     <div class="secure-note" style="margin-top:8px">${I.check}<span>Aprobás una prueba digital antes de que entre a máquina.</span></div>`;
 }
 
+/* ============================================================
+   PAGO CON MERCADO PAGO
+   mercadopago.php recalcula el total con el catálogo y devuelve el
+   enlace de pago. Sin PHP (sitio abierto con doble clic o servidor
+   local) el pedido sigue por WhatsApp, como antes.
+   ============================================================ */
+async function pagarConMercadoPago(data){
+  let r;
+  try{
+    r = await fetch("mercadopago.php?accion=crear", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "X-Bacano":"1" },
+      body: JSON.stringify({ ...data, items: Cart.items, cupon: Cart.cupon })
+    });
+  }catch{ return { sinPago:true }; }
+  let j = null;
+  try{ j = await r.json(); }catch{}
+  if(!j) return { sinPago:true };                            /* no hay PHP: el servidor devolvió el archivo tal cual */
+  if(r.status === 503 || r.status === 404) return { sinPago:true };   /* pagos no configurados */
+  return j;
+}
+
+function pantallaPago(icono, titulo, texto, botones){
+  $("#checkoutWrap").innerHTML = `
+    <div class="panel center" style="padding:44px 30px">
+      <div style="width:76px;height:76px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;margin:0 auto 20px">
+        <span style="width:34px;height:34px;display:block">${icono}</span>
+      </div>
+      <h2 class="display" style="margin-bottom:12px">${titulo}</h2>
+      <p style="color:var(--gray);max-width:52ch;margin-inline:auto">${texto}</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:26px">${botones}</div>
+    </div>`;
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+/* Vuelta desde Mercado Pago: carrito.html?pago=ok|pendiente|error&payment_id=… */
+async function resultadoPago(){
+  const q = new URLSearchParams(location.search);
+  const vuelta = q.get("pago");
+  if(!vuelta || !$("#checkoutWrap")) return false;
+  const pagoId = q.get("payment_id") || q.get("collection_id");
+  const nro = q.get("external_reference") || "";
+  history.replaceState(null, "", location.pathname);
+
+  const seguir = `<a class="btn btn--ghost" href="productos.html">Seguir comprando</a>`;
+  const ws = t => `<a class="btn btn--red" href="${waLink(t)}" target="_blank" rel="noopener">Escribirnos por WhatsApp ${I.wa}</a>`;
+
+  /* el estado se confirma con Mercado Pago, no con lo que dice la dirección */
+  let estado = "";
+  if(pagoId && pagoId !== "null"){
+    try{
+      const r = await fetch("mercadopago.php?accion=verificar&payment_id=" + encodeURIComponent(pagoId));
+      const j = await r.json();
+      if(j.ok) estado = j.estado;
+    }catch{}
+  }
+
+  if(estado === "approved"){
+    Cart.clear();
+    pantallaPago(I.check, "¡Pago recibido!",
+      `Tu pedido <b style="color:var(--black)">${nro}</b> está pagado. Te escribimos para que nos mandes tu diseño y apruebes la prueba digital antes de imprimir.`,
+      ws(`Hola Bacano, pagué el pedido ${nro}. Les envío mi diseño.`) + seguir);
+  } else if(estado === "pending" || estado === "in_process" || vuelta === "pendiente"){
+    Cart.clear();
+    pantallaPago(I.check, "Pago en proceso",
+      `Mercado Pago está procesando el pago del pedido <b style="color:var(--black)">${nro}</b>. Apenas se acredite te avisamos para seguir con tu trabajo.`,
+      ws(`Hola Bacano, mi pago del pedido ${nro} quedó en proceso.`) + seguir);
+  } else {
+    pantallaPago(I.x, "El pago no se completó",
+      `No se hizo ningún cobro. Tu carrito sigue guardado: podés intentarlo de nuevo con otro medio de pago o coordinar con nosotros.`,
+      `<a class="btn btn--red" href="carrito.html">Volver al carrito</a>` + ws(`Hola Bacano, tuve un problema al pagar el pedido ${nro}.`));
+  }
+  return true;
+}
+
 function initCheckout(){
   const form = $("#checkoutForm");
   if(!form) return;
+  resultadoPago();
 
-  form.addEventListener("submit", e => {
+  form.addEventListener("submit", async e => {
     e.preventDefault();
     if(!Cart.items.length){ toast("Tu carrito está vacío", I.cart); return; }
 
     const data = Object.fromEntries(new FormData(form).entries());
+
+    const boton = form.querySelector("[type=submit]");
+    const textoBoton = boton.innerHTML;
+    boton.disabled = true;
+    boton.textContent = "Preparando el pago…";
+    const pago = await pagarConMercadoPago(data);
+    if(pago.ok && pago.url){ location.href = pago.url; return; }
+    boton.disabled = false;
+    boton.innerHTML = textoBoton;
+    if(!pago.sinPago){ toast(pago.error || "No se pudo preparar el pago. Probá de nuevo."); return; }
+
     const nro = "BC-" + Date.now().toString().slice(-6);
     const detalle = Cart.items.map(i => {
       const p = Cart.find(i.id);

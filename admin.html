@@ -1238,7 +1238,7 @@ async function cargarPedidos(){
           <b>${esc(p.numero)} · ${esc(p.nombre || "sin nombre")}</b>
           <span>${clp(p.total)} · ${esc(p.entrega || "")} · ${esc(p.creado)}</span>
           <div class="tagline">
-            <span class="tg ${p.estado === "nuevo" ? "red" : ""}">${esc(p.estado)}</span>
+            <span class="tg ${["nuevo","pagado"].includes(p.estado) ? "red" : ""}">${esc(p.estado)}</span>
             ${(p.items || []).map(i => `<span class="tg">${esc(i.qty + "× " + (i.nombre || i.id))}</span>`).join("")}
           </div>
         </div>

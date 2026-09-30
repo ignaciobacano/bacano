@@ -21,7 +21,8 @@ $excluir = @(
   ".git", ".claude", "_publicar", "node_modules",
   "*.ps1", "*.md", ".gitignore", ".gitattributes",
   "*.zip", "bacano-respaldo-*.json", "_hoja.html",
-  "Thumbs.db", "desktop.ini"
+  "Thumbs.db", "desktop.ini",
+  "mercadopago-config.php"   # credenciales: se suben a mano, para no pisar las del servidor
 )
 
 function Excluido($ruta) {

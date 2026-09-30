@@ -24,3 +24,6 @@ _publicar/
 
 # NUNCA subir: tiene la contraseña de la base de datos
 config.php
+
+# NUNCA subir: tiene el access token de Mercado Pago
+mercadopago-config.php
