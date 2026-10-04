@@ -22,7 +22,8 @@ $excluir = @(
   "*.ps1", "*.md", ".gitignore", ".gitattributes",
   "*.zip", "bacano-respaldo-*.json", "_hoja.html",
   "Thumbs.db", "desktop.ini",
-  "mercadopago-config.php"   # credenciales: se suben a mano, para no pisar las del servidor
+  "mercadopago-config.php",  # credenciales: se suben a mano, para no pisar las del servidor
+  "catalogo-config.php", "catalogo-core.*"   # el catálogo lo genera el servidor cada día: no pisarlo con la copia local
 )
 
 function Excluido($ruta) {

@@ -27,3 +27,8 @@ config.php
 
 # NUNCA subir: tiene el access token de Mercado Pago
 mercadopago-config.php
+
+# El catálogo de Bacano Core: lo genera catalogo-sync.php en el servidor, cada día
+catalogo-config.php
+catalogo-core.js
+catalogo-core.json

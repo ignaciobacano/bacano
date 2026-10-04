@@ -115,6 +115,38 @@ Con la base instalada, la tabla `pedidos` guarda cada compra del carrito con su 
 
 No pasa nada: todo lo anterior es opcional. El panel funciona igual generando `data.js` para subir por FTP o publicando en GitHub.
 
+## Catálogo desde Bacano Core
+
+El sitio muestra el catálogo que se trabaja en **bacanocore.cl** (módulo Catálogo). Lo lee
+**una vez al día** desde `https://bacanocore.cl/api/catalogo-publico`, de solo lectura.
+
+| Archivo | Para qué |
+|---|---|
+| `catalogo-sync.php` | Lee Core y escribe los dos archivos de abajo. Lo copia el despliegue de cPanel |
+| `catalogo-core.js` | El catálogo que carga el navegador. **Lo genera el servidor**, no está en GitHub |
+| `catalogo-core.json` | Los precios con que cobra Mercado Pago. Bloqueado desde internet |
+
+**Activarlo (una sola vez):** cPanel → **Cron Jobs** → *Add New Cron Job*:
+
+- Frecuencia: una vez al día (por ejemplo, minuto `0`, hora `6`).
+- Comando: `php /home1/bacanoc1/public_html/catalogo-sync.php`
+
+Para la primera lectura sin esperar al día siguiente: en cPanel → **Terminal**, ejecutá ese
+mismo comando. Tiene que responder `OK · … · 30 familias y 63 variantes`.
+
+**Qué pasa si algo falla:** si Core no responde, manda un catálogo vacío o pide iniciar sesión,
+`catalogo-sync.php` **no toca nada** y el sitio sigue con la copia del día anterior. Sin ninguna
+copia (antes de la primera lectura), el sitio muestra los productos de `data.js`.
+
+**Actualizar al momento (opcional):** copiá `catalogo-config.ejemplo.php` como
+`catalogo-config.php` en el hosting, poné una `clave` larga y abrí
+`https://bacano.cl/catalogo-sync.php?clave=TU_CLAVE`.
+
+**Cómo se ve:** cada familia del catálogo es un producto; sus variantes son las opciones que el
+cliente elige en la ficha (medida, formato, plan). El menú *Productos impresos* sale de las
+categorías de productos y servicios, y *Servicios digitales* de logotipo y web. Mientras Core
+no tenga fotos de producto, se usa una foto por categoría.
+
 ## 5 · Sobre el panel en internet
 
 `admin.html` no tiene contraseña: cualquiera que sepa la dirección puede abrirlo y ver el catálogo, aunque **no puede publicar nada** en GitHub sin tu token. Tres formas de cerrarlo, de menos a más segura:

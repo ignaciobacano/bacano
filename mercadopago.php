@@ -17,6 +17,7 @@ define('RAIZ',      __DIR__);
 define('CONFIG_MP', RAIZ . '/mercadopago-config.php');
 define('CONFIG_BD', RAIZ . '/config.php');
 define('DATAJS',    RAIZ . '/assets/js/data.js');
+define('CATALOGO_CORE', RAIZ . '/catalogo-core.json');   /* lo escribe catalogo-sync.php */
 define('API_MP',    'https://api.mercadopago.com');
 define('ENVIO',     4990);   /* el mismo valor que Cart.envio() en app.js */
 
@@ -106,6 +107,18 @@ function catalogo() {
       'nombre' => isset($nombre[1]) ? stripcslashes($nombre[1]) : $id[1],
       'precio' => (int)$precio[1],
     ];
+  }
+  /* Con el catálogo de Bacano Core (catalogo-sync.php), se cobra por SKU con esos precios */
+  $core = @json_decode((string)@file_get_contents(CATALOGO_CORE), true);
+  if (is_array($core['familias'] ?? null) && $core['familias']) {
+    $productos = [];
+    foreach ($core['familias'] as $f) foreach ((array)($f['variantes'] ?? []) as $v) {
+      if (empty($v['sku']) || empty($v['precio'])) continue;
+      $productos[$v['sku']] = [
+        'nombre' => $f['nombre'] . (!empty($v['opcion']) ? ' · ' . $v['opcion'] : ''),
+        'precio' => (int)$v['precio'],
+      ];
+    }
   }
   if (!$productos) error('No se pudo leer el catálogo.', 500);
 

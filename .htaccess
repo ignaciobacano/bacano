@@ -65,9 +65,16 @@ DirectoryIndex index.html
 </Files>
 
 # ---------- Las credenciales de Mercado Pago, tampoco ----------
-<FilesMatch "^mercadopago-config">
+<FilesMatch "^(mercadopago|catalogo)-config">
   Require all denied
 </FilesMatch>
+
+# ---------- El catálogo de Bacano Core: se renueva cada día ----------
+<Files "catalogo-core.js">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "no-cache, must-revalidate"
+  </IfModule>
+</Files>
 
 # ---------- El instalador: borralo apenas termines ----------
 # Mientras exista, cualquiera que sepa la dirección puede abrirlo.

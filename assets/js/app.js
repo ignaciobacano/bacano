@@ -122,6 +122,77 @@ const MENU = {
   }
 };
 
+/* ============================================================
+   CATÁLOGO DESDE BACANO CORE
+   catalogo-sync.php deja cada día en catalogo-core.js el catálogo de
+   bacanocore.cl. Si está, reemplaza los productos de data.js: cada
+   familia es un producto y sus opciones (variantes) son lo que se
+   compra, por SKU. Sin ese archivo, el sitio sigue con data.js.
+   ============================================================ */
+const VARIANTES = {};
+const slugDe = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+  .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+(function catalogoCore(){
+  const C = window.CATALOGO_CORE;
+  if(!C || !Array.isArray(C.familias) || !C.familias.length) return;
+
+  /* las fotos de categoría que ya tenía el sitio sirven mientras Core no tenga fotos */
+  const fotoDe = {};
+  CATEGORIAS.forEach(c => { fotoDe[c.slug] = c.img; });
+  const fotoGenerica = Object.values(FOTOS)[0] || "";
+  const DIGITALES = new Set(["logotipo", "web"]);
+  const unidadDe = v => [v.formato, v.minimo && `mínimo ${v.minimo}`].filter(Boolean).join(" · ");
+
+  const cats = [], prods = [];
+  for(const f of C.familias){
+    const slug = slugDe(f.categoria);
+    let cat = cats.find(c => c.slug === slug);
+    if(!cat){
+      cat = { slug, nombre:f.categoria, desc:"", img:fotoDe[slug] || fotoGenerica, digital:DIGITALES.has(f.lista) };
+      cats.push(cat);
+    }
+    const precios = f.variantes.map(v => v.precio).filter(Boolean);
+    const img = (f.variantes.find(v => v.imagen) || {}).imagen || cat.img;
+    const p = {
+      id: f.codigo, nombre: f.nombre, cat: slug, img,
+      precio: precios.length ? Math.min(...precios) : 0,
+      desde: new Set(precios).size > 1,
+      unidad: f.variantes.length > 1 ? `${f.variantes.length} opciones` : unidadDe(f.variantes[0]),
+      flags: [], desc: f.detalle || "", plazo: "",
+      specs: f.variantes.length === 1 ? f.variantes[0].incluye : [],
+      variantes: f.variantes.map(v => ({ ...v, unidad: unidadDe(v) }))
+    };
+    prods.push(p);
+    p.variantes.forEach(v => {
+      VARIANTES[v.sku] = { id:v.sku, familia:p.id, nombre: v.opcion ? `${p.nombre} · ${v.opcion}` : p.nombre,
+        cat:slug, precio:v.precio || 0, unidad:v.unidad, img:v.imagen || img, flags:[] };
+    });
+  }
+  CATEGORIAS = cats;
+  PRODUCTOS = prods;
+
+  /* el menú sale del mismo catálogo: impresos por un lado, logotipo y web por otro */
+  const impresas = cats.filter(c => !c.digital), digitales = cats.filter(c => c.digital);
+  const deCat = c => prods.filter(p => p.cat === c.slug);
+  const precioTxt = p => p.precio ? `${p.desde ? "desde " : ""}${money(p.precio)}` : "a cotizar";
+
+  MENU.prod.secciones = impresas.map(c => ({ txt:c.nombre, href:mCat(c.slug) }));
+  MENU.prod.columnas = [[], [], [], []];
+  impresas.forEach((c, i) => MENU.prod.columnas[i % 4].push({
+    titulo:c.nombre, href:mCat(c.slug), items:deCat(c).slice(0, 6).map(p => p.nombre) }));
+  const dest = prods.find(p => !cats.find(c => c.slug === p.cat).digital && p.variantes.length > 1) || prods[0];
+  MENU.prod.destacado = { eyebrow:"Del catálogo", titulo:dest.nombre,
+    texto:`${dest.desc ? dest.desc.charAt(0).toUpperCase() + dest.desc.slice(1) + ". " : ""}${precioTxt(dest).replace(/^d/, "D")} con IVA.`,
+    cta:"Ver opciones", href:mCat(dest.cat) };
+
+  if(digitales.length){
+    MENU.dig.secciones = [MENU.dig.secciones[0], ...digitales.map(c => ({ txt:c.nombre, href:mCat(c.slug) }))];
+    MENU.dig.proyectos = digitales.flatMap(deCat).map(p => ({
+      titulo:p.nombre, precio:precioTxt(p), texto:p.desc, href:mCat(p.cat) }));
+  }
+})();
+
 const PAGE = (location.pathname.split("/").pop() || "index.html").toLowerCase();
 
 /* ============================================================
@@ -464,16 +535,24 @@ const Cart = {
   load(){
     try { this.items = JSON.parse(localStorage.getItem(this.key)) || []; }
     catch { this.items = []; }
+    /* lo que ya no está en el catálogo (o cambió de código) sale del carrito */
+    this.items = this.items.filter(i => this.find(i.id));
   },
   save(){
     localStorage.setItem(this.key, JSON.stringify(this.items));
     this.render();
   },
-  find(id){ return PRODUCTOS.find(p => p.id === id); },
+  find(id){ return VARIANTES[id] || PRODUCTOS.find(p => p.id === id); },
 
   add(id, qty = 1, silent = false){
+    /* una familia del catálogo de Core no se compra: se compra una de sus opciones */
+    const fam = PRODUCTOS.find(p => p.id === id && p.variantes);
+    if(fam){
+      if(fam.variantes.length > 1 || !fam.variantes[0].precio){ if(!silent) openQuickView(id); return; }
+      id = fam.variantes[0].sku;
+    }
     const p = this.find(id);
-    if(!p) return;
+    if(!p || !p.precio) return;
     const line = this.items.find(i => i.id === id);
     if(line) line.qty += qty;
     else this.items.push({ id, qty });
@@ -701,6 +780,12 @@ function stars(r){
   return `<span class="stars">${"★".repeat(full)}${"☆".repeat(5 - full)}</span>`;
 }
 
+/* «Desde» solo cuando hay opciones con distinto precio; sin precio, se cotiza */
+function precioHTML(p){
+  if(!p.precio) return `<small>Precio</small>A cotizar`;
+  return `${p.desde || !p.variantes ? "<small>Desde</small>" : ""}${money(p.precio)}`;
+}
+
 function cardHTML(p){
   const cat = CATEGORIAS.find(c => c.slug === p.cat);
   return `<article class="card reveal">
@@ -716,9 +801,9 @@ function cardHTML(p){
       <span class="card__cat">${cat ? cat.nombre : ""}</span>
       <h3 class="card__title">${p.nombre}</h3>
       <span class="card__meta">${p.unidad}</span>
-      <div class="card__rating">${stars(p.rating)}<span>${p.rating} (${p.reviews})</span></div>
+      ${p.rating ? `<div class="card__rating">${stars(p.rating)}<span>${p.rating} (${p.reviews})</span></div>` : ""}
       <div class="card__foot">
-        <div class="price"><small>Desde</small>${money(p.precio)}${p.antes ? `<s>${money(p.antes)}</s>` : ""}</div>
+        <div class="price">${precioHTML(p)}${p.antes ? `<s>${money(p.antes)}</s>` : ""}</div>
         <button class="add-btn" data-add="${p.id}" aria-label="Agregar ${p.nombre} al carrito">${I.plus}</button>
       </div>
     </div>
@@ -733,7 +818,7 @@ function pcardHTML(p){
     <div class="pcard__bot">
       <div>
         <h3>${p.nombre}</h3>
-        <b>${money(p.precio)}</b>
+        <b>${p.precio ? (p.desde ? "desde " : "") + money(p.precio) : "A cotizar"}</b>
         <small>${p.unidad}</small>
       </div>
       <button class="pcard__add" data-add="${p.id}" aria-label="Agregar ${p.nombre} al carrito">${I.plus}</button>
@@ -755,20 +840,43 @@ function openQuickView(id){
       <div class="modal__body">
         <span class="card__cat">${cat ? cat.nombre : ""}</span>
         <h3 class="display" style="margin:8px 0 10px">${p.nombre}</h3>
-        <div class="card__rating" style="margin-bottom:14px">${stars(p.rating)}<span>${p.rating} · ${p.reviews} opiniones</span></div>
-        <p style="color:var(--gray);font-size:.94rem">${p.desc}</p>
-        <div class="spec">${p.specs.map(s => `<div>${I.check}<span>${s}</span></div>`).join("")}</div>
-        <div class="qv__eta">
+        ${p.rating ? `<div class="card__rating" style="margin-bottom:14px">${stars(p.rating)}<span>${p.rating} · ${p.reviews} opiniones</span></div>` : ""}
+        ${p.desc ? `<p style="color:var(--gray);font-size:.94rem">${p.desc}</p>` : ""}
+        ${p.variantes && p.variantes.length > 1 ? `
+          <div class="qv__opts" role="radiogroup" aria-label="Elige una opción">
+            ${p.variantes.map((v, i) => `
+              <button type="button" class="qv__opt" role="radio" aria-checked="${i === 0}" data-opt="${i}">
+                <span>${v.opcion || v.formato || v.sku}</span>
+                <small>${v.unidad}</small>
+                <b>${v.precio ? money(v.precio) : "A cotizar"}</b>
+              </button>`).join("")}
+          </div>` : ""}
+        <div class="spec" id="qvSpecs"></div>
+        ${p.plazo ? `<div class="qv__eta">
           ${I.clock}<span>Entrega estimada: <b style="color:var(--black)">${p.plazo}</b></span>
-        </div>
-        <div class="price" style="font-size:2rem;margin-bottom:16px"><small>${p.unidad}</small>${money(p.precio)}${p.antes ? `<s>${money(p.antes)}</s>` : ""}</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn--red" data-add="${p.id}">Agregar al carrito ${I.cart}</button>
-          <a class="btn btn--ghost" href="${waLink(`Hola Bacano, quiero cotizar: ${p.nombre}`)}" target="_blank" rel="noopener">Consultar</a>
-        </div>
+        </div>` : ""}
+        <div class="price" id="qvPrecio" style="font-size:2rem;margin-bottom:16px"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap" id="qvAcciones"></div>
         <div class="secure-note" style="margin-top:16px">${I.shield}<span>Prueba digital antes de imprimir · Garantía de reimpresión por falla nuestra</span></div>
       </div>
     </div>`;
+  /* precio, características y botón de la opción elegida (o del producto, si no tiene opciones) */
+  const elegir = i => {
+    const v = p.variantes ? p.variantes[i] : null;
+    const precio = v ? v.precio : p.precio;
+    const nombre = v && v.opcion ? `${p.nombre} · ${v.opcion}` : p.nombre;
+    const specs = v ? [...v.incluye, ...v.noIncluye.map(x => `No incluye: ${x}`)] : p.specs;
+    $("#qvSpecs").innerHTML = specs.map(s => `<div>${I.check}<span>${s}</span></div>`).join("");
+    $("#qvPrecio").innerHTML = precio
+      ? `<small>${v ? v.unidad : p.unidad}</small>${money(precio)}${!v && p.antes ? `<s>${money(p.antes)}</s>` : ""}`
+      : `<small>${v ? v.unidad : p.unidad}</small>A cotizar`;
+    const consultar = `<a class="btn btn--ghost" href="${waLink(`Hola Bacano, quiero cotizar: ${nombre}`)}" target="_blank" rel="noopener">Consultar</a>`;
+    $("#qvAcciones").innerHTML = (precio ? `<button class="btn btn--red" data-add="${v ? v.sku : p.id}">Agregar al carrito ${I.cart}</button>` : "") + consultar;
+    $$(".qv__opt", $("#modalBox")).forEach(b => b.setAttribute("aria-checked", b.dataset.opt === String(i)));
+  };
+  $$(".qv__opt", $("#modalBox")).forEach(b => b.onclick = () => elegir(+b.dataset.opt));
+  elegir(0);
+
   $("#modal").classList.add("is-open");
   $("#overlay").classList.add("is-on");
   document.body.style.overflow = "hidden";
@@ -844,16 +952,19 @@ function buildHome(){
 
   const destHost = $("#destacadosHost");
   if(destHost){
-    const dest = PRODUCTOS.filter(p => p.flags.length).slice(0, 8);
+    const marcados = PRODUCTOS.filter(p => p.flags.length);
+    const dest = (marcados.length ? marcados : PRODUCTOS).slice(0, 8);
     destHost.innerHTML = dest.map(cardHTML).join("");
   }
 
   /* portada: producto destacado (id en data-producto) */
   const sotd = $(".sotd[data-producto]");
-  const pd = sotd && PRODUCTOS.find(p => p.id === sotd.dataset.producto);
+  /* con el catálogo de Core ese id ya no existe: se usa el primero que tenga opciones */
+  const pd = sotd && (PRODUCTOS.find(p => p.id === sotd.dataset.producto)
+    || (window.CATALOGO_CORE && (PRODUCTOS.find(p => p.variantes && p.variantes.length > 1) || PRODUCTOS[0])));
   if(pd){
     const c = CATEGORIAS.find(x => x.slug === pd.cat);
-    $("[data-f='precio']", sotd).textContent = "Desde " + money(pd.precio);
+    $("[data-f='precio']", sotd).textContent = pd.precio ? (pd.desde || !pd.variantes ? "Desde " : "") + money(pd.precio) : "A cotizar";
     $("[data-f='unidad']", sotd).textContent = pd.unidad;
     $("[data-f='nombre']", sotd).textContent = pd.nombre;
     $("[data-f='cat']", sotd).textContent = c ? c.nombre : "";
@@ -861,7 +972,7 @@ function buildHome(){
     img.src = pd.img.replace(/w=\d+/, "w=1800"); img.alt = pd.nombre;
     $("[data-f='spec']", sotd).innerHTML =
       pd.specs.slice(0, 2).map((s, i) => `<div><small>${i ? "Detalle" : "Incluye"}</small><strong>${s}</strong></div>`).join("") +
-      `<div><small>Plazo</small><strong>${pd.plazo}</strong></div>` +
+      (pd.plazo ? `<div><small>Plazo</small><strong>${pd.plazo}</strong></div>` : "") +
       `<button class="sotd__go" type="button" data-view="${pd.id}">Ver detalle →</button>`;
   }
 
@@ -881,7 +992,7 @@ function buildHome(){
         return `<article class="wcard">
           <button class="wcard__img" type="button" data-view="${p.id}" aria-label="Ver ${p.nombre}"><img src="${p.img}" alt="" loading="lazy"></button>
           <div class="wcard__row"><h3>${p.nombre}</h3><span class="wtag">${c ? corto(c) : ""}</span></div>
-          <div class="wcard__row"><p class="wprice"><b>${money(p.precio)}</b> ${p.unidad}</p>
+          <div class="wcard__row"><p class="wprice"><b>${p.precio ? (p.desde ? "desde " : "") + money(p.precio) : "A cotizar"}</b> ${p.unidad}</p>
             <button class="wadd" type="button" data-add="${p.id}" aria-label="Agregar ${p.nombre} al carrito">${I.plus}</button></div>
         </article>`;
       }).join("");
@@ -990,7 +1101,7 @@ function buildShop(){
 
     if(state.orden === "asc")  list.sort((a, b) => a.precio - b.precio);
     if(state.orden === "desc") list.sort((a, b) => b.precio - a.precio);
-    if(state.orden === "top")  list.sort((a, b) => b.reviews - a.reviews);
+    if(state.orden === "top")  list.sort((a, b) => (b.reviews || 0) - (a.reviews || 0));
 
     host.innerHTML = list.length
       ? list.map(cardHTML).join("")
