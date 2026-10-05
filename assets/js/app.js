@@ -153,9 +153,12 @@ const slugDe = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
       cats.push(cat);
     }
     const precios = f.variantes.map(v => v.precio).filter(Boolean);
-    const img = (f.variantes.find(v => v.imagen) || {}).imagen || cat.img;
+    /* las fotos de la familia (portada primero); si no tiene, la de una opción o la de la categoría */
+    const galeria = (f.imagenes || []).map(i => i.url).filter(Boolean);
+    const img = galeria[0] || (f.variantes.find(v => v.imagen) || {}).imagen || cat.img;
+    if(galeria[0] && !cat.conFoto){ cat.img = galeria[0]; cat.conFoto = true; }
     const p = {
-      id: f.codigo, nombre: f.nombre, cat: slug, img,
+      id: f.codigo, nombre: f.nombre, cat: slug, img, galeria,
       precio: precios.length ? Math.min(...precios) : 0,
       desde: new Set(precios).size > 1,
       unidad: f.variantes.length > 1 ? `${f.variantes.length} opciones` : unidadDe(f.variantes[0]),
@@ -836,7 +839,11 @@ function openQuickView(id){
   $("#modalBox").innerHTML = `
     <button class="modal__close xclose" id="modalClose" type="button">${I.x}<span>Cerrar</span></button>
     <div class="modal__grid">
-      <div class="modal__media"><img src="${p.img}" alt="${p.nombre}"></div>
+      <div class="modal__media"><img src="${p.img}" alt="${p.nombre}" id="qvFoto">
+        ${p.galeria && p.galeria.length > 1 ? `<div class="qv__galeria">
+          ${p.galeria.map((u, i) => `<button type="button" class="qv__mini" aria-current="${i === 0}" data-foto="${u}"><img src="${u}?tam=mini" alt="" loading="lazy"></button>`).join("")}
+        </div>` : ""}
+      </div>
       <div class="modal__body">
         <span class="card__cat">${cat ? cat.nombre : ""}</span>
         <h3 class="display" style="margin:8px 0 10px">${p.nombre}</h3>
@@ -875,6 +882,10 @@ function openQuickView(id){
     $$(".qv__opt", $("#modalBox")).forEach(b => b.setAttribute("aria-checked", b.dataset.opt === String(i)));
   };
   $$(".qv__opt", $("#modalBox")).forEach(b => b.onclick = () => elegir(+b.dataset.opt));
+  $$(".qv__mini", $("#modalBox")).forEach(b => b.onclick = () => {
+    $("#qvFoto").src = b.dataset.foto;
+    $$(".qv__mini", $("#modalBox")).forEach(x => x.setAttribute("aria-current", x === b));
+  });
   elegir(0);
 
   $("#modal").classList.add("is-open");

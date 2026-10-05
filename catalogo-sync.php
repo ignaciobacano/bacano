@@ -23,11 +23,14 @@ define('URL_CORE',  'https://bacanocore.cl/api/catalogo-publico');
 $conf = file_exists(CONFIG) ? (require CONFIG) : [];
 $url  = $conf['url'] ?? URL_CORE;
 
-/* Solo desde la tarea programada (línea de comandos), o desde el navegador con la clave */
+/* Solo desde la tarea programada (línea de comandos), o con la clave: por POST desde el botón
+   «Actualizar bacano.cl» del catálogo de Bacano Core, o en la dirección desde el navegador */
 if (PHP_SAPI !== 'cli') {
   header('Content-Type: text/plain; charset=utf-8');
+  header('Cache-Control: no-store');
   $clave = (string)($conf['clave'] ?? '');
-  if (strlen($clave) < 16 || !hash_equals($clave, (string)($_GET['clave'] ?? ''))) {
+  $dada  = (string)($_POST['clave'] ?? $_GET['clave'] ?? '');
+  if (strlen($clave) < 16 || !hash_equals($clave, $dada)) {
     http_response_code(403);
     exit("No autorizado.\n");
   }
@@ -46,6 +49,7 @@ curl_setopt_array($ch, [
   CURLOPT_TIMEOUT        => 30,
   CURLOPT_FOLLOWLOCATION => false,   /* si Core manda a /ingresar, es un error, no un catálogo */
   CURLOPT_HTTPHEADER     => ['Accept: application/json'],
+  CURLOPT_USERAGENT      => 'bacano.cl catalogo-sync',
 ]);
 $resp = curl_exec($ch);
 $cod  = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -62,6 +66,20 @@ if (!is_array($cat) || ($cat['version'] ?? null) !== 1 || !is_array($cat['famili
 $txt = fn($v, $max = 300) => is_string($v) && trim($v) !== '' ? mb_substr(trim($v), 0, $max) : null;
 $lista = fn($v) => array_values(array_filter(array_map(fn($x) => $txt($x, 200), is_array($v) ? $v : [])));
 $img = fn($v) => is_string($v) && preg_match('#^https://\S+$#i', trim($v)) ? trim($v) : null;
+
+/* Las fotos de la familia: Core las da como rutas propias (/api/catalogo-publico/imagen/<id>)
+   y aquí se vuelven direcciones completas de Core. Lo que no tenga esa forma se descarta. */
+$origen = preg_match('#^(https://[^/]+)#i', $url, $m) ? $m[1] : 'https://bacanocore.cl';
+$fotos = function ($v) use ($origen) {
+  $res = [];
+  foreach (is_array($v) ? $v : [] as $i) {
+    $ruta = is_array($i) && is_string($i['url'] ?? null) ? $i['url'] : '';
+    if (!preg_match('#^/api/catalogo-publico/imagen/[A-Za-z0-9]{8,40}$#', $ruta)) continue;
+    $res[] = ['url' => $origen . $ruta, 'pieza' => is_string($i['pieza'] ?? null) ? mb_substr($i['pieza'], 0, 40) : null];
+    if (count($res) >= 12) break;
+  }
+  return $res;
+};
 
 $familias = [];
 $skus = [];
@@ -94,6 +112,7 @@ foreach ($cat['familias'] as $f) {
     'detalle'   => $txt($f['detalle'] ?? null),
     'lista'     => $txt($f['lista'] ?? null, 30) ?? 'productos',
     'categoria' => $txt($f['categoria'] ?? null, 120) ?? 'Otros',
+    'imagenes'  => $fotos($f['imagenes'] ?? []),
     'variantes' => $variantes,
   ];
 }
