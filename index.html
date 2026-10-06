@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://images.unsplash.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter+Tight:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=17">
+<link rel="stylesheet" href="assets/css/style.css?v=18">
 <noscript><style>.pre,.pt{display:none!important}</style></noscript>
 
 </head>
@@ -288,9 +288,9 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
 
 <script src="assets/js/data.js?v=7"></script>
 <script src="catalogo-core.js"></script>
-<script src="assets/js/app.js?v=17"></script>
+<script src="assets/js/app.js?v=18"></script>
 <script>
-/* El hero de promociones (2026-10-06): pasa de página cada 7 s, con flechas y rayas;
+/* El hero de promociones (2026-10-06): pasa de página cada 5 s, con flechas y rayas;
    se pausa al pasar el mouse. ?foto=N fija una página, para las capturas. */
 (function(){
   var hero=document.querySelector(".hp"); if(!hero) return;
@@ -299,14 +299,14 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
   function ir(k){
     k=(k+n)%n; if(k===i) return;
     var antes=pags[i]; antes.classList.remove("on"); antes.classList.add("sale"); antes.setAttribute("aria-hidden","true");
-    setTimeout(function(){ antes.classList.remove("sale"); }, 950);
+    setTimeout(function(){ antes.classList.remove("sale"); }, 650);
     [].forEach.call(antes.querySelectorAll("a"), function(a){ a.tabIndex=-1; });
     pags[k].classList.add("on"); pags[k].removeAttribute("aria-hidden");
     [].forEach.call(pags[k].querySelectorAll("a"), function(a){ a.removeAttribute("tabindex"); });
     puntos[i].classList.remove("on"); void puntos[k].offsetWidth; puntos[k].classList.add("on");
     i=k; num.textContent=("0"+(k+1)).slice(-2)+" / "+("0"+n).slice(-2);
   }
-  function andar(){ clearInterval(reloj); reloj=setInterval(function(){ if(!hero.matches(":hover")) ir(i+1); }, 7000); }
+  function andar(){ clearInterval(reloj); reloj=setInterval(function(){ if(!hero.matches(":hover")) ir(i+1); }, 5000); }
   hero.addEventListener("click", function(e){
     var b=e.target.closest("[data-ir],[data-a]"); if(!b) return;
     ir(b.hasAttribute("data-ir") ? i+(+b.dataset.ir) : +b.dataset.a); andar();

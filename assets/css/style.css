@@ -1459,39 +1459,40 @@ select.input{cursor:pointer}
 /* ===== HERO · PROMOCIONES (maqueta, 2026-10-06) =====
    Varias «páginas» con la misma estructura de texto; cambian la imagen y la temática.
    Pasan solas cada 7 s, con una transición de página; se pausan al pasar el mouse. */
-.hp{background:var(--paper-2);padding:calc(var(--header-h) + clamp(36px,5vw,72px)) 0 0;overflow:hidden;position:relative}
+/* La foto va pegada a la botonera (Ignacio, 2026-10-06: «que no exista ese espacio»): el aire de arriba lo lleva el texto. */
+.hp{background:var(--paper-2);padding:var(--header-h) 0 0;overflow:hidden;position:relative}
 .hp__pags{display:grid}
-.hp__pag{grid-area:1/1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,80px);align-items:end;visibility:hidden}
+.hp__pag{grid-area:1/1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,80px);align-items:stretch;visibility:hidden}
 .hp__pag.on{visibility:visible}
-.hp__txt{padding-bottom:clamp(64px,7vw,110px)}
+.hp__txt{padding:clamp(36px,4vw,64px) 0 clamp(64px,6vw,96px);align-self:end}
 .hp__tit{margin:0 0 22px;font-size:clamp(2.6rem,5vw,4.7rem)}
 .hp__lead{font-size:clamp(1rem,1.3vw,1.18rem);line-height:1.55;color:var(--g-70);max-width:34em;margin:0 0 32px;min-height:4.65em}
 .hp__ctas{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.hp__foto{position:relative;margin:0;align-self:end}
-.hp__foto img{display:block;width:100%;aspect-ratio:4/4.4;object-fit:cover}
+.hp__foto{position:relative;margin:0;align-self:stretch;min-height:clamp(420px,44vw,640px)}
+.hp__foto img{display:block;width:100%;height:100%;position:absolute;inset:0;object-fit:cover}
 .hp__chip{position:absolute;background:#fff;border:1px solid var(--ink);padding:12px 16px;font-size:.78rem;line-height:1.3;box-shadow:6px 6px 0 var(--ink)}
 .hp__chip b{display:block;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase}
 .hp__chip--1{left:18px;top:12%}.hp__chip--2{right:-14px;top:46%}.hp__chip--3{left:8%;bottom:30px;background:var(--ink);color:#fff;box-shadow:6px 6px 0 var(--g-40)}
 /* LA TRANSICIÓN DE PÁGINA: el texto sube línea a línea; la foto entra con una cortina */
-.hp__pag .eyebrow,.hp__pag .hp__tit,.hp__pag .hp__lead,.hp__pag .hp__ctas{opacity:0;transform:translateY(26px);transition:opacity .55s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
-.hp__pag.on .eyebrow{opacity:1;transform:none;transition-delay:.15s}
-.hp__pag.on .hp__tit{opacity:1;transform:none;transition-delay:.25s}
-.hp__pag.on .hp__lead{opacity:1;transform:none;transition-delay:.38s}
-.hp__pag.on .hp__ctas{opacity:1;transform:none;transition-delay:.5s}
-.hp__pag .hp__foto img{clip-path:inset(0 0 0 100%);transition:clip-path .9s cubic-bezier(.7,0,.2,1)}
+.hp__pag .eyebrow,.hp__pag .hp__tit,.hp__pag .hp__lead,.hp__pag .hp__ctas{opacity:0;transform:translateY(26px);transition:opacity .4s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.hp__pag.on .eyebrow{opacity:1;transform:none;transition-delay:.08s}
+.hp__pag.on .hp__tit{opacity:1;transform:none;transition-delay:.14s}
+.hp__pag.on .hp__lead{opacity:1;transform:none;transition-delay:.22s}
+.hp__pag.on .hp__ctas{opacity:1;transform:none;transition-delay:.3s}
+.hp__pag .hp__foto img{clip-path:inset(0 0 0 100%);transition:clip-path .6s cubic-bezier(.7,0,.2,1)}
 .hp__pag.on .hp__foto img{clip-path:inset(0 0 0 0)}
 .hp__pag.sale{visibility:visible;z-index:0}
 .hp__pag.sale .hp__foto img{clip-path:inset(0 0 0 0)}
 .hp__pag.on{z-index:1}
 .hp__pag .hp__chip{opacity:0;transform:translateY(12px);transition:opacity .4s ease,transform .5s ease}
 .hp__pag.on .hp__chip{opacity:1;transform:none}
-.hp__pag.on .hp__chip--1{transition-delay:.75s}.hp__pag.on .hp__chip--2{transition-delay:.9s}.hp__pag.on .hp__chip--3{transition-delay:1.05s}
+.hp__pag.on .hp__chip--1{transition-delay:.45s}.hp__pag.on .hp__chip--2{transition-delay:.55s}.hp__pag.on .hp__chip--3{transition-delay:.65s}
 /* el paginador: rayas con su barra de avance, y flechas */
 .hp__nav{position:absolute;left:var(--gut);bottom:clamp(20px,2.4vw,34px);display:flex;align-items:center;gap:14px;z-index:3}
 .hp__puntos{display:flex;gap:8px}
 .hp__punto{width:42px;height:3px;background:var(--g-25);border:0;padding:0;position:relative;overflow:hidden;cursor:pointer}
 .hp__punto i{position:absolute;inset:0;background:var(--ink);transform:scaleX(0);transform-origin:left}
-.hp__punto.on i{animation:hpBarra 7s linear forwards}
+.hp__punto.on i{animation:hpBarra 5s linear forwards}
 .hp:hover .hp__punto.on i{animation-play-state:paused}
 @keyframes hpBarra{to{transform:scaleX(1)}}
 .hp__flecha{width:38px;height:38px;border-radius:50%;border:1px solid var(--g-25);background:transparent;display:grid;place-items:center;cursor:pointer;font-size:1rem;color:var(--ink)}
