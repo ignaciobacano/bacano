@@ -1449,3 +1449,71 @@ select.input{cursor:pointer}
 }
 .wprog{display:none; position:relative; height:3px; background:var(--g-15); margin-top:18px; border-radius:3px; overflow:hidden}
 .wprog i{position:absolute; left:0; top:0; bottom:0; width:25%; background:var(--ink); border-radius:3px; transition:left .15s linear, width .2s}
+
+/* ============================================================
+   HERO DE PROMOCIONES · PLANES WEB (Ignacio, 2026-10-06)
+   Cuatro «páginas» con la misma estructura de texto; cambian la
+   imagen y la temática. Fotos: Pexels (uso libre). Logos de
+   «Trabajamos con»: Simple Icons (CC0); las marcas son de sus dueños.
+   ============================================================ */
+/* ===== HERO · PROMOCIONES (maqueta, 2026-10-06) =====
+   Varias «páginas» con la misma estructura de texto; cambian la imagen y la temática.
+   Pasan solas cada 7 s, con una transición de página; se pausan al pasar el mouse. */
+.hp{background:var(--paper-2);padding:calc(var(--header-h) + clamp(36px,5vw,72px)) 0 0;overflow:hidden;position:relative}
+.hp__pags{display:grid}
+.hp__pag{grid-area:1/1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,80px);align-items:end;visibility:hidden}
+.hp__pag.on{visibility:visible}
+.hp__txt{padding-bottom:clamp(64px,7vw,110px)}
+.hp__tit{margin:0 0 22px;font-size:clamp(2.6rem,5vw,4.7rem)}
+.hp__lead{font-size:clamp(1rem,1.3vw,1.18rem);line-height:1.55;color:var(--g-70);max-width:34em;margin:0 0 32px;min-height:4.65em}
+.hp__ctas{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.hp__foto{position:relative;margin:0;align-self:end}
+.hp__foto img{display:block;width:100%;aspect-ratio:4/4.4;object-fit:cover}
+.hp__chip{position:absolute;background:#fff;border:1px solid var(--ink);padding:12px 16px;font-size:.78rem;line-height:1.3;box-shadow:6px 6px 0 var(--ink)}
+.hp__chip b{display:block;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase}
+.hp__chip--1{left:18px;top:12%}.hp__chip--2{right:-14px;top:46%}.hp__chip--3{left:8%;bottom:30px;background:var(--ink);color:#fff;box-shadow:6px 6px 0 var(--g-40)}
+/* LA TRANSICIÓN DE PÁGINA: el texto sube línea a línea; la foto entra con una cortina */
+.hp__pag .eyebrow,.hp__pag .hp__tit,.hp__pag .hp__lead,.hp__pag .hp__ctas{opacity:0;transform:translateY(26px);transition:opacity .55s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+.hp__pag.on .eyebrow{opacity:1;transform:none;transition-delay:.15s}
+.hp__pag.on .hp__tit{opacity:1;transform:none;transition-delay:.25s}
+.hp__pag.on .hp__lead{opacity:1;transform:none;transition-delay:.38s}
+.hp__pag.on .hp__ctas{opacity:1;transform:none;transition-delay:.5s}
+.hp__pag .hp__foto img{clip-path:inset(0 0 0 100%);transition:clip-path .9s cubic-bezier(.7,0,.2,1)}
+.hp__pag.on .hp__foto img{clip-path:inset(0 0 0 0)}
+.hp__pag.sale{visibility:visible;z-index:0}
+.hp__pag.sale .hp__foto img{clip-path:inset(0 0 0 0)}
+.hp__pag.on{z-index:1}
+.hp__pag .hp__chip{opacity:0;transform:translateY(12px);transition:opacity .4s ease,transform .5s ease}
+.hp__pag.on .hp__chip{opacity:1;transform:none}
+.hp__pag.on .hp__chip--1{transition-delay:.75s}.hp__pag.on .hp__chip--2{transition-delay:.9s}.hp__pag.on .hp__chip--3{transition-delay:1.05s}
+/* el paginador: rayas con su barra de avance, y flechas */
+.hp__nav{position:absolute;left:var(--gut);bottom:clamp(20px,2.4vw,34px);display:flex;align-items:center;gap:14px;z-index:3}
+.hp__puntos{display:flex;gap:8px}
+.hp__punto{width:42px;height:3px;background:var(--g-25);border:0;padding:0;position:relative;overflow:hidden;cursor:pointer}
+.hp__punto i{position:absolute;inset:0;background:var(--ink);transform:scaleX(0);transform-origin:left}
+.hp__punto.on i{animation:hpBarra 7s linear forwards}
+.hp:hover .hp__punto.on i{animation-play-state:paused}
+@keyframes hpBarra{to{transform:scaleX(1)}}
+.hp__flecha{width:38px;height:38px;border-radius:50%;border:1px solid var(--g-25);background:transparent;display:grid;place-items:center;cursor:pointer;font-size:1rem;color:var(--ink)}
+.hp__flecha:hover{border-color:var(--ink)}
+.hp__num{font-family:var(--font-cond);font-weight:700;letter-spacing:.1em;font-size:.85rem;color:var(--g-55);min-width:3.2em}
+@media (prefers-reduced-motion:reduce){.hp__pag *,.hp__pag .hp__foto img{transition:none !important}.hp__punto.on i{animation:none;transform:scaleX(1)}}
+/* la franja negra, recta como el sitio */
+.hp-franja{background:var(--ink);color:#fff;padding:clamp(48px,6vw,84px) 0}
+.hp-franja .wrap{display:grid;grid-template-columns:repeat(3,1fr)}
+.hp-col{padding:0 clamp(18px,2.6vw,40px);border-left:1px solid var(--line-dark)}
+.hp-col:first-child{border-left:0;padding-left:0}
+.hp-col .n{font-family:var(--font-cond);font-weight:700;font-size:.9rem;letter-spacing:.12em;color:var(--g-40)}
+.hp-col h3{margin:10px 0 12px;color:#fff}
+.hp-col p{margin:0;color:#cfcfcf;line-height:1.6}
+/* «Trabajamos con»: la misma cinta del sitio, con logos */
+.hp-marcas{padding:clamp(36px,4vw,56px) 0 clamp(26px,3vw,40px);border-bottom:1px solid var(--line)}
+.hp-marcas .eyebrow{display:flex;justify-content:center}
+.hp-marcas .marquee{border:0;padding:6px 0}
+.hp-marca{display:inline-flex !important;align-items:center;gap:12px;font-family:var(--font-body) !important;font-weight:600 !important;
+  font-size:1rem !important;letter-spacing:0 !important;text-transform:none !important;color:var(--g-55);padding-right:56px !important}
+.hp-marca img{width:30px;height:30px;opacity:.55}
+/* el producto gigante baja: ya no lleva el alto del menú encima */
+.hp-marcas + .sotd{padding-top:clamp(56px,7vw,110px)}
+@media(max-width:900px){.hp__pag,.hp-franja .wrap{grid-template-columns:1fr}.hp-col{border-left:0;padding:0 0 28px}.hp__chip--1{left:8px}.hp__chip--2{right:8px}
+  .hp__nav{position:static;margin:16px var(--gut) 20px}.hp__txt{padding-bottom:24px}.hp__lead{min-height:0}}
