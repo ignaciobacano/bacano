@@ -1429,6 +1429,9 @@ function initMarquee(){
     clone.setAttribute("aria-hidden", "true");
     m.append(clone);
     row.dataset.ready = "1";
+    /* Las dos filas parten juntas: la original llevaba corriendo desde que cargó la
+       página y la copia partía de cero, y el desfase abría un hueco en blanco. */
+    [row, clone].forEach(r => { r.style.animation = "none"; void r.offsetWidth; r.style.animation = ""; });
   });
 }
 
