@@ -7,6 +7,6 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home1/bacanoc1/public_html/
-    - /bin/cp -f index.html productos.html carrito.html contacto.html nosotros.html admin.html instalar.php mercadopago.php catalogo-sync.php $DEPLOYPATH
+    - /bin/cp -f index.html productos.html carrito.html contacto.html nosotros.html admin.html instalar.php mercadopago.php catalogo-sync.php proximamente.html portero.php entrar.php acceso.php $DEPLOYPATH
     - /bin/mkdir -p ${DEPLOYPATH}assets
     - /bin/cp -Rf assets/css assets/js assets/img ${DEPLOYPATH}assets/

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Bacano — Próximamente</title>
+<meta name="description" content="La nueva tienda de Bacano: letreros, stickers e impresión publicitaria. Muy pronto.">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!--
+  PRÓXIMAMENTE (Ignacio, 2026-10-05). Lo ve cualquiera mientras bacano.cl está
+  cerrado; el equipo entra con su usuario de Bacano Core (ver portero.php y
+  acceso.php). Página aparte, sin app.js ni el catálogo: no vende nada.
+-->
+<style>
+  :root{--g40:#9e9e9e;--g55:#767676;--linea:#232323}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:#000;color:#fff;font-family:"Inter Tight",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  .pagina{position:relative;min-height:100vh;min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}
+  .pagina::before{content:"";position:absolute;inset:0;pointer-events:none;background:
+    radial-gradient(1200px 520px at 50% 115%,rgba(255,255,255,.10),transparent 60%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 120px)}
+  .top{position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:26px 40px}
+  .top img{height:30px;filter:invert(1)}
+  .top a{color:#fff;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;border:1px solid var(--linea);border-radius:999px;padding:9px 16px}
+  .top a:hover{border-color:#fff}
+  .centro{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 24px 36px}
+  /* EL ASTERISCO: los tres brazos llegan uno a uno y después gira de a 60°, con pausa */
+  .asterisco{width:96px;height:96px;margin-bottom:24px;color:#fff;animation:gira 6s cubic-bezier(.7,0,.2,1) 1.6s infinite}
+  .asterisco rect{fill:currentColor;transform-origin:50px 50px;transform-box:view-box;opacity:0;animation:llega .7s cubic-bezier(.2,.9,.2,1.2) forwards}
+  .asterisco rect:nth-child(1){--r:0deg;animation-delay:.1s}
+  .asterisco rect:nth-child(2){--r:60deg;animation-delay:.35s}
+  .asterisco rect:nth-child(3){--r:120deg;animation-delay:.6s}
+  @keyframes llega{from{opacity:0;transform:rotate(calc(var(--r) - 90deg)) scaleY(.2)}to{opacity:1;transform:rotate(var(--r)) scaleY(1)}}
+  @keyframes gira{0%,55%{transform:rotate(0)}75%,100%{transform:rotate(60deg)}}
+  /* y uno enorme de fondo, apenas visible, que gira muy lento */
+  .fondo{position:absolute;width:900px;height:900px;right:-260px;bottom:-330px;color:rgba(255,255,255,.045);animation:lento 80s linear infinite;pointer-events:none}
+  .fondo rect{fill:currentColor}
+  @keyframes lento{to{transform:rotate(360deg)}}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--g40);margin-bottom:14px}
+  h1{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;font-size:clamp(64px,13vw,148px);line-height:.86;letter-spacing:-.01em;margin:0}
+  h1 span{display:block;color:transparent;-webkit-text-stroke:1.5px #fff}
+  .bajada{max-width:560px;margin:22px 0 30px;font-size:17px;line-height:1.5;color:#d6d6d6;font-weight:300}
+  .entrar{display:inline-flex;align-items:center;gap:12px;background:#fff;color:#000;border-radius:999px;padding:16px 26px 16px 18px;font:700 13px "Inter Tight",Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;box-shadow:0 0 0 6px rgba(255,255,255,.08);transition:box-shadow .2s}
+  .entrar:hover{box-shadow:0 0 0 9px rgba(255,255,255,.14)}
+  .entrar b{width:28px;height:28px;border-radius:50%;background:#000;color:#fff;display:grid;place-items:center;font-size:12px}
+  .nota{margin-top:14px;font-size:12px;color:var(--g55)}
+  .aviso{margin-top:14px;font-size:13px;color:#fff;border:1px solid var(--linea);border-radius:10px;padding:8px 14px}
+  .pie{position:relative;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:20px 40px;border-top:1px solid var(--linea);font-size:12px;color:var(--g40)}
+  .pie a{color:#fff;text-decoration:none;font-weight:600}
+  .cinta{display:flex;gap:22px;flex-wrap:wrap;font-family:"Barlow Condensed",sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:15px;color:#6b6b6b}
+  @media (max-width:640px){.top,.pie{padding:18px 20px}.cinta{display:none}}
+  @media (prefers-reduced-motion:reduce){.asterisco,.fondo,.asterisco rect{animation:none;opacity:1}.asterisco rect{transform:rotate(var(--r))}}
+</style>
+</head>
+<body>
+<main class="pagina">
+  <svg class="fondo" viewBox="0 0 100 100" aria-hidden="true"><rect x="43.4" y="19" width="13.2" height="62"/><rect x="43.4" y="19" width="13.2" height="62" transform="rotate(60 50 50)"/><rect x="43.4" y="19" width="13.2" height="62" transform="rotate(120 50 50)"/></svg>
+
+  <header class="top">
+    <img src="assets/img/logo-bacano.png" alt="Bacano">
+    <a href="mailto:contacto@bacano.cl">Contacto</a>
+  </header>
+
+  <section class="centro">
+    <svg class="asterisco" viewBox="0 0 100 100" aria-hidden="true"><rect x="43.4" y="19" width="13.2" height="62"/><rect x="43.4" y="19" width="13.2" height="62"/><rect x="43.4" y="19" width="13.2" height="62"/></svg>
+    <div class="eyebrow">La nueva tienda de Bacano</div>
+    <h1>Próxima<span>mente</span></h1>
+    <p class="bajada">Estamos preparando el catálogo en línea de letreros, stickers e impresión publicitaria. Muy pronto vas a poder cotizar y comprar desde aquí.</p>
+    <a class="entrar" id="entrar" href="https://bacanocore.cl/acceso/bacano-cl"><b>→</b>Entrar con Bacano Core</a>
+    <div class="nota">Acceso solo para el equipo de Bacano.</div>
+    <div class="aviso" id="aviso" hidden>No se pudo abrir el acceso. Vuelve a intentarlo desde aquí.</div>
+  </section>
+
+  <footer class="pie">
+    <div class="cinta"><span>Letreros</span><span>·</span><span>Stickers</span><span>·</span><span>Gran formato</span><span>·</span><span>Vehicular</span><span>·</span><span>Papelería</span></div>
+    <div>¿Necesitas un trabajo ahora? Escríbenos a <a href="mailto:contacto@bacano.cl">contacto@bacano.cl</a></div>
+  </footer>
+</main>
+<script>
+  /* Para volver a la misma página después de entrar: solo «/» o «/algo.html». */
+  (function () {
+    var ruta = location.pathname;
+    var a = document.getElementById("entrar");
+    if (/^\/(?:[a-z0-9-]+\.html)?$/i.test(ruta) && ruta !== "/proximamente.html") a.href += "?ir=" + encodeURIComponent(ruta);
+    if (/[?&]acceso=no\b/.test(location.search)) document.getElementById("aviso").hidden = false;
+  })();
+</script>
+</body>
+</html>

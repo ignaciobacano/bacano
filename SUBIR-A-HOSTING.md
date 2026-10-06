@@ -147,6 +147,25 @@ cliente elige en la ficha (medida, formato, plan). El menú *Productos impresos*
 categorías de productos y servicios, y *Servicios digitales* de logotipo y web. Mientras Core
 no tenga fotos de producto, se usa una foto por categoría.
 
+## Próximamente (sitio cerrado, solo el equipo)
+
+Mientras el sitio no se abre al público, cualquiera que entre ve `proximamente.html`. El equipo
+de Bacano entra con **«Entrar con Bacano Core»**: inicia sesión en bacanocore.cl y vuelve con el sitio
+abierto por 7 días en ese navegador. Solo cuentas internas y activas de Core.
+
+| Archivo | Para qué |
+|---|---|
+| `proximamente.html` | La página que ve todo el mundo |
+| `portero.php` | Decide, en cada página, si mostrar el sitio o el Próximamente |
+| `entrar.php` | Recibe el pase de Bacano Core y deja la cookie del equipo |
+| `acceso.php` | Las funciones de los dos anteriores (bloqueado desde internet) |
+
+**Activarlo:** el despliegue de cPanel copia los archivos; el bloque *Próximamente* va en el
+`.htaccess` del hosting (se maneja a mano). Usa la misma `clave` de `catalogo-config.php`:
+sin ella, nadie puede entrar y todos ven el Próximamente.
+
+**Abrir el sitio a todos:** borrar el bloque *Próximamente* del `.htaccess`.
+
 ## 5 · Sobre el panel en internet
 
 `admin.html` no tiene contraseña: cualquiera que sepa la dirección puede abrirlo y ver el catálogo, aunque **no puede publicar nada** en GitHub sin tu token. Tres formas de cerrarlo, de menos a más segura:

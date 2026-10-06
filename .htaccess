@@ -16,6 +16,21 @@ Options -Indexes
 # ---------- Página de inicio ----------
 DirectoryIndex index.html
 
+# ---------- Próximamente (Ignacio, 2026-10-05) ----------
+# Mientras el sitio está cerrado, cada página .html y la portada pasan por
+# portero.php: el equipo (que entró con su usuario de Bacano Core) ve el
+# sitio; los demás ven proximamente.html. Los .php (catálogo, Mercado Pago)
+# y los archivos de assets/ no pasan por aquí.
+# PARA ABRIR EL SITIO A TODOS: borrá este bloque (de aquí hasta </IfModule>).
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^$ portero.php [L]
+  RewriteRule ^([A-Za-z0-9-]+\.html)$ portero.php?pagina=$1 [L,QSA]
+</IfModule>
+<Files "acceso.php">
+  Require all denied
+</Files>
+
 # ---------- Forzar HTTPS ----------
 # Descomentá estas 3 líneas SOLO cuando el certificado SSL esté activo.
 # Si las activás sin certificado, el sitio deja de abrir.
