@@ -104,20 +104,21 @@ const MENU = {
   },
   dig: {
     nombre: "Servicios digitales",
+    /* solo dos: Diseño web (los planes Partner, en diseno-web.html) y Diseño de logotipo */
     secciones: [
-      { txt:"Planes mensuales",     href:mCotizar("Servicios digitales: plan mensual") },
-      { txt:"Logotipo e identidad", href:mCotizar("Logotipo e identidad") },
-      { txt:"Diseño web",           href:mCotizar("Diseño web") }
+      { txt:"Diseño web",         href:"diseno-web.html" },
+      { txt:"Diseño de logotipo", href:mCotizar("Logotipo e identidad") }
     ],
-    mensuales: [
-      { titulo:"Planes mensuales", precio:"/ mes", texto:"Servicios digitales con pago mes a mes. Pregúntanos por el plan que necesitas.", href:mCotizar("Servicios digitales: plan mensual") }
+    web: [
+      { titulo:"Partner Start", precio:"$349.900 + IVA", texto:"Landing Page profesional y un equipo detrás cada mes.", href:"diseno-web.html#planes" },
+      { titulo:"Partner Grow",  precio:"$549.900 + IVA", texto:"Sitio web administrable que crece contigo.", href:"diseno-web.html#planes" },
+      { titulo:"Partner Elite", precio:"$899.900 + IVA", texto:"E-commerce con carrito y campañas de marketing.", href:"diseno-web.html#planes" }
     ],
-    proyectos: [
-      { titulo:"Logotipo e identidad", precio:"desde $120.000", texto:"Diseño de marca listo para imprimir y usar en digital.", href:mCotizar("Logotipo e identidad") },
-      { titulo:"Diseño web", precio:"desde $250.000", texto:"Sitio a medida, como el de Bacano.", href:mCotizar("Diseño web") }
+    logo: [
+      { titulo:"Logotipo e identidad", precio:"desde $120.000", texto:"Diseño de marca listo para imprimir y usar en digital.", href:mCotizar("Logotipo e identidad") }
     ],
     destacado: { eyebrow:"¿No sabes cuál elegir?", titulo:"Te asesoramos gratis",
-      texto:"Cuéntanos qué necesitas y te proponemos un plan mensual o un proyecto cerrado.",
+      texto:"Cuéntanos qué necesitas y te orientamos hacia el plan que corresponde a tu negocio.",
       cta:"Hablar con Bacano", href:mCotizar("Servicios digitales") }
   }
 };
@@ -149,7 +150,7 @@ const slugDe = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
     const slug = slugDe(f.categoria);
     let cat = cats.find(c => c.slug === slug);
     if(!cat){
-      cat = { slug, nombre:f.categoria, desc:"", img:fotoDe[slug] || fotoGenerica, digital:DIGITALES.has(f.lista) };
+      cat = { slug, nombre:f.categoria, desc:"", img:fotoDe[slug] || fotoGenerica, digital:DIGITALES.has(f.lista), lista:f.lista };
       cats.push(cat);
     }
     const precios = f.variantes.map(v => v.precio).filter(Boolean);
@@ -189,12 +190,34 @@ const slugDe = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
     texto:`${dest.desc ? dest.desc.charAt(0).toUpperCase() + dest.desc.slice(1) + ". " : ""}${precioTxt(dest).replace(/^d/, "D")} con IVA.`,
     cta:"Ver opciones", href:mCat(dest.cat) };
 
-  if(digitales.length){
-    MENU.dig.secciones = [MENU.dig.secciones[0], ...digitales.map(c => ({ txt:c.nombre, href:mCat(c.slug) }))];
-    MENU.dig.proyectos = digitales.flatMap(deCat).map(p => ({
+  /* Diseño web se queda siempre en diseno-web.html; del catálogo solo sale el logotipo */
+  const logos = digitales.filter(c => c.lista === "logotipo");
+  if(logos.length){
+    MENU.dig.secciones = [MENU.dig.secciones[0], { txt:"Diseño de logotipo", href:mCat(logos[0].slug) }];
+    MENU.dig.logo = logos.flatMap(deCat).map(p => ({
       titulo:p.nombre, precio:precioTxt(p), texto:p.desc, href:mCat(p.cat) }));
   }
 })();
+
+/* ============================================================
+   PLANES PARTNER (diseno-web.html)
+   Entran al carro como cualquier producto: se paga hoy la
+   implementación con IVA. La membresía (cada 30 días desde la puesta
+   en producción) no pasa por el carro. Precios netos del Informe
+   Maestro Partner Bacano v3.
+   ⚠ mercadopago.php todavía no conoce estos códigos: falta sincronizarlo.
+   ============================================================ */
+const PLANES_PARTNER = [
+  { id:"PARTNER-START", nombre:"Partner Start · Landing Page profesional",   impl:349900, memb:29990 },
+  { id:"PARTNER-GROW",  nombre:"Partner Grow · Sitio web administrable",     impl:549900, memb:59990 },
+  { id:"PARTNER-ELITE", nombre:"Partner Elite · E-commerce con carrito",     impl:899900, memb:99990 }
+];
+PLANES_PARTNER.forEach(p => {
+  VARIANTES[p.id] = { id:p.id, nombre:p.nombre, cat:"diseno-web", digital:true, flags:[],
+    precio:Math.round(p.impl * 1.19),
+    unidad:`Implementación · luego ${money(p.memb * 1.19)} cada 30 días`,
+    plazo:"según el proyecto", img:"assets/img/fotos/hero-planes-1.jpg" };
+});
 
 const PAGE = (location.pathname.split("/").pop() || "index.html").toLowerCase();
 
@@ -276,8 +299,8 @@ function buildHeader(){
     <div class="mega mega--dig" id="mega-dig" hidden>
       <div class="wrap mega__top"><button class="xclose mega__x" type="button">${I.x}<span>Cerrar</span></button></div>
       <div class="wrap mega__in">
-        <div class="mega__col"><h4>Con pago mensual</h4><div class="msvcs">${D.mensuales.map(svc).join("")}</div></div>
-        <div class="mega__col"><h4>Proyectos a medida</h4><div class="msvcs">${D.proyectos.map(svc).join("")}</div></div>
+        <div class="mega__col"><h4><a href="diseno-web.html">Diseño web · Planes Partner</a></h4><div class="msvcs">${D.web.map(svc).join("")}</div></div>
+        <div class="mega__col"><h4>Diseño de logotipo</h4><div class="msvcs">${D.logo.map(svc).join("")}</div></div>
         ${feat(D.destacado)}
       </div>
     </div>
@@ -316,10 +339,10 @@ function buildHeader(){
         <div class="mnav__view" data-view="dig">
           <button class="mnav__back" type="button" data-go="main">${chevL}Todo</button>
           <h3 class="mnav__h">${D.nombre}</h3>
-          <h4 class="mnav__sub">Con pago mensual</h4>
-          <div class="msvcs">${D.mensuales.map(svc).join("")}</div>
-          <h4 class="mnav__sub">Proyectos a medida</h4>
-          <div class="msvcs">${D.proyectos.map(svc).join("")}</div>
+          <h4 class="mnav__sub">Diseño web · Planes Partner</h4>
+          <div class="msvcs">${D.web.map(svc).join("")}</div>
+          <h4 class="mnav__sub">Diseño de logotipo</h4>
+          <div class="msvcs">${D.logo.map(svc).join("")}</div>
         </div>
       </div>
     </aside>
@@ -337,7 +360,8 @@ function buildHeader(){
       `<a href="${s.href}" class="${actual === s.href ? "is-active" : ""}">${s.txt}</a>`).join("");
   };
   const tipo = new URLSearchParams(location.search).get("tipo") || "";
-  setArea(/digital|logotipo|web/i.test(tipo) ? "dig" : "prod");
+  const PAGE_ACTUAL = (location.pathname.split("/").pop() || "").toLowerCase();
+  setArea(/digital|logotipo|web/i.test(tipo) || PAGE_ACTUAL === "diseno-web.html" ? "dig" : "prod");
 
   const cerrar = () => {
     tops.forEach(b => { b.setAttribute("aria-expanded", "false"); $("#" + b.getAttribute("aria-controls")).hidden = true; });
@@ -557,8 +581,9 @@ const Cart = {
     const p = this.find(id);
     if(!p || !p.precio) return;
     const line = this.items.find(i => i.id === id);
-    if(line) line.qty += qty;
-    else this.items.push({ id, qty });
+    /* un plan Partner se contrata una vez: no suma cantidades */
+    if(line) line.qty = p.digital ? 1 : line.qty + qty;
+    else this.items.push({ id, qty: p.digital ? 1 : qty });
     if(!silent) this.lastAdded = { id, t: Date.now() };
     this.save();
     /* igual que en las tiendas grandes: al agregar se abre el carrito con la confirmación */
@@ -567,7 +592,7 @@ const Cart = {
   setQty(id, qty){
     const line = this.items.find(i => i.id === id);
     if(!line) return;
-    line.qty = Math.max(1, Math.min(999, qty));
+    line.qty = this.find(id)?.digital ? 1 : Math.max(1, Math.min(999, qty));
     this.save();
   },
   remove(id){
@@ -587,7 +612,11 @@ const Cart = {
   /* tipo de entrega elegido en el checkout: el retiro en taller no paga despacho */
   entrega: "Despacho a domicilio",
   envio(){
-    const s = this.subtotal();
+    /* los planes Partner no se despachan: solo cuenta lo físico */
+    const s = this.items.reduce((a, i) => {
+      const p = this.find(i.id);
+      return a + (p && !p.digital ? p.precio * i.qty : 0);
+    }, 0);
     if(s === 0 || this.entrega === "Retiro en taller") return 0;
     return s >= SITE.envioGratisDesde ? 0 : 4990;
   },
