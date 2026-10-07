@@ -350,3 +350,4 @@
 .dw .crumb a{text-decoration:underline;text-underline-offset:3px}
 .dw .hero-cab>*,.dw .hero-pie>*,.dw .sim>*,.dw .portal-grid>*,.dw .detalle>*,.dw .ficha>*,.dw .cita-foto>*{min-width:0}
 @media (max-width:960px){.dw .dhero h1{font-size:clamp(44px,13vw,72px)}.dw .vida{overflow:hidden}}
+@media (prefers-reduced-motion:reduce){.dw .hero-foto{clip-path:none}.dw .hero-foto img{transform:none}.dw .hito .punto,.dw .hito .et,.dw .hito .mes{opacity:1}.dw .vida .eje b{transform:none}}

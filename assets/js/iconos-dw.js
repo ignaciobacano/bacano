@@ -66,7 +66,17 @@ const DW_ICONOS = {
   core:       { n:"Bacano Core",        g:"Camino",     d:'<rect x="3" y="3" width="18" height="18"/><path d="M3 8h18M8 8v13"/>' },
   calendario: { n:"Cada 30 días",       g:"Camino",     d:'<rect x="3" y="5" width="18" height="16"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 15h3"/>' },
   carro:      { n:"Carro",              g:"Camino",     d:'<path d="M5 8h14l-1 13H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>' },
-  flecha:     { n:"Flecha",             g:"Camino",     d:'<path d="M4 12h16M14 6l6 6-6 6"/>' }
+  flecha:     { n:"Flecha",             g:"Camino",     d:'<path d="M4 12h16M14 6l6 6-6 6"/>' },
+
+  /* --- diseño de logotipo (2026-10-07) --- */
+  reloj:      { n:"Tiempo",             g:"Logotipo",   d:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>' },
+  descarga:   { n:"Entrega en la nube", g:"Logotipo",   d:'<path d="M7 18H6a4 4 0 0 1-.5-8A6 6 0 0 1 17 9a4.5 4.5 0 0 1 1 9h-1"/><path d="M12 12v9M9 18l3 3 3-3"/>' },
+  escudo:     { n:"Proceso claro",      g:"Logotipo",   d:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>' },
+  objetivo:   { n:"Enfocados",          g:"Logotipo",   d:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><path d="M12 3v3M21 12h-3"/>' },
+  propuestas: { n:"3 propuestas",       g:"Logotipo",   d:'<rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="8" y="13" width="8" height="8"/>' },
+  lapiz:      { n:"Bocetos",            g:"Logotipo",   d:'<path d="M15 4l5 5L9 20H4v-5z"/><path d="M13 6l5 5"/>' },
+  paleta:     { n:"Colores",            g:"Logotipo",   d:'<path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 2-2s-1-2 0-3 2-1 3-1a4 4 0 0 0 4-4c0-4.5-4-8-9-8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="14.5" cy="7" r="1"/>' },
+  tipografia: { n:"Tipografía",         g:"Logotipo",   d:'<path d="M5 6V4h14v2M12 4v16M9 20h6"/>' }
 };
 
 /* el trazo va por CSS (no en el símbolo) para poder engrosarlo o afinarlo según el tamaño */

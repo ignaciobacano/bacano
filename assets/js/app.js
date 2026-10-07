@@ -107,7 +107,7 @@ const MENU = {
     /* solo dos: Diseño web (los planes Partner, en diseno-web.html) y Diseño de logotipo */
     secciones: [
       { txt:"Diseño web",         href:"diseno-web.html" },
-      { txt:"Diseño de logotipo", href:mCotizar("Logotipo e identidad") }
+      { txt:"Diseño de logotipo", href:"diseno-logotipo.html" }
     ],
     web: [
       { titulo:"Partner Start", precio:"$349.900 + IVA", texto:"Landing Page profesional y un equipo detrás cada mes.", href:"diseno-web.html#planes" },
@@ -115,7 +115,7 @@ const MENU = {
       { titulo:"Partner Elite", precio:"$899.900 + IVA", texto:"E-commerce con carrito y campañas de marketing.", href:"diseno-web.html#planes" }
     ],
     logo: [
-      { titulo:"Logotipo e identidad", precio:"desde $120.000", texto:"Diseño de marca listo para imprimir y usar en digital.", href:mCotizar("Logotipo e identidad") }
+      { titulo:"Logotipo e identidad", precio:"desde $120.000", texto:"6 etapas y 3 propuestas: tu marca lista para imprimir y usar en digital.", href:"diseno-logotipo.html" }
     ],
     destacado: { eyebrow:"¿No sabes cuál elegir?", titulo:"Te asesoramos gratis",
       texto:"Cuéntanos qué necesitas y te orientamos hacia el plan que corresponde a tu negocio.",
@@ -193,9 +193,9 @@ const slugDe = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
   /* Diseño web se queda siempre en diseno-web.html; del catálogo solo sale el logotipo */
   const logos = digitales.filter(c => c.lista === "logotipo");
   if(logos.length){
-    MENU.dig.secciones = [MENU.dig.secciones[0], { txt:"Diseño de logotipo", href:mCat(logos[0].slug) }];
+    /* la sección lleva a su página (diseno-logotipo.html); el catálogo pone los precios */
     MENU.dig.logo = logos.flatMap(deCat).map(p => ({
-      titulo:p.nombre, precio:precioTxt(p), texto:p.desc, href:mCat(p.cat) }));
+      titulo:p.nombre, precio:precioTxt(p), texto:p.desc, href:"diseno-logotipo.html" }));
   }
 })();
 
@@ -361,7 +361,7 @@ function buildHeader(){
   };
   const tipo = new URLSearchParams(location.search).get("tipo") || "";
   const PAGE_ACTUAL = (location.pathname.split("/").pop() || "").toLowerCase();
-  setArea(/digital|logotipo|web/i.test(tipo) || PAGE_ACTUAL === "diseno-web.html" ? "dig" : "prod");
+  setArea(/digital|logotipo|web/i.test(tipo) || ["diseno-web.html", "diseno-logotipo.html"].includes(PAGE_ACTUAL) ? "dig" : "prod");
 
   const cerrar = () => {
     tops.forEach(b => { b.setAttribute("aria-expanded", "false"); $("#" + b.getAttribute("aria-controls")).hidden = true; });
