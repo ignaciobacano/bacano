@@ -1518,3 +1518,13 @@ select.input{cursor:pointer}
 .hp-marcas + .sotd{padding-top:clamp(56px,7vw,110px)}
 @media(max-width:900px){.hp__pag,.hp-franja .wrap{grid-template-columns:1fr}.hp-col{border-left:0;padding:0 0 28px}.hp__chip--1{left:8px}.hp__chip--2{right:8px}
   .hp__nav{position:static;margin:16px var(--gut) 20px}.hp__txt{padding-bottom:24px}.hp__lead{min-height:0}}
+
+/* ---------- «Ingresar a Core» junto a Contacto (2026-10-07) ----------
+   El portal de clientes de Bacano Core. Contorno, para no competir con
+   «Pedir cotización», que es la acción principal. */
+.hdr__core{display:inline-flex; align-items:center; gap:8px; padding:10px 16px; border:1.5px solid var(--ink);
+  border-radius:100px; color:var(--ink); font:600 .9rem var(--font-body); white-space:nowrap;
+  transition:background .25s,color .25s}
+.hdr__core svg{width:16px; height:16px; flex:none}
+.hdr__core:hover{background:var(--ink); color:var(--paper)}
+@media(max-width:900px){ .hdr__core{display:none} }

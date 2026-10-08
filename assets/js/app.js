@@ -17,6 +17,10 @@ const waLink = (txt = "Hola Bacano, quiero cotizar un trabajo.") =>
   `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(txt)}`;
 
 /* ---------------- Iconos ---------------- */
+/* El portal de clientes de Bacano Core (2026-10-07): «Ingresar a Core».
+   No es el «Entrar con Bacano Core» del Próximamente, que es del equipo. */
+const CORE_INGRESO = "https://bacanocore.cl/ingresar";
+
 const I = {
   cart:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.6 12.4a1.7 1.7 0 0 0 1.7 1.3h8.4a1.7 1.7 0 0 0 1.7-1.3L21.5 7H6"/></svg>`,
   plus:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,
@@ -256,6 +260,7 @@ function buildHeader(){
         </nav>
         <div class="hdr__act">
           <a class="hdr__txt ${PAGE === "contacto.html" ? "is-active" : ""}" href="contacto.html">Contacto</a>
+          <a class="hdr__core" href="${CORE_INGRESO}" target="_blank" rel="noopener">${I.user}<span>Ingresar a Core</span></a>
           <button class="icon-btn hdr__find" id="openSearch" type="button" aria-label="Buscar" aria-expanded="false">${I.search}</button>
           <button class="icon-btn" id="openCart" aria-label="Abrir carrito">
             ${I.cart}<span class="cart-count" id="cartCount">0</span>
@@ -325,6 +330,7 @@ function buildHeader(){
           <p class="mnav__note">Diseñamos, fabricamos e instalamos. Te enviamos una prueba digital antes de imprimir.</p>
           <a class="mnav__cta" href="contacto.html">Pedir cotización</a>
           <div class="mnav__links">
+            <a href="${CORE_INGRESO}" target="_blank" rel="noopener">${I.user}<span>Ingresar a Core</span></a>
             <button type="button" data-mcart>${I.cart}<span>Mi carrito</span></button>
             <a href="${waLink()}" target="_blank" rel="noopener">${I.wa}<span>WhatsApp</span></a>
             <a href="index.html#faq">${I.headset}<span>Ayuda</span></a>
