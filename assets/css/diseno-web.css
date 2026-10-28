@@ -116,11 +116,8 @@
 .dw .capa:nth-child(2) .tubo b{transition-delay:.08s}.dw .capa:nth-child(3) .tubo b{transition-delay:.16s}.dw .capa:nth-child(4) .tubo b{transition-delay:.24s}
 .dw .capa:not(.on){color:var(--g-40)}
 .dw .capa:not(.on) .tubo{border-color:var(--g-25)}
-.dw .cupos{display:flex;flex-wrap:wrap;gap:6px}
-.dw .cupos i{width:30px;height:30px;border:1.5px solid var(--ink);display:block;transform:scale(0);transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
-.dw .cupos i.ve{transform:scale(1);background:var(--ink)}
-.dw .cupos-txt{font-size:14px;margin-top:10px;color:var(--g-70)}
-.dw .cupos-txt b{color:var(--ink)}
+.dw .atencion-txt{font-size:14px;color:var(--g-70)}
+.dw .atencion-txt b{color:var(--ink)}
 .dw .vivo{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--g-70)}
 .dw .vivo .cara{width:42px;height:42px;border:1.5px solid var(--ink);display:grid;place-items:center}
 .dw .vivo .cara svg{width:24px;stroke:var(--ink);fill:none;stroke-width:2}
@@ -134,34 +131,10 @@
 .dw .cambia{animation:cambia .45s ease}
 @keyframes cambia{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-.dw .sim{display:grid;grid-template-columns:1fr 1.25fr;gap:0;margin-top:48px;border:1px solid var(--ink)}
-.dw .pedidos{padding:28px;border-right:1px solid var(--ink)}
-.dw .pedidos h4,.dw .bandejas h4{font-family:var(--cond);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:14px;color:var(--g-55);margin-bottom:16px}
-.dw .chips{display:flex;flex-wrap:wrap;gap:8px}
-.dw .chip{border:1.5px solid var(--ink);background:#fff;padding:10px 14px;font-size:14px;font-weight:500;cursor:pointer;transition:background .15s,color .15s,transform .15s;text-align:left}
-.dw .chip:hover{background:var(--ink);color:#fff;transform:translateY(-2px)}
-.dw .planes-mini{display:flex;margin-top:28px;border:1px solid var(--ink);width:max-content}
-.dw .planes-mini button{border:0;background:none;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
-.dw .planes-mini button.on{background:var(--ink);color:#fff}
-.dw .reset{background:none;border:0;text-decoration:underline;font-size:13px;color:var(--g-55);cursor:pointer;margin-top:16px}
-.dw .bandejas{display:grid;grid-template-rows:auto 1fr}
-.dw .medidor{padding:24px 28px;border-bottom:1px solid var(--ink);background:var(--g-04)}
-.dw .medidor .fila{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
-.dw .medidor .fila strong{font-size:40px;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
-.dw .medidor .fila span{font-size:14px;color:var(--g-70)}
-.dw .casillas{display:flex;gap:6px}
-.dw .casillas i{flex:1;height:26px;border:1.5px solid var(--ink);background:#fff;transition:background .3s}
-.dw .casillas i.usada{background:var(--ink)}
-.dw .dosb{display:grid;grid-template-columns:1fr 1fr}
-.dw .bandeja{padding:24px 28px;min-height:230px}
-.dw .bandeja+.bandeja{border-left:1px solid var(--ink);background:repeating-linear-gradient(45deg,transparent 0 9px,var(--g-08) 9px 10px)}
-.dw .bandeja .vacio{font-size:13px;color:var(--g-40)}
-.dw .ficha-sol{display:block;background:#fff;border:1.5px solid var(--ink);padding:8px 10px;font-size:13px;margin-bottom:6px;animation:cae .4s cubic-bezier(.3,1.4,.5,1)}
-.dw .ficha-sol.no{border-style:dashed}
-.dw .ficha-sol small{display:block;color:var(--g-55);font-size:11px}
-@keyframes cae{from{opacity:0;transform:translateY(-16px) rotate(-2deg)}to{opacity:1;transform:none}}
-.dw .msg{grid-column:1/-1;padding:16px 28px;border-top:1px solid var(--ink);font-size:15px;min-height:56px;background:#fff;transition:background .3s,color .3s}
-.dw .msg.lleno{background:var(--ink);color:#fff}
+.dw .franja-meson{display:flex;gap:32px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--ink);color:#fff;padding:clamp(28px,4vw,48px);margin-top:24px}
+.dw .franja-meson h2{color:#fff;font-size:clamp(26px,3vw,40px);margin:0 0 10px}
+.dw .franja-meson p{color:var(--g-25);max-width:62ch;font-size:15px}
+.dw .franja-meson>div{flex:1 1 420px;min-width:0}
 
 .dw .pagos{margin-top:56px;display:grid;grid-template-columns:repeat(5,1fr);position:relative}
 .dw .pagos::before{content:"";position:absolute;left:0;right:0;top:27px;height:2px;background:var(--ink)}
@@ -242,12 +215,6 @@
 .dw .lista.ic .ico{width:18px;height:18px;margin-top:1px}
 .dw .vivo .cara .ico{width:22px;height:22px}
 .dw .vivo .cara.off .ico{stroke:var(--g-25)}
-.dw .chip{display:inline-flex;align-items:center;gap:8px}
-.dw .chip .ico{width:18px;height:18px}
-.dw .ficha-sol{display:flex;gap:10px;align-items:center}
-.dw .ficha-sol .ico{width:18px;height:18px}
-.dw .bandeja h4{display:flex;align-items:center;gap:8px}
-.dw .bandeja h4 .ico{width:18px;height:18px;stroke:var(--ink)}
 .dw .pg .nodo .ico{width:26px;height:26px}
 .dw .pg .paso-n{position:absolute;top:-10px;right:-10px;background:#fff;border:1.5px solid var(--ink);font-size:11px;width:20px;height:20px;display:grid;place-items:center;font-family:var(--font);font-weight:600}
 .dw .pg.pago .paso-n{background:#fff;color:#000}
@@ -323,16 +290,13 @@
   .dw .incluye .wrap{grid-template-columns:repeat(3,1fr)}
   .dw .incluye .tit{grid-column:1/-1;border-right:0;border-bottom:1px solid var(--g-15);padding:16px 0}
   .dw .nav1,.dw .nav2 .indice{display:none}
-  .dw .hero-pie,.dw .sim,.dw .portal-grid,.dw .especial .reja,.dw .detalle{grid-template-columns:1fr}
+  .dw .hero-pie,.dw .portal-grid,.dw .especial .reja,.dw .detalle{grid-template-columns:1fr}
   .dw .dhero .acc{justify-content:flex-start}
   .dw .momentos{grid-template-columns:1fr}
   .dw .mom+.mom{border-left:0;border-top:1px solid var(--ink)}
   .dw .mom .ic{height:56px}.dw .mom .ic svg{height:56px}
   .dw .ficha{grid-template-columns:1fr}
   .dw .escalera{border-right:0;border-bottom:1px solid var(--ink);min-height:200px}
-  .dw .pedidos{border-right:0;border-bottom:1px solid var(--ink)}
-  .dw .dosb{grid-template-columns:1fr}
-  .dw .bandeja+.bandeja{border-left:0;border-top:1px solid var(--ink)}
   .dw .pagos{grid-template-columns:1fr;gap:28px}
   .dw .pagos::before{left:27px;right:auto;top:0;bottom:0;width:2px;height:auto}
   .dw .pagos::after{display:none}
@@ -348,6 +312,6 @@
 @media (prefers-reduced-motion:reduce){.dw *{animation:none!important;transition:none!important}.dw .rev{opacity:1;transform:none}.dw .dhero h1 .mask span{transform:none}}
 .dw .dw-nota{padding:40px var(--gut) 56px;color:var(--g-55);font-size:13px;max-width:var(--wrap);margin:0 auto}
 .dw .crumb a{text-decoration:underline;text-underline-offset:3px}
-.dw .hero-cab>*,.dw .hero-pie>*,.dw .sim>*,.dw .portal-grid>*,.dw .detalle>*,.dw .ficha>*,.dw .cita-foto>*{min-width:0}
+.dw .hero-cab>*,.dw .hero-pie>*,.dw .portal-grid>*,.dw .detalle>*,.dw .ficha>*,.dw .cita-foto>*{min-width:0}
 @media (max-width:960px){.dw .dhero h1{font-size:clamp(44px,13vw,72px)}.dw .vida{overflow:hidden}}
 @media (prefers-reduced-motion:reduce){.dw .hero-foto{clip-path:none}.dw .hero-foto img{transform:none}.dw .hito .punto,.dw .hito .et,.dw .hito .mes{opacity:1}.dw .vida .eje b{transform:none}}

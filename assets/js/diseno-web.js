@@ -15,17 +15,17 @@ const clp = n => "$" + Math.round(n).toLocaleString("es-CL");
 /* ---------- datos (del Informe Maestro Partner Bacano v3) ---------- */
 const P = {
   start:{ nombre:"Start", lema:"Preséntate", prod:"Landing Page profesional", impl:349900, memb:29990,
-    capas:["Orientar"], semana:3, dia:1, vivo:0,
+    capas:["Orientar"], vivo:0,
     construimos:[["diseno","Diseño adaptado a tu marca"],["landing","Landing para informar y generar contacto"],["chat","WhatsApp y formulario"],["responsive","Responsive"],["dominio","Dominio, hosting, SSL y correo"]],
     membresia:[["mantencion","Mantención básica"],["soporte","Soporte y asesoría"],["grafico","Apoyo gráfico básico"],["descuento","Descuentos base Bacano"]],
     fuera:"E-commerce, campañas e identidad corporativa completa se cotizan aparte." },
   grow:{ nombre:"Grow", lema:"Crece", prod:"Sitio web profesional y administrable", impl:549900, memb:59990,
-    capas:["Orientar","Desarrollar"], semana:5, dia:1, vivo:1,
+    capas:["Orientar","Desarrollar"], vivo:1,
     construimos:[["web","Arquitectura y navegación"],["diseno","Diseño personalizado"],["sitio","Inicio, Nosotros, Servicios, Catálogo, Galería, Contacto"],["chat","Formularios, WhatsApp y redes"],["seo","SEO básico, dominio, hosting, SSL y correo"]],
     membresia:[["mantencion","Mantención y mejoras"],["grafico","Apoyo gráfico"],["analisis","Análisis de ideas y proyectos"],["descuento","Descuentos superiores"]],
     fuera:"E-commerce completo y campañas recurrentes se cotizan aparte." },
   elite:{ nombre:"Elite", lema:"Vende y escala", prod:"E-commerce con carrito de compra", impl:899900, memb:99990,
-    capas:["Orientar","Desarrollar","Ejecutar","Acompañar"], semana:8, dia:2, vivo:2,
+    capas:["Orientar","Desarrollar","Ejecutar","Acompañar"], vivo:2,
     construimos:[["diseno","Tienda con diseño personalizado"],["catalogo","Catálogo, categorías y productos"],["pago","Carrito, checkout y medios de pago"],["pedidos","Gestión básica de pedidos"],["mentoria","Mentoría para administrar tu tienda"]],
     membresia:[["mantencion","Mantención y mejoras"],["grafico","Diseño gráfico recurrente"],["campana","Campañas de marketing: ejecución y seguimiento"],["descuento","Descuentos preferenciales"]],
     fuera:"La inversión publicitaria (Meta, Google) y el software a medida van aparte." }
@@ -85,9 +85,8 @@ function plan(p){
         `<div class="capa" data-c="${c}"><span>${dwIco({Orientar:"orientar",Desarrollar:"desarrollar",Ejecutar:"ejecutar",Acompañar:"acompanar"}[c])}${c}</span><div class="tubo"><b></b></div></div>`).join("")}</div>
     </div>
     <div class="bloque">
-      <h4>Tus solicitudes por semana</h4>
-      <div class="cupos">${Array.from({length:8}, () => "<i></i>").join("")}</div>
-      <p class="cupos-txt"><b>${d.semana} por semana</b>, hasta ${d.dia} al día. Asesoría y soporte: sin límite.</p>
+      <h4>Atención directa</h4>
+      <p class="atencion-txt">Nos escribes por <b>WhatsApp, correo o teléfono</b> y tu equipo lo resuelve. Asesoría y soporte incluidos, sin cupos.</p>
     </div>
     <div class="bloque">
       <h4>Construimos</h4><ul class="lista ic">${d.construimos.map(([k, x]) => `<li>${dwIco(k)}${x}</li>`).join("")}</ul>
@@ -106,10 +105,9 @@ function plan(p){
   det.classList.remove("cambia"); void det.offsetWidth; det.classList.add("cambia");
   requestAnimationFrame(() => requestAnimationFrame(() => {
     $$(".capa").forEach(c => c.classList.toggle("on", d.capas.includes(c.dataset.c)));
-    $$(".cupos i").forEach((c, i) => setTimeout(() => c.classList.toggle("ve", i < d.semana), i * 70));
     $$("#detalle [data-n]").forEach(contar);
   }));
-  pintarPagos(); pintarSim();
+  pintarPagos();
 }
 function contar(el){
   const fin = +el.dataset.n, t0 = performance.now(), dur = 700;
@@ -117,55 +115,7 @@ function contar(el){
   requestAnimationFrame(paso);
 }
 
-/* ---------- 03 · simulador ---------- */
-const PEDIDOS = [
-  { k:"precio", t:"Cambiar los precios de mi web", cupo:true, tipo:"Cambio puntual" },
-  { k:"redes", t:"Una pieza para Instagram", cupo:true, tipo:"Pieza gráfica" },
-  { k:"fotos", t:"Actualizar las fotos", cupo:true, tipo:"Contenido" },
-  { k:"producto", t:"Agregar un producto nuevo", cupo:true, tipo:"Contenido" },
-  { k:"idea", t:"Tengo una idea, ¿qué opinan?", cupo:false, tipo:"Nueva idea" },
-  { k:"problema", t:"Algo no funciona", cupo:false, tipo:"Soporte técnico" },
-  { k:"pregunta", t:"¿Qué me conviene hacer?", cupo:false, tipo:"Asesoría" },
-  { k:"impresion", t:"Necesito 500 tarjetas", cupo:false, tipo:"Encargo Bacano" }
-];
-let usados = 0;
-$("#chips").innerHTML = PEDIDOS.map((x, i) => `<button class="chip" onclick="dw.pedir(${i})">${dwIco(x.k)}${x.t}</button>`).join("");
-function pintarSim(){
-  const max = P[actual].semana;
-  if(usados > max) usados = max;
-  $("#casillas").innerHTML = Array.from({length:max}, (_, i) => `<i class="${i < usados ? "usada" : ""}"></i>`).join("");
-  $("#usados").textContent = `${usados} / ${max}`;
-}
-function ficha(dest, x, extra){
-  const c = $(dest); const v = c.querySelector(".vacio"); if(v) v.remove();
-  c.insertAdjacentHTML("afterbegin", `<span class="ficha-sol ${x.cupo ? "" : "no"}">${dwIco(x.k)}<span>${x.t}<small>${extra}</small></span></span>`);
-  [...c.children].slice(5).forEach(n => n.remove());
-}
-function pedir(i){
-  const x = PEDIDOS[i], max = P[actual].semana, m = $("#msg");
-  if(!x.cupo){
-    ficha("#bNo", x, x.tipo + " · no descuenta");
-    m.classList.remove("lleno");
-    m.innerHTML = `<b>${x.tipo}</b>: te respondemos sin tocar tu cupo. Conversar con tu equipo nunca se descuenta.`;
-    return;
-  }
-  if(usados >= max){
-    m.classList.add("lleno");
-    m.innerHTML = `Cupo de la semana completo. Se renueva en 7 días. Mientras, la asesoría y el soporte siguen disponibles${actual !== "elite" ? ", o puedes subir de plan" : ""}.`;
-    return;
-  }
-  usados++; pintarSim();
-  ficha("#bUsa", x, `${x.tipo} · cupo ${usados} de ${max}`);
-  m.classList.remove("lleno");
-  m.innerHTML = `<b>${x.tipo}</b>: es una tarea concreta con un resultado claro, así que usa 1 cupo. Te quedan ${max - usados}.`;
-}
-function reiniciar(){
-  usados = 0; pintarSim();
-  $("#bUsa").innerHTML = '<p class="vacio">Aquí caen las tareas concretas.</p>';
-  $("#bNo").innerHTML = '<p class="vacio">Aquí, todo lo demás.</p>';
-  $("#msg").classList.remove("lleno");
-  $("#msg").textContent = "Semana nueva: cupos completos.";
-}
+/* ---------- 03 · los pedidos se atienden en el Mesón de atención (contacto.html) ---------- */
 
 /* ---------- 04 · línea de pagos ---------- */
 function pintarPagos(){
@@ -183,8 +133,7 @@ const VISTAS = {
   sol:`<h5>Solicitudes</h5>
     <div class="fila-core"><span>Cambiar precios del menú</span><em class="neg">Finalizada</em></div>
     <div class="fila-core"><span>Banner para el Cyber</span><em>En desarrollo</em></div>
-    <div class="fila-core"><span>¿Conviene una tienda online?</span><em>Asesoría</em></div>
-    <div class="fila-core"><span>Cupo de esta semana</span><span style="font-weight:600">2 de 5</span></div>`,
+    <div class="fila-core"><span>¿Conviene una tienda online?</span><em>Asesoría</em></div>`,
   doc:`<h5>Mis documentos</h5><div class="archivos">
     <div><b>Ai</b>Logotipo</div><div><b>PDF</b>Manual de marca</div><div><b>PNG</b>Redes</div>
     <div><b>PDF</b>Tarjetas</div><div><b>JPG</b>Fotos web</div><div><b>PDF</b>Cotización</div></div>`,
@@ -232,5 +181,5 @@ $$("#ivaSw button").forEach(b => b.onclick = () => {
 function agregar(){ Cart.add("PARTNER-" + actual.toUpperCase()); }
 
 plan("grow");
-window.dw = { plan, modo, pedir, reiniciar, agregar };
+window.dw = { plan, modo, agregar };
 })();

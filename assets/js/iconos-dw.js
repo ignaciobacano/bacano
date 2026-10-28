@@ -26,6 +26,7 @@ const DW_ICONOS = {
   ssl:        { n:"SSL seguro",         g:"Construimos",d:'<rect x="4" y="11" width="16" height="10"/><path d="M8 11V7a4 4 0 0 1 8 0v4M12 15v2"/>' },
   correo:     { n:"Correo",             g:"Construimos",d:'<rect x="2" y="5" width="20" height="14"/><path d="M2 5l10 8 10-8"/>' },
   chat:       { n:"WhatsApp",           g:"Construimos",d:'<path d="M4 4h16v12H9l-5 4z"/><path d="M8 9h8M8 12h5"/>' },
+  telefono:   { n:"Teléfono",           g:"Construimos",d:'<path d="M3 3h6l2 5-3 2a12 12 0 0 0 6 6l2-3 5 2v6h-3A17 17 0 0 1 3 6z"/>' },
   formulario: { n:"Formulario",         g:"Construimos",d:'<rect x="4" y="3" width="16" height="18"/><path d="M8 8h8M8 12h8M8 16h4"/>' },
   seo:        { n:"SEO",                g:"Construimos",d:'<circle cx="10" cy="10" r="6"/><path d="M15 15l6 6"/>' },
   catalogo:   { n:"Catálogo",           g:"Construimos",d:'<rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/>' },

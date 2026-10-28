@@ -63,7 +63,7 @@ const NAV = [
   { href: "index.html",     txt: "Inicio" },
   { href: "productos.html", txt: "Productos" },
   { href: "nosotros.html",  txt: "Nosotros" },
-  { href: "contacto.html",  txt: "Contacto" }
+  { href: "contacto.html",  txt: "Mesón de atención" }
 ];
 
 /* Menú de dos niveles.
@@ -259,7 +259,7 @@ function buildHeader(){
           <a href="nosotros.html" class="${PAGE === "nosotros.html" ? "is-active" : ""}">Nosotros</a>
         </nav>
         <div class="hdr__act">
-          <a class="hdr__txt ${PAGE === "contacto.html" ? "is-active" : ""}" href="contacto.html">Contacto</a>
+          <a class="hdr__txt ${PAGE === "contacto.html" ? "is-active" : ""}" href="contacto.html">Mesón de atención</a>
           <a class="hdr__core" href="${CORE_INGRESO}" target="_blank" rel="noopener">${I.user}<span>Ingresar a Core</span></a>
           <button class="icon-btn hdr__find" id="openSearch" type="button" aria-label="Buscar" aria-expanded="false">${I.search}</button>
           <button class="icon-btn" id="openCart" aria-label="Abrir carrito">
@@ -325,7 +325,7 @@ function buildHeader(){
             <button type="button" data-go="prod">${P.nombre}${chevR}</button>
             <button type="button" data-go="dig">${D.nombre}${chevR}</button>
             <a href="nosotros.html">Nosotros</a>
-            <a href="contacto.html">Contacto</a>
+            <a href="contacto.html">Mesón de atención</a>
           </nav>
           <p class="mnav__note">Diseñamos, fabricamos e instalamos. Te enviamos una prueba digital antes de imprimir.</p>
           <a class="mnav__cta" href="contacto.html">Pedir cotización</a>
@@ -452,7 +452,7 @@ function buildRail(){
     { icon:I.home,    href:"index.html",                    label:"Inicio" },
     { icon:I.grid,    href:"productos.html",                label:"Categorías" },
     { icon:I.box,     href:"productos.html?cat=granformato", label:"Gran formato" },
-    { icon:I.headset, href:"contacto.html",                 label:"Soporte" },
+    { icon:I.headset, href:"contacto.html",                 label:"Mesón de atención" },
     { icon:I.user,    href:"carrito.html",                  label:"Mi pedido" }
   ];
   host.className = "rail";
@@ -492,7 +492,7 @@ function buildFooter(){
             <li><a href="nosotros.html#terreno">Trabajo en terreno</a></li>
             <li><a href="nosotros.html#garantias">Garantías</a></li>
             <li><a href="index.html#faq">Preguntas frecuentes</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="contacto.html">Mesón de atención</a></li>
           </ul>
         </div>
         <div>
@@ -1358,33 +1358,64 @@ function initCheckout(){
 }
 
 /* ============================================================
-   FORMULARIO DE CONTACTO
+   MESÓN DE ATENCIÓN (contacto.html)
+   El sitio no tiene servidor que reciba el formulario: antes decía
+   «Mensaje enviado» y la solicitud se perdía. Ahora arma el mensaje y
+   lo abre en WhatsApp (o en el correo), donde de verdad llega.
    ============================================================ */
 function initContacto(){
   const form = $("#contactoForm");
   if(!form) return;
 
-  /* si llega desde el menú (contacto.html?tipo=…), deja elegido ese tipo de trabajo */
-  const tipo = new URLSearchParams(location.search).get("tipo");
+  $$("#msMail").forEach(a => a.href = `mailto:${SITE.email}`);
+  $$("#msTel").forEach(a => a.href = `tel:${SITE.telefonoLink}`);
+
+  /* elige un tipo en el selector; si no existe (productos del menú), lo agrega a «Cotizar» */
   const sel = $("#c-tipo");
-  if(tipo && sel){
+  const elegir = tipo => {
+    if(!tipo || !sel) return;
     let opt = [...sel.options].find(o => o.text === tipo);
-    if(!opt){ opt = new Option(tipo, tipo); sel.add(opt, sel.options[sel.options.length - 1]); }
+    if(!opt){
+      opt = new Option(tipo, tipo);
+      const otro = [...sel.options].find(o => o.text === "Otro / proyecto a medida");
+      otro ? otro.before(opt) : sel.add(opt);
+    }
     sel.value = opt.value;
-  }
+  };
+
+  /* si llega desde el menú (contacto.html?tipo=…), deja elegido ese tipo de trabajo */
+  elegir(new URLSearchParams(location.search).get("tipo"));
+
+  /* los temas de «Qué atendemos» dejan el formulario listo */
+  $$("[data-tema]").forEach(b => b.addEventListener("click", () => {
+    $$("[data-tema]").forEach(x => x.classList.toggle("on", x === b));
+    elegir(b.dataset.tema);
+    $("#formulario").scrollIntoView({ behavior: REDUCED ? "auto" : "smooth" });
+    setTimeout(() => $("#c-msg").focus({ preventScroll: true }), 500);
+  }));
 
   form.addEventListener("submit", e => {
     e.preventDefault();
+    if(!form.reportValidity()) return;
     const d = Object.fromEntries(new FormData(form).entries());
+    const txt = [
+      `Hola Bacano, soy ${d.nombre}${d.empresa ? ` de ${d.empresa}` : ""}.`,
+      `Necesito: ${d.tipo} (${d.plazo.toLowerCase()}).`,
+      d.mensaje,
+      `Correo: ${d.email} · Teléfono: ${d.telefono}`
+    ].join("\n");
+    const wa = waLink(txt);
+    const mail = `mailto:${SITE.email}?subject=${encodeURIComponent("Mesón de atención: " + d.tipo)}&body=${encodeURIComponent(txt)}`;
+    window.open(wa, "_blank", "noopener");
     form.innerHTML = `<div class="center" style="padding:26px 0">
       <div style="width:66px;height:66px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;margin:0 auto 18px">
         <span style="width:30px;height:30px;display:block">${I.check}</span>
       </div>
-      <h3 class="display" style="margin-bottom:10px">Mensaje enviado</h3>
-      <p style="color:var(--gray)">Gracias ${d.nombre.split(" ")[0]}, recibimos tu solicitud. Respondemos cotizaciones en menos de 2 horas hábiles.</p>
-      <a class="btn btn--red" style="margin-top:20px" href="${waLink(`Hola Bacano, soy ${d.nombre}. ${d.mensaje}`)}" target="_blank" rel="noopener">Continuar por WhatsApp</a>
+      <h3 class="display" style="margin-bottom:10px">Tu mensaje está listo</h3>
+      <p style="color:var(--gray)">Gracias ${d.nombre.split(" ")[0]}. Lo abrimos en WhatsApp: solo falta que lo envíes desde ahí. ¿No se abrió? Usa uno de estos botones.</p>
+      <a class="btn btn--red" style="margin-top:20px" href="${wa}" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+      <a class="btn btn--ghost" style="margin-top:12px" href="${mail}">Prefiero enviarlo por correo</a>
     </div>`;
-    toast("Solicitud enviada. Te contactamos muy pronto.");
   });
 }
 

@@ -1,0 +1,45 @@
+/* ============================================================
+   MESÓN DE ATENCIÓN (contacto.html)
+   Canales, temas, formato de trabajo y el formulario de siempre.
+   ============================================================ */
+.ms .ms-kick{display:flex;align-items:center;gap:10px;font-family:"Barlow Condensed","Arial Narrow",Arial,sans-serif;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:14px;color:var(--g-55);margin:clamp(48px,6vw,80px) 0 20px}
+.ms .ms-kick:first-child{margin-top:0}
+.ms .ms-kick i{font-style:normal;background:var(--ink);color:#fff;padding:2px 7px;font-size:12px;letter-spacing:.05em}
+
+.ms-canales{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ms-canal{display:flex;flex-direction:column;gap:6px;border:1.5px solid var(--ink);padding:22px 22px 20px;min-height:150px;background:#fff;color:var(--ink);transition:background .15s,color .15s,transform .15s}
+.ms-canal b{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.ms-canal span{font-size:14px;color:var(--g-55);overflow-wrap:anywhere}
+.ms-canal em{font-style:normal;font-weight:700;font-size:13px;margin-top:auto;padding-top:14px}
+a.ms-canal:hover{background:var(--ink);color:#fff;transform:translateY(-2px)}
+a.ms-canal:hover span{color:var(--g-25)}
+.ms-canal--wsp{background:var(--ink);color:#fff}
+.ms-canal--wsp span{color:var(--g-25)}
+.ms-canal--hora{background:var(--g-04)}
+
+.ms-temas{display:flex;flex-wrap:wrap;gap:8px}
+.ms-temas button{border:1.5px solid var(--ink);background:#fff;padding:12px 18px;font:inherit;font-size:15px;font-weight:500;cursor:pointer;transition:background .15s,color .15s}
+.ms-temas button:hover,.ms-temas button.on{background:var(--ink);color:#fff}
+.ms-nota{font-size:13px;color:var(--g-55);margin-top:12px}
+
+.ms-pasos{list-style:none;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;counter-reset:paso;position:relative}
+.ms-pasos::before{content:"";position:absolute;left:18px;right:calc((100% - 72px) / 4 - 18px);top:18px;height:2px;background:var(--ink)}
+.ms-pasos li{counter-increment:paso;display:grid;gap:6px;align-content:start;position:relative}
+.ms-pasos li::before{content:counter(paso);width:36px;height:36px;display:grid;place-items:center;background:#fff;border:2px solid var(--ink);font-weight:800;margin-bottom:12px}
+.ms-pasos li:first-child::before{background:var(--ink);color:#fff}
+.ms-pasos b{font-size:17px;font-weight:800}
+.ms-pasos span{font-size:14px;color:var(--g-70)}
+
+.ms-form{margin-top:0}
+
+@media (max-width:900px){
+  .ms-canales{grid-template-columns:1fr 1fr}
+  .ms-pasos{grid-template-columns:1fr;gap:18px}
+  .ms-pasos::before{left:17px;right:auto;top:0;bottom:0;width:2px;height:auto}
+  .ms-pasos li{grid-template-columns:36px 1fr;column-gap:16px}
+  .ms-pasos li::before{grid-row:1/span 2;margin-bottom:0}
+}
+@media (max-width:520px){
+  .ms-canales{grid-template-columns:1fr}
+  .ms-canal{min-height:0}
+}

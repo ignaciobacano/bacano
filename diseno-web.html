@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter+Tight:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css?v=19">
-<link rel="stylesheet" href="assets/css/diseno-web.css?v=3">
+<link rel="stylesheet" href="assets/css/diseno-web.css?v=5">
 <noscript><style>.pre,.pt{display:none!important}</style></noscript>
 </head>
 <body>
@@ -133,32 +133,13 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
 
 <!-- ============ 4 · SOLICITUDES ============ -->
 <section id="solicitudes" style="background:var(--g-04)"><div class="wrap">
-  <div class="kick"><i>03</i> Pruébalo</div>
-  <h2 class="rev">Pídenos lo que quieras. Mira qué pasa.</h2>
-  <p class="sub rev d1">Toca cualquier pedido. Las tareas concretas usan un cupo de tu semana; conversar, preguntar o pedir ayuda, nunca. Los cupos se renuevan cada 7 días y no se acumulan.</p>
-
-  <div class="sim rev d2" style="background:#fff">
-    <div class="pedidos">
-      <h4>¿Qué necesitas hoy?</h4>
-      <div class="chips" id="chips"></div>
-      <div class="planes-mini" id="planesMini">
-        <button data-p="start" onclick="dw.plan('start')">Start · 3</button>
-        <button data-p="grow" onclick="dw.plan('grow')">Grow · 5</button>
-        <button data-p="elite" onclick="dw.plan('elite')">Elite · 8</button>
-      </div>
-      <button class="reset" onclick="dw.reiniciar()">Empezar otra semana</button>
+  <div class="kick"><i>03</i> Cómo nos pides</div>
+  <div class="franja-meson rev">
+    <div>
+      <h2>¿Ya eres Partner y necesitas algo?</h2>
+      <p>Cambios, piezas, soporte o una idea: te atendemos en el Mesón de atención. Lo del día a día no tiene límite; lo que supera tu plan se cotiza aparte, antes de empezar.</p>
     </div>
-    <div class="bandejas">
-      <div class="medidor">
-        <div class="fila"><strong id="usados">0 / 5</strong><span id="medTxt">cupos usados esta semana</span></div>
-        <div class="casillas" id="casillas"></div>
-      </div>
-      <div class="dosb">
-        <div class="bandeja"><h4><svg class="ico"><use href="#i-cupo"/></svg>Usa cupo</h4><div id="bUsa"><p class="vacio">Aquí caen las tareas concretas.</p></div></div>
-        <div class="bandeja"><h4><svg class="ico"><use href="#i-ilimitado"/></svg>Sin cupo · ilimitado</h4><div id="bNo"><p class="vacio">Aquí, todo lo demás.</p></div></div>
-      </div>
-      <div class="msg" id="msg">No necesitas saber cómo se hace: nosotros clasificamos tu pedido antes de descontar nada.</div>
-    </div>
+    <a class="dbtn blanco" href="contacto.html?tipo=Cambios%20a%20mi%20web%20(soy%20Partner)">Ir al Mesón de atención <svg class="ico"><use href="#i-flecha"/></svg></a>
   </div>
   <div class="cita-foto rev">
     <div class="foto"><img src="assets/img/fotos/dw-equipo-cafe.jpg" alt="Dueños de una cafetería en su local" style="object-position:50% 30%"></div>
@@ -228,7 +209,7 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
     <thead><tr><th>&nbsp;</th><th>Start</th><th>Grow</th><th>Elite</th></tr></thead>
     <tbody>
       <tr><td><svg class="ico"><use href="#i-web"/></svg>Tu web</td><td>Landing Page</td><td>Sitio administrable</td><td>E-commerce</td></tr>
-      <tr><td><svg class="ico"><use href="#i-solicitud"/></svg>Solicitudes por semana</td><td><span class="pts"><i></i><i></i><i></i></span>3</td><td><span class="pts"><i></i><i></i><i></i><i></i><i></i></span>5</td><td><span class="pts"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>8</td></tr>
+      <tr><td><svg class="ico"><use href="#i-chat"/></svg>Atención por WhatsApp, correo y teléfono</td><td class="si"></td><td class="si"></td><td class="si"></td></tr>
       <tr><td><svg class="ico"><use href="#i-reunion"/></svg>Reuniones al mes</td><td class="no"></td><td>1</td><td>Hasta 2</td></tr>
       <tr><td><svg class="ico"><use href="#i-campana"/></svg>Campañas de marketing</td><td class="no"></td><td class="no"></td><td class="si"></td></tr>
       <tr><td><svg class="ico"><use href="#i-dominio"/></svg>Dominio, hosting, SSL y correo</td><td class="si"></td><td class="si"></td><td class="si"></td></tr>
@@ -260,8 +241,8 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
 
 <script src="assets/js/data.js?v=8"></script>
 <script src="catalogo-core.js"></script>
-<script src="assets/js/app.js?v=22"></script>
-<script src="assets/js/iconos-dw.js?v=2"></script>
-<script src="assets/js/diseno-web.js?v=1"></script>
+<script src="assets/js/app.js?v=23"></script>
+<script src="assets/js/iconos-dw.js?v=3"></script>
+<script src="assets/js/diseno-web.js?v=3"></script>
 </body>
 </html>
