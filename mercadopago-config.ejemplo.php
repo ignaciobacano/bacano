@@ -13,4 +13,5 @@ return [
   'public_key'   => 'PEGAR_AQUI_LA_PUBLIC_KEY',     // pública: hoy no se usa (Checkout Pro no la necesita)
   'prueba'       => true,                           // true con credenciales de prueba; false con las de producción
   'sitio'        => '',                             // dirección pública, ej. https://bacano.cl — vacío = se detecta sola
+  'avisar_a'     => 'contacto@bacano.cl',           // correo que recibe cada pedido pagado (pueden ir varios separados por coma)
 ];

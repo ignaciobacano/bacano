@@ -32,3 +32,6 @@ mercadopago-config.php
 catalogo-config.php
 catalogo-core.js
 catalogo-core.json
+
+# Pedidos del carrito (los escribe pedidos-aviso.php en el servidor)
+_pedidos/

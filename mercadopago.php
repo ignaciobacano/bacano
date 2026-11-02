@@ -21,6 +21,8 @@ define('CATALOGO_CORE', RAIZ . '/catalogo-core.json');   /* lo escribe catalogo-
 define('API_MP',    'https://api.mercadopago.com');
 define('ENVIO',     4990);   /* el mismo valor que Cart.envio() en app.js */
 
+require __DIR__ . '/pedidos-aviso.php';   /* pedidos en archivo y correos al aprobarse el pago */
+
 function salir($datos, $codigo = 200) {
   http_response_code($codigo);
   echo json_encode($datos, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -198,6 +200,7 @@ function consultarPago($id) {
   [$cod, $p] = mp('GET', '/v1/payments/' . $id);
   if ($cod >= 400 || empty($p['status'])) return null;
   actualizarPedido($p['external_reference'] ?? '', $p['status']);
+  avisarPedido($p, confMp()['avisar_a'] ?? 'contacto@bacano.cl');
   return $p;
 }
 
@@ -279,6 +282,10 @@ switch ($accion) {
       error('Mercado Pago no pudo preparar el pago. Probá de nuevo o escribinos por WhatsApp.', 502);
 
     guardarPedido($numero, $cliente, $lineas, $total);
+    guardarPedidoArchivo($numero, $cliente, $lineas, [
+      'subtotal' => $subtotal, 'descuento' => $descuento, 'cupon' => $pct ? $cupon : '',
+      'envio' => $envio, 'total' => $total,
+    ]);
     salir(['ok' => true, 'numero' => $numero, 'total' => $total, 'url' => $r['init_point']]);
 
   /* La página de vuelta confirma el pago con Mercado Pago */

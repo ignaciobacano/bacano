@@ -1327,8 +1327,8 @@ function initCheckout(){
         </div>
         <h2 class="display" style="margin-bottom:12px">¡Pedido recibido!</h2>
         <p style="color:var(--gray);max-width:52ch;margin-inline:auto">
-          Tu número de pedido es <b style="color:var(--black)">${nro}</b>. Te enviamos un correo a
-          <b style="color:var(--black)">${data.email}</b> con el enlace para subir tu diseño y los datos de pago.
+          Tu número de pedido es <b style="color:var(--black)">${nro}</b>. Envíanos el pedido por WhatsApp
+          para coordinar el pago y tu diseño.
           Un ejecutivo confirma todo en menos de 2 horas hábiles.
         </p>
         <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:26px">
