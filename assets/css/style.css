@@ -1525,3 +1525,16 @@ select.input{cursor:pointer}
 .hdr__meson svg{width:16px; height:16px; flex:none}
 .mnav__meson{gap:10px; margin-bottom:10px}
 .mnav__meson svg{width:18px; height:18px; flex:none}
+
+/* ---------- Checkout: tres formas de entrega y datos de factura (2026-11-02) ---------- */
+.entrega-op{transition:border-color .2s, background .2s}
+.entrega-op:hover{opacity:1; border-color:var(--black)!important}
+.entrega-op.is-on{border-color:var(--black)!important; background:var(--paper, #f6f6f4)}
+.entrega-precio{font-size:.86rem; white-space:nowrap}
+.entrega-bloque{border:1px solid var(--line); border-radius:9px; padding:16px 16px 6px; margin:0; display:grid; gap:14px}
+.entrega-bloque[hidden]{display:none}
+.entrega-bloque > legend{padding:0 6px; margin-left:-6px}
+.courier-ops{display:flex; flex-wrap:wrap; gap:8px}
+.courier-ops .check{border:1px solid var(--line); border-radius:999px; padding:8px 16px}
+.courier-ops .check:has(input:checked){border-color:var(--black); background:var(--black); color:#fff}
+.courier-ops .check:has(input:checked) input{accent-color:#fff}

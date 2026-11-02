@@ -59,9 +59,32 @@ function detallePedido($p) {
   $t[] = '';
   $t[] = '  Subtotal:  ' . clp($tot['subtotal']);
   if (!empty($tot['descuento'])) $t[] = '  Descuento: -' . clp($tot['descuento']) . (empty($tot['cupon']) ? '' : " (cupón {$tot['cupon']})");
-  $t[] = '  Despacho:  ' . ($tot['envio'] ? clp($tot['envio']) : 'sin costo');
+  $entrega = $p['cliente']['entrega'] ?? '';
+  $t[] = '  Entrega:   ' . ($entrega === 'Despacho a regiones' ? 'por pagar al recibir'
+                         : ($tot['envio'] ? clp($tot['envio']) : 'sin costo'));
   $t[] = '  TOTAL:     ' . clp($tot['total']);
   return implode("\n", $t);
+}
+
+/* La entrega, con lo que hace falta para cumplirla */
+function textoEntrega($c) {
+  $e = $c['entrega'] ?? '';
+  if ($e === 'Retiro en taller')
+    return "Retiro en taller\nRetira: {$c['r_nombre']} · RUT {$c['r_rut']}";
+  if ($e === 'Delivery en Puerto Montt')
+    return "Delivery en Puerto Montt\nDirección: {$c['direccion']}" . (($c['referencia'] ?? '') !== '' ? " ({$c['referencia']})" : '');
+  if ($e === 'Despacho a regiones')
+    return "Despacho a regiones por {$c['courier']}, POR PAGAR al recibir\n"
+         . "Recibe: {$c['d_nombre']} · RUT {$c['d_rut']} · {$c['d_telefono']}\n"
+         . "Destino: {$c['d_direccion']}, {$c['comuna']}, región de {$c['region']}";
+  return $e . (($c['direccion'] ?? '') !== '' ? "\nDirección: {$c['direccion']}, {$c['comuna']}" : '');
+}
+
+/* El documento, y con factura todos sus datos */
+function textoDocumento($c) {
+  if (($c['documento'] ?? '') !== 'Factura') return 'Boleta';
+  return "Factura\nRazón social: {$c['f_razon']}\nRUT: {$c['f_rut']}\nGiro: {$c['f_giro']}\n"
+       . "Dirección: {$c['f_direccion']}, {$c['f_comuna']}\nTeléfono: {$c['f_telefono']}\nCorreo de facturación: {$c['f_email']}";
 }
 
 function enviarCorreo($para, $asunto, $texto, $responderA = '') {
@@ -95,7 +118,7 @@ function avisarPedido($pago, $avisarA) {
   $idPago = (string)($pago['id'] ?? '');
   $metodo = trim(($pago['payment_type_id'] ?? '') . ' ' . ($pago['payment_method_id'] ?? ''));
   $detalle = detallePedido($p);
-  $entrega = $c['entrega'] . ($c['entrega'] === 'Retiro en taller' ? '' : "\nDirección: {$c['direccion']}, {$c['comuna']}");
+  $entrega = textoEntrega($c);
 
   $aBacano = "Nuevo pedido pagado en bacano.cl\n\n"
     . "Pedido:  $numero\n"
@@ -106,8 +129,8 @@ function avisarPedido($pago, $avisarA) {
     . "Nombre: {$c['nombre']}\n"
     . "Correo: {$c['email']}\n"
     . "Teléfono: {$c['telefono']}\n"
-    . ($c['documento'] !== '' ? "RUT / documento: {$c['documento']}\n" : '')
-    . "Entrega: $entrega\n"
+    . "\nDOCUMENTO\n" . textoDocumento($c) . "\n\n"
+    . "ENTREGA\n$entrega\n\n"
     . 'Notas: ' . ($c['notas'] !== '' ? $c['notas'] : '—') . "\n\n"
     . "Responde este correo para escribirle directamente al cliente.\n";
 
@@ -117,6 +140,7 @@ function avisarPedido($pago, $avisarA) {
     . "Pago Mercado Pago:  $idPago\n\n"
     . "$detalle\n\n"
     . "Entrega: $entrega\n\n"
+    . "Documento: " . textoDocumento($c) . "\n\n"
     . "Te escribiremos para que nos envíes tu diseño y apruebes la prueba digital antes de producir.\n"
     . "Si tienes dudas, responde este correo o escríbenos por WhatsApp al +56 9 6776 0841.\n\n"
     . "Bacano · Puerto Montt, Chile · bacano.cl\n";

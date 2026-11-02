@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter+Tight:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=20">
+<link rel="stylesheet" href="assets/css/style.css?v=21">
 <noscript><style>.pre,.pt{display:none!important}</style></noscript>
 </head>
 <body>
@@ -79,39 +79,114 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
                 <label class="lb" for="documento">Documento</label>
                 <select class="input" id="documento" name="documento">
                   <option>Boleta</option>
-                  <option>Factura (empresa)</option>
+                  <option>Factura</option>
                 </select>
               </div>
             </div>
 
+            <!-- Datos de facturación: solo con Factura (Ignacio, 2026-11-02) -->
+            <fieldset class="entrega-bloque" id="bloqueFactura" hidden>
+              <legend class="lb">Datos para la factura</legend>
+              <div class="form-row form-row--2">
+                <div><label class="lb" for="f_razon">Razón social</label><input class="input" id="f_razon" name="f_razon" placeholder="Ej: Comercial Los Alerces SpA"></div>
+                <div><label class="lb" for="f_rut">RUT de la empresa</label><input class="input" id="f_rut" name="f_rut" placeholder="Ej: 76.123.456-7"></div>
+              </div>
+              <div class="form-row form-row--2">
+                <div><label class="lb" for="f_giro">Giro</label><input class="input" id="f_giro" name="f_giro" placeholder="Ej: Venta de artículos de oficina"></div>
+                <div><label class="lb" for="f_direccion">Dirección comercial</label><input class="input" id="f_direccion" name="f_direccion" placeholder="Calle, número, oficina"></div>
+              </div>
+              <div class="form-row form-row--2">
+                <div><label class="lb" for="f_comuna">Comuna</label><input class="input" id="f_comuna" name="f_comuna" placeholder="Ej: Puerto Montt"></div>
+                <div><label class="lb" for="f_telefono">Teléfono de contacto</label><input class="input" id="f_telefono" name="f_telefono" placeholder="+56 9 ..."></div>
+              </div>
+              <div><label class="lb" for="f_email">Correo para recibir la factura</label><input class="input" id="f_email" name="f_email" type="email" placeholder="facturas@empresa.cl"></div>
+            </fieldset>
+
             <div>
               <label class="lb">Tipo de entrega</label>
               <div style="display:grid;gap:10px">
-                <label class="check" style="border:1px solid var(--line);border-radius:9px;padding:12px 14px">
-                  <input type="radio" name="entrega" value="Despacho a domicilio" checked>
-                  <span><b>Despacho a domicilio</b><br><small style="color:var(--gray)">Courier con seguimiento · gratis sobre $80.000 en Puerto Montt</small></span>
+                <label class="check entrega-op" style="border:1px solid var(--line);border-radius:9px;padding:12px 14px">
+                  <input type="radio" name="entrega" value="Retiro en taller" checked>
+                  <span style="flex:1"><b>Retiro en taller</b><br><small style="color:var(--gray)">Retiras tu pedido en nuestro taller de Puerto Montt</small></span>
+                  <b class="entrega-precio">Sin costo</b>
                 </label>
-                <label class="check" style="border:1px solid var(--line);border-radius:9px;padding:12px 14px">
-                  <input type="radio" name="entrega" value="Retiro en taller">
-                  <span><b>Retiro en taller</b><br><small style="color:var(--gray)" data-site="direccion"></small></span>
+                <label class="check entrega-op" style="border:1px solid var(--line);border-radius:9px;padding:12px 14px">
+                  <input type="radio" name="entrega" value="Delivery en Puerto Montt">
+                  <span style="flex:1"><b>Delivery en Puerto Montt</b><br><small style="color:var(--gray)">Te lo llevamos dentro de Puerto Montt · gratis sobre $80.000</small></span>
+                  <b class="entrega-precio">$7.500</b>
                 </label>
-                <label class="check" style="border:1px solid var(--line);border-radius:9px;padding:12px 14px">
-                  <input type="radio" name="entrega" value="Instalación en terreno">
-                  <span><b>Instalación en terreno</b><br><small style="color:var(--gray)">Coordinamos visita y montaje con nuestro equipo</small></span>
+                <label class="check entrega-op" style="border:1px solid var(--line);border-radius:9px;padding:12px 14px">
+                  <input type="radio" name="entrega" value="Despacho a regiones">
+                  <span style="flex:1"><b>Despacho a regiones</b><br><small style="color:var(--gray)">Por Chilexpress, Cruz del Sur o Starken · lo pagas al recibir</small></span>
+                  <b class="entrega-precio">Por pagar</b>
                 </label>
               </div>
             </div>
 
-            <div class="form-row form-row--2" id="bloqueDespacho">
-              <div>
-                <label class="lb" for="direccion">Dirección</label>
-                <input class="input" id="direccion" name="direccion" placeholder="Calle, número, depto.">
+            <!-- Retiro en taller: quién retira, para corroborarlo al entregar -->
+            <fieldset class="entrega-bloque" id="bloqueRetiro">
+              <legend class="lb">¿Quién retira?</legend>
+              <p class="hint" style="margin-top:0">Lo verificamos al entregar. Puede ser otra persona.</p>
+              <div class="form-row form-row--2">
+                <div><label class="lb" for="r_nombre">Nombre de quien retira</label><input class="input" id="r_nombre" name="r_nombre" placeholder="Ej: Camila Torres"></div>
+                <div><label class="lb" for="r_rut">RUT de quien retira</label><input class="input" id="r_rut" name="r_rut" placeholder="Ej: 12.345.678-9"></div>
               </div>
-              <div>
-                <label class="lb" for="comuna">Comuna / Ciudad</label>
-                <input class="input" id="comuna" name="comuna" placeholder="Ej: Puerto Montt">
+            </fieldset>
+
+            <!-- Delivery en Puerto Montt -->
+            <fieldset class="entrega-bloque" id="bloqueDelivery" hidden>
+              <legend class="lb">¿Dónde lo llevamos?</legend>
+              <div class="form-row form-row--2">
+                <div><label class="lb" for="direccion">Dirección en Puerto Montt</label><input class="input" id="direccion" name="direccion" placeholder="Calle, número, depto."></div>
+                <div><label class="lb" for="referencia">Referencia (opcional)</label><input class="input" id="referencia" name="referencia" placeholder="Ej: casa esquina, portón verde"></div>
               </div>
-            </div>
+            </fieldset>
+
+            <!-- Despacho a regiones, por pagar -->
+            <fieldset class="entrega-bloque" id="bloqueRegiones" hidden>
+              <legend class="lb">Despacho a regiones · por pagar</legend>
+              <div>
+                <label class="lb">Empresa de envío</label>
+                <div class="courier-ops">
+                  <label class="check"><input type="radio" name="courier" value="Chilexpress"> <span>Chilexpress</span></label>
+                  <label class="check"><input type="radio" name="courier" value="Cruz del Sur"> <span>Cruz del Sur</span></label>
+                  <label class="check"><input type="radio" name="courier" value="Starken"> <span>Starken</span></label>
+                </div>
+              </div>
+              <div class="form-row form-row--2">
+                <div><label class="lb" for="d_nombre">Nombre de quien recibe</label><input class="input" id="d_nombre" name="d_nombre" placeholder="Ej: Camila Torres"></div>
+                <div><label class="lb" for="d_rut">RUT de quien recibe</label><input class="input" id="d_rut" name="d_rut" placeholder="Ej: 12.345.678-9"></div>
+              </div>
+              <div class="form-row form-row--2">
+                <div><label class="lb" for="d_telefono">Teléfono de quien recibe</label><input class="input" id="d_telefono" name="d_telefono" placeholder="+56 9 ..."></div>
+                <div><label class="lb" for="region">Región</label>
+                  <select class="input" id="region" name="region">
+                    <option value="">Elige la región</option>
+                    <option>Arica y Parinacota</option>
+                    <option>Tarapacá</option>
+                    <option>Antofagasta</option>
+                    <option>Atacama</option>
+                    <option>Coquimbo</option>
+                    <option>Valparaíso</option>
+                    <option>Metropolitana de Santiago</option>
+                    <option>Libertador General Bernardo O’Higgins</option>
+                    <option>Maule</option>
+                    <option>Ñuble</option>
+                    <option>Biobío</option>
+                    <option>La Araucanía</option>
+                    <option>Los Ríos</option>
+                    <option>Los Lagos</option>
+                    <option>Aysén del General Carlos Ibáñez del Campo</option>
+                    <option>Magallanes y de la Antártica Chilena</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row form-row--2">
+                <div><label class="lb" for="comuna">Comuna / ciudad</label><input class="input" id="comuna" name="comuna" placeholder="Ej: Temuco"></div>
+                <div><label class="lb" for="d_direccion">Dirección o sucursal de destino</label><input class="input" id="d_direccion" name="d_direccion" placeholder="Calle y número, o la sucursal del courier"></div>
+              </div>
+              <p class="hint">El envío lo cobra la empresa de transporte al recibir; no se suma a tu pago.</p>
+            </fieldset>
 
             <div>
               <label class="lb" for="notas">Notas del pedido (opcional)</label>
@@ -146,7 +221,7 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
       <div class="step"><h3>Confirmás el pedido</h3><p>Recibís un número de seguimiento y el detalle por correo.</p></div>
       <div class="step"><h3>Subís tu diseño</h3><p>Por enlace o WhatsApp. Si no tenés, lo diseñamos por vos.</p></div>
       <div class="step"><h3>Aprobás la prueba</h3><p>Revisás medidas, textos y colores antes de producir.</p></div>
-      <div class="step"><h3>Recibís tu trabajo</h3><p>Despacho con seguimiento o instalación en terreno.</p></div>
+      <div class="step"><h3>Recibís tu trabajo</h3><p>Retiro en taller, delivery en Puerto Montt o despacho a regiones.</p></div>
     </div>
   </div>
 </section>
@@ -155,6 +230,6 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
 
 <script src="assets/js/data.js?v=10"></script>
 <script src="catalogo-core.js"></script>
-<script src="assets/js/app.js?v=26"></script>
+<script src="assets/js/app.js?v=27"></script>
 </body>
 </html>

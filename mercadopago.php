@@ -19,7 +19,16 @@ define('CONFIG_BD', RAIZ . '/config.php');
 define('DATAJS',    RAIZ . '/assets/js/data.js');
 define('CATALOGO_CORE', RAIZ . '/catalogo-core.json');   /* lo escribe catalogo-sync.php */
 define('API_MP',    'https://api.mercadopago.com');
-define('ENVIO',     4990);   /* el mismo valor que Cart.envio() en app.js */
+define('DELIVERY_PM', 7500);  /* delivery en Puerto Montt: el mismo valor que DELIVERY_PUERTO_MONTT en app.js */
+
+/* Las tres entregas (Ignacio, 2026-11-02) y lo que exige cada una */
+const ENTREGAS = [
+  'Retiro en taller'         => ['r_nombre', 'r_rut'],
+  'Delivery en Puerto Montt' => ['direccion'],
+  'Despacho a regiones'      => ['courier', 'd_nombre', 'd_rut', 'd_telefono', 'region', 'comuna', 'd_direccion'],
+];
+const COURIERS = ['Chilexpress', 'Cruz del Sur', 'Starken'];
+const DATOS_FACTURA = ['f_razon', 'f_rut', 'f_giro', 'f_direccion', 'f_comuna', 'f_telefono', 'f_email'];
 
 require __DIR__ . '/pedidos-aviso.php';   /* pedidos en archivo y correos al aprobarse el pago */
 
@@ -163,7 +172,8 @@ function guardarPedido($numero, $d, $lineas, $total) {
       VALUES (?,?,?,?,?,?,?,?,?,?,?, 'por pagar', NOW())");
     $st->execute([
       $numero, $d['nombre'], $d['email'], $d['telefono'], $d['documento'],
-      $d['entrega'], $d['direccion'], $d['comuna'], $d['notas'],
+      $d['entrega'] . ($d['entrega'] === 'Despacho a regiones' ? " · {$d['courier']} (por pagar)" : ''),
+      $d['entrega'] === 'Despacho a regiones' ? $d['d_direccion'] : $d['direccion'], $d['comuna'], $d['notas'],
       json_encode($lineas, JSON_UNESCAPED_UNICODE), $total,
     ]);
   } catch (PDOException $e) { error_log('No se guardó el pedido ' . $numero . ': ' . $e->getMessage()); }
@@ -220,10 +230,27 @@ switch ($accion) {
     $cat  = catalogo();
 
     $cliente = [];
-    foreach (['nombre','email','telefono','documento','entrega','direccion','comuna','notas'] as $k)
+    $campos = array_merge(['nombre','email','telefono','documento','entrega','referencia','notas'],
+                          DATOS_FACTURA, ...array_values(ENTREGAS));
+    foreach (array_unique($campos) as $k)
       $cliente[$k] = mb_substr(trim((string)($d[$k] ?? '')), 0, $k === 'notas' ? 2000 : 160);
     if ($cliente['nombre'] === '' || $cliente['telefono'] === '') error('Faltan tu nombre o tu teléfono.');
-    if (!filter_var($cliente['email'], FILTER_VALIDATE_EMAIL)) error('Revisá tu correo electrónico.');
+    if (!filter_var($cliente['email'], FILTER_VALIDATE_EMAIL)) error('Revisa tu correo electrónico.');
+
+    /* la entrega elegida y sus datos */
+    if (!isset(ENTREGAS[$cliente['entrega']])) error('Elige cómo quieres recibir tu pedido.');
+    foreach (ENTREGAS[$cliente['entrega']] as $k)
+      if ($cliente[$k] === '') error('Faltan datos de la entrega. Revisa el formulario.');
+    if ($cliente['entrega'] === 'Despacho a regiones' && !in_array($cliente['courier'], COURIERS, true))
+      error('Elige la empresa de envío: Chilexpress, Cruz del Sur o Starken.');
+    if ($cliente['entrega'] === 'Delivery en Puerto Montt') $cliente['comuna'] = 'Puerto Montt';
+
+    /* con factura, todos sus datos */
+    $cliente['documento'] = $cliente['documento'] === 'Factura' ? 'Factura' : 'Boleta';
+    if ($cliente['documento'] === 'Factura') {
+      foreach (DATOS_FACTURA as $k) if ($cliente[$k] === '') error('Faltan datos para la factura. Revisa el formulario.');
+      if (!filter_var($cliente['f_email'], FILTER_VALIDATE_EMAIL)) error('Revisa el correo para la factura.');
+    }
 
     $lineas = []; $subtotal = 0;
     foreach ((array)($d['items'] ?? []) as $i) {
@@ -240,7 +267,8 @@ switch ($accion) {
     $cupon     = strtoupper(trim((string)($d['cupon'] ?? '')));
     $pct       = $cat['cupones'][$cupon] ?? 0;
     $descuento = $pct ? (int)round($subtotal * $pct / 100) : 0;
-    $envio     = ($subtotal >= $cat['envioGratis'] || $cliente['entrega'] === 'Retiro en taller') ? 0 : ENVIO;
+    /* solo el delivery en Puerto Montt se cobra aquí; a regiones es por pagar */
+    $envio     = ($cliente['entrega'] !== 'Delivery en Puerto Montt' || $subtotal >= $cat['envioGratis']) ? 0 : DELIVERY_PM;
     $total     = $subtotal - $descuento + $envio;
 
     $numero = 'BC-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(2)));
@@ -254,7 +282,7 @@ switch ($accion) {
         'id' => $l['id'], 'title' => $l['nombre'], 'quantity' => $l['qty'],
         'unit_price' => $l['precio'], 'currency_id' => 'CLP',
       ], $lineas);
-      if ($envio) $items[] = ['id' => 'despacho', 'title' => 'Despacho', 'quantity' => 1,
+      if ($envio) $items[] = ['id' => 'despacho', 'title' => 'Delivery en Puerto Montt', 'quantity' => 1,
                               'unit_price' => $envio, 'currency_id' => 'CLP'];
     }
 

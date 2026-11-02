@@ -412,7 +412,7 @@ function buildHeader(){
 
   /* franja de avisos que rota */
   const AVISOS = [
-    `Despacho gratis desde <b>${money(SITE.envioGratisDesde)}</b>`,
+    `Delivery gratis en Puerto Montt desde <b>${money(SITE.envioGratisDesde)}</b>`,
     `Te enviamos una <b>prueba digital</b> antes de imprimir`,
     `Cotiza por <a href="${waLink()}" target="_blank" rel="noopener"><b>WhatsApp</b></a> y te respondemos rápido`
   ];
@@ -611,16 +611,25 @@ const Cart = {
       return a + (p ? p.precio * i.qty : 0);
     }, 0);
   },
-  /* tipo de entrega elegido en el checkout: el retiro en taller no paga despacho */
-  entrega: "Despacho a domicilio",
+  /* tipo de entrega elegido en el checkout (Ignacio, 2026-11-02):
+     retiro en taller sin costo · delivery en Puerto Montt $7.500 (gratis sobre $80.000) ·
+     despacho a regiones POR PAGAR (lo cobra el courier al recibir).
+     El mismo cálculo se repite en mercadopago.php, que es el que cobra. */
+  entrega: "Retiro en taller",
   envio(){
     /* los planes Partner no se despachan: solo cuenta lo físico */
     const s = this.items.reduce((a, i) => {
       const p = this.find(i.id);
       return a + (p && !p.digital ? p.precio * i.qty : 0);
     }, 0);
-    if(s === 0 || this.entrega === "Retiro en taller") return 0;
-    return s >= SITE.envioGratisDesde ? 0 : 4990;
+    if(s === 0 || this.entrega !== "Delivery en Puerto Montt") return 0;
+    return s >= SITE.envioGratisDesde ? 0 : DELIVERY_PUERTO_MONTT;
+  },
+  /* lo que se lee en la línea de despacho */
+  envioTexto(){
+    if(this.entrega === "Despacho a regiones") return "Por pagar";
+    if(this.entrega === "Retiro en taller") return "Sin costo";
+    return this.envio() ? money(this.envio()) : "Gratis";
   },
   /* códigos de descuento: se definen en data.js como SITE.cupones = { "CODIGO": 10 } (porcentaje) */
   cupon: (() => { try { return localStorage.getItem("bacano_cupon_v1") || ""; } catch { return ""; } })(),
@@ -683,9 +692,9 @@ const Cart = {
       /* barra de despacho gratis */
       const sub = this.subtotal(), meta = SITE.envioGratisDesde, falta = meta - sub;
       $("#cdShip").innerHTML = !this.items.length
-        ? `Despacho gratis desde <b>${money(meta)}</b>`
-        : falta > 0 ? `Agrega <b>${money(falta)}</b> para tener <b>despacho gratis</b>`
-                    : `${I.check}<b>¡Tienes despacho gratis!</b>`;
+        ? `Delivery gratis en Puerto Montt desde <b>${money(meta)}</b>`
+        : falta > 0 ? `Agrega <b>${money(falta)}</b> para tener <b>delivery gratis en Puerto Montt</b>`
+                    : `${I.check}<b>¡Tienes delivery gratis en Puerto Montt!</b>`;
       $("#cdBar").style.width = Math.min(100, sub / meta * 100) + "%";
       $("#cdBar").classList.toggle("is-full", falta <= 0 && sub > 0);
 
@@ -718,7 +727,7 @@ const Cart = {
           <div class="cd__sum">
             <div><span>Subtotal</span><b>${money(sub)}</b></div>
             ${d ? `<div><span>Descuento (${this.cupon})</span><b>−${money(d)}</b></div>` : ""}
-            <div><span>Despacho</span><b>${this.envio() ? money(this.envio()) : "Gratis"}</b></div>
+            <div><span>Entrega</span><b>Se elige al pagar</b></div>
           </div>
           <div class="cd__total"><span>Total</span><b>${money(this.total())}</b></div>
           <a class="cd__see" href="carrito.html">Ver carrito</a>
@@ -1197,14 +1206,15 @@ function renderCartPage(){
   }
 
   host.innerHTML = Cart.items.map(i => Cart.lineHTML(i, false)).join("");
-  const retira = Cart.entrega === "Retiro en taller";
-  const falta = retira ? 0 : SITE.envioGratisDesde - Cart.subtotal();
+  const delivery = Cart.entrega === "Delivery en Puerto Montt";
+  const falta = delivery ? SITE.envioGratisDesde - Cart.subtotal() : 0;
 
   $("#cartSummary").innerHTML = `
     <div class="totals">
       <div><span>Subtotal (${Cart.count()} ítems)</span><b>${money(Cart.subtotal())}</b></div>
-      <div><span>${retira ? "Retiro en taller" : "Despacho"}</span><b>${Cart.envio() ? money(Cart.envio()) : retira ? "Sin costo" : "Gratis"}</b></div>
-      ${falta > 0 ? `<div style="font-size:.82rem;color:var(--gray)"><span>Faltan ${money(falta)} para envío gratis</span></div>` : ""}
+      <div><span>${Cart.entrega}</span><b>${Cart.envioTexto()}</b></div>
+      ${falta > 0 ? `<div style="font-size:.82rem;color:var(--gray)"><span>Faltan ${money(falta)} para delivery gratis</span></div>` : ""}
+      ${Cart.entrega === "Despacho a regiones" ? `<div style="font-size:.82rem;color:var(--gray)"><span>El envío lo pagas al recibir</span></div>` : ""}
       <div class="grand"><span>Total</span><span>${money(Cart.total())}</span></div>
     </div>
     <p class="form-note" style="margin:10px 0 16px">Precios con IVA incluido. Emitimos boleta o factura.</p>
@@ -1291,6 +1301,20 @@ async function resultadoPago(){
   return true;
 }
 
+const DELIVERY_PUERTO_MONTT = 7500;   /* el mismo valor que DELIVERY_PM en mercadopago.php */
+
+function textoEntrega(d){
+  if(d.entrega === "Retiro en taller")
+    return `Entrega: Retiro en taller\nRetira: ${d.r_nombre} · RUT ${d.r_rut}\n`;
+  if(d.entrega === "Delivery en Puerto Montt")
+    return `Entrega: Delivery en Puerto Montt\nDirección: ${d.direccion}${d.referencia ? " (" + d.referencia + ")" : ""}\n`;
+  return `Entrega: Despacho a regiones por ${d.courier} (por pagar)\nRecibe: ${d.d_nombre} · RUT ${d.d_rut} · ${d.d_telefono}\nDestino: ${d.d_direccion}, ${d.comuna}, región de ${d.region}\n`;
+}
+function textoFactura(d){
+  if(d.documento !== "Factura") return "Documento: Boleta\n";
+  return `Documento: Factura\nRazón social: ${d.f_razon}\nRUT: ${d.f_rut}\nGiro: ${d.f_giro}\nDirección: ${d.f_direccion}, ${d.f_comuna}\nTeléfono: ${d.f_telefono}\nCorreo de facturación: ${d.f_email}\n`;
+}
+
 function initCheckout(){
   const form = $("#checkoutForm");
   if(!form) return;
@@ -1300,6 +1324,10 @@ function initCheckout(){
     e.preventDefault();
     if(!Cart.items.length){ toast("Tu carrito está vacío", I.cart); return; }
 
+    if(!form.reportValidity()) return;
+    if(form.entrega.value === "Despacho a regiones" && !form.courier.value){
+      toast("Elige la empresa de envío: Chilexpress, Cruz del Sur o Starken"); return;
+    }
     const data = Object.fromEntries(new FormData(form).entries());
 
     const boton = form.querySelector("[type=submit]");
@@ -1318,7 +1346,7 @@ function initCheckout(){
       return `• ${i.qty} × ${p.nombre} (${money(p.precio * i.qty)})`;
     }).join("\n");
 
-    const msg = `Pedido ${nro} — ${SITE.dominio}\n\n${detalle}\n\nTotal: ${money(Cart.total())}\n\nNombre: ${data.nombre}\nEmail: ${data.email}\nTeléfono: ${data.telefono}\nDespacho: ${data.entrega}\nDirección: ${data.direccion || "—"}\nComuna: ${data.comuna || "—"}\nNotas: ${data.notas || "—"}`;
+    const msg = `Pedido ${nro} — ${SITE.dominio}\n\n${detalle}\n\nTotal: ${money(Cart.total())} (${data.entrega}: ${Cart.envioTexto()})\n\nNombre: ${data.nombre}\nEmail: ${data.email}\nTeléfono: ${data.telefono}\n${textoEntrega(data)}\n${textoFactura(data)}Notas: ${data.notas || "—"}`;
 
     $("#checkoutWrap").innerHTML = `
       <div class="panel center" style="padding:44px 30px">
@@ -1341,16 +1369,22 @@ function initCheckout(){
     window.scrollTo({ top:0, behavior:"smooth" });
   });
 
-  /* mostrar/ocultar dirección según tipo de entrega */
-  form.addEventListener("change", e => {
-    if(e.target.name === "entrega"){
-      const retira = e.target.value === "Retiro en taller";
-      $("#bloqueDespacho").style.display = retira ? "none" : "grid";
-      $$("#bloqueDespacho .input").forEach(i => i.required = !retira);
-      Cart.entrega = e.target.value;
-      renderCartPage();
-    }
-  });
+  /* cada entrega muestra y exige sus datos; la factura, los suyos */
+  const BLOQUES = { "Retiro en taller":"#bloqueRetiro", "Delivery en Puerto Montt":"#bloqueDelivery", "Despacho a regiones":"#bloqueRegiones" };
+  const OPCIONALES = ["referencia"];
+  const mostrar = (sel, si) => {
+    const b = $(sel); b.hidden = !si;
+    $$(".input", b).forEach(i => i.required = si && !OPCIONALES.includes(i.name));
+  };
+  const ajustar = () => {
+    Object.entries(BLOQUES).forEach(([valor, sel]) => mostrar(sel, form.entrega.value === valor));
+    mostrar("#bloqueFactura", form.documento.value === "Factura");
+    $$(".entrega-op").forEach(l => l.classList.toggle("is-on", $("input", l).checked));
+    Cart.entrega = form.entrega.value;
+    renderCartPage();
+  };
+  form.addEventListener("change", e => { if(["entrega", "documento"].includes(e.target.name)) ajustar(); });
+  ajustar();
 }
 
 /* ============================================================
