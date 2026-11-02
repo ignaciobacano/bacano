@@ -470,7 +470,7 @@ function buildFooter(){
       <div class="footer__grid">
         <div>
           ${logoHTML()}
-          <p style="margin-top:16px;max-width:34ch">${SITE.slogan}. Fabricamos, imprimimos e instalamos desde ${2026 - SITE.anios} en Santiago, con despacho a todo Chile.</p>
+          <p style="margin-top:16px;max-width:34ch">${SITE.slogan}. Fabricamos, imprimimos e instalamos desde ${2026 - SITE.anios} en Puerto Montt, con despacho a todo Chile y al extranjero.</p>
           <div class="socials">
             <a href="#" aria-label="Instagram">${I.ig}</a>
             <a href="#" aria-label="Facebook">${I.fb}</a>
@@ -513,7 +513,6 @@ function buildFooter(){
         <span>Sitio con compra segura · Datos protegidos</span>
       </div>
     </div>
-    <div class="footer__mark"><span class="footer__logo" role="img" aria-label="Bacano"></span></div>
   </footer>`;
 }
 
