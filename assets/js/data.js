@@ -240,14 +240,8 @@ let PRODUCTOS = [
   }
 ];
 
-let TESTIMONIOS = [
-  { nombre:"Carolina Muñoz", empresa:"Café Raíz · Providencia", inicial:"C", estrellas:5,
-    texto:"Nos hicieron el letrero luminoso y la gráfica de la vidriera. Llegaron a medir el mismo día que cotizamos y la instalación fue impecable. El local se ve otro." },
-  { nombre:"Rodrigo Salinas", empresa:"Constructora Andes", inicial:"R", estrellas:5,
-    texto:"Trabajamos con Bacano hace 3 años en señalética de obra y rotulación de la flota. Cumplen los plazos, que en nuestro rubro es lo más difícil de encontrar." },
-  { nombre:"Fernanda Ríos", empresa:"Tienda Lunares", inicial:"F", estrellas:5,
-    texto:"Pedí 500 stickers troquelados por la web, pagué en línea y llegaron en 4 días a Valparaíso. La calidad del corte es exacta a mi diseño." }
-];
+/* Sin reseñas por ahora: solo se publican reseñas reales de clientes reales. */
+let TESTIMONIOS = [];
 
 let FAQS = [
   { q:"¿Cómo envío mi diseño o archivo?",
