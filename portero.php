@@ -1,25 +1,20 @@
 <?php
 /* ============================================================
-   BACANO.CL — El portero del «Próximamente».
-   El .htaccess manda aquí cada página .html (y la portada). Quien tiene el
-   acceso del equipo (ver acceso.php) ve la página que pidió; cualquier otra
-   persona ve proximamente.html.
-   Para abrir el sitio a todos: se quita el bloque «Próximamente» del
-   .htaccess y listo; este archivo deja de usarse.
+   BACANO.CL — El portero, con el sitio ABIERTO (Ignacio, 2026-11-03:
+   «saquemos el próximamente, dejemos el sitio web online»).
+   El .htaccess del servidor todavía manda aquí cada página .html y la
+   portada; ahora todos ven la página que pidieron. El «Próximamente» ya no
+   se muestra: quien pida proximamente.html llega a la portada.
+   Cuando se quite el bloque «Próximamente» del .htaccess del servidor,
+   este archivo deja de usarse.
    ============================================================ */
-require __DIR__ . '/acceso.php';
-
 header('Content-Type: text/html; charset=utf-8');
-header('Cache-Control: private, no-store');
-header('X-Robots-Tag: noindex');
+header('Cache-Control: max-age=600');
 
 $pagina = (string)($_GET['pagina'] ?? 'index.html');
-if (!preg_match('/^[a-z0-9-]+\.html$/i', $pagina) || !is_file(__DIR__ . '/' . $pagina)) {
+if (!preg_match('/^[a-z0-9-]+\.html$/i', $pagina) || !is_file(__DIR__ . '/' . $pagina)
+    || in_array(strtolower($pagina), ['proximamente.html', 'admin.html'], true)) {
   $pagina = 'index.html';
 }
 
-if (accesoDelEquipo() && $pagina !== 'proximamente.html') {
-  readfile(__DIR__ . '/' . $pagina);
-} else {
-  readfile(__DIR__ . '/proximamente.html');
-}
+readfile(__DIR__ . '/' . $pagina);
