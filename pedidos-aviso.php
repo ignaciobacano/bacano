@@ -170,7 +170,12 @@ function avisarPedido($pago) {
     . 'Documento: ' . textoDocumento($c) . "\n\n"
     . "Te escribiremos para que nos envíes tu diseño y apruebes la prueba digital antes de producir.\n"
     . "Si tienes dudas, responde este correo o escríbenos por WhatsApp al +56 9 6776 0841.\n\n"
-    . "Bacano · Puerto Montt, Chile · bacano.cl\n";
+    . "CONDICIONES DE TU COMPRA (versión 1.0)\n"
+    . "- Sin derecho a retracto: el trabajo se fabrica según tus especificaciones (Ley 19.496, art. 3 bis letra b).\n"
+    . "- Garantía legal de 6 meses: si la falla es nuestra, eliges rehacerlo, cambiarlo o la devolución del dinero en 15 días.\n"
+    . "- Producción: 5 días hábiles desde que apruebas la prueba digital; después, la entrega.\n"
+    . "Términos completos: https://bacano.cl/politicas.html\n\n"
+    . "Bacano SpA · RUT 77.257.839-3 · Puerto Montt, Chile · bacano.cl\n";
 
   /* si no salió, se vuelve a intentar en la próxima consulta del pago */
   $ok = enviarCorreo($c['email'], "Tu pedido $numero en Bacano", $aCliente);

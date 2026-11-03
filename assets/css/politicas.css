@@ -1,0 +1,55 @@
+/* Políticas de Bacano.cl: términos, devoluciones, despacho, privacidad y servidores */
+
+.pol-id{display:flex; flex-wrap:wrap; gap:8px 22px; margin-top:22px; font-size:.92rem; color:var(--gray)}
+.pol-id b{color:var(--ink); font-weight:600}
+
+.pol-tabs{position:sticky; top:0; z-index:5; background:var(--paper); border-bottom:1px solid var(--line)}
+.pol-tabs .wrap{display:flex; gap:6px; overflow-x:auto; padding-top:12px; padding-bottom:12px; scrollbar-width:none}
+.pol-tabs button{flex:none; border:1px solid var(--line); background:var(--paper); color:var(--ink);
+  font:600 .92rem/1 var(--font-body); padding:11px 16px; border-radius:999px; cursor:pointer}
+.pol-tabs button.on{background:var(--ink); color:#fff; border-color:var(--ink)}
+
+.pol{display:none; padding:48px 0 80px}
+.pol.on{display:block}
+.pol__grid{display:grid; grid-template-columns:240px minmax(0,1fr); gap:56px; align-items:start}
+.pol__nav{position:sticky; top:84px; font-size:.9rem}
+.pol__nav b{display:block; font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gray); margin-bottom:10px}
+.pol__nav a{display:block; padding:6px 0; color:var(--gray); border-left:2px solid var(--line); padding-left:12px}
+.pol__nav a:hover{color:var(--ink); border-color:var(--ink)}
+.pol__body{max-width:760px}
+.pol__body h2{font:800 clamp(1.8rem,3vw,2.4rem)/1.05 var(--font-display); letter-spacing:-.02em; margin:0 0 8px}
+.pol__ver{color:var(--gray); font-size:.86rem; margin:0 0 26px}
+.pol__body h3{font:700 1.14rem/1.25 var(--font-display); margin:38px 0 10px; scroll-margin-top:90px}
+.pol__body h3 span{color:var(--gray); font-weight:600; margin-right:8px}
+.pol__body p, .pol__body li{line-height:1.62; color:#262626}
+.pol__body ul{padding-left:20px; margin:8px 0; list-style:disc}
+.pol__body li{margin:5px 0}
+
+/* «En simple»: el resumen que se lee primero */
+.simple{border:1px solid var(--line); border-radius:14px; padding:20px 22px; background:var(--paper-2)}
+.simple b.t{display:block; font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gray); margin-bottom:12px}
+.simple ul{list-style:none; padding:0; margin:0; display:grid; gap:10px}
+.simple li{display:flex; gap:10px; margin:0}
+.simple li::before{content:""; flex:none; width:7px; height:7px; border-radius:50%; background:var(--ink); margin-top:9px}
+
+/* el aviso que la ley pide destacado */
+.aviso{background:var(--ink); color:#fff; border-radius:14px; padding:22px 24px; margin:24px 0}
+.aviso b.t{display:block; font:800 1.22rem/1.2 var(--font-display); margin-bottom:8px}
+.aviso p{color:#d9d9d9; margin:0}
+.aviso p + p{margin-top:8px}
+
+.tabla{width:100%; border-collapse:collapse; margin:12px 0; font-size:.94rem}
+.tabla th, .tabla td{text-align:left; padding:11px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+.tabla th{font-size:.76rem; letter-spacing:.06em; text-transform:uppercase; color:var(--gray); font-weight:600}
+.tabla td b{white-space:nowrap}
+
+/* lo que falta decidir: solo en este borrador */
+mark.pend{background:#fff3a6; color:#3d3300; padding:1px 5px; border-radius:4px; box-decoration-break:clone; -webkit-box-decoration-break:clone}
+.borrador{background:#fff3a6; color:#3d3300; font-size:.9rem; padding:10px 0; text-align:center}
+
+@media (max-width:860px){
+  .pol__grid{grid-template-columns:minmax(0,1fr); gap:24px}
+  .pol__nav{display:none}
+  .tabla{font-size:.88rem}
+  .tabla th, .tabla td{padding:9px 8px}
+}

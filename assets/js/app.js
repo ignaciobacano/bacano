@@ -258,6 +258,7 @@ function buildHeader(){
           <a href="nosotros.html" class="${PAGE === "nosotros.html" ? "is-active" : ""}">Nosotros</a>
         </nav>
         <div class="hdr__act">
+          <a class="hdr__cta hdr__pol${PAGE === "politicas.html" ? " is-active" : ""}" href="politicas.html">${I.shield}<span>Políticas Bacano</span></a>
           <a class="hdr__cta hdr__meson" href="contacto.html">${I.headset}<span>Mesón de atención</span></a>
           <button class="icon-btn hdr__find" id="openSearch" type="button" aria-label="Buscar" aria-expanded="false">${I.search}</button>
           <button class="icon-btn" id="openCart" aria-label="Abrir carrito">
@@ -326,6 +327,7 @@ function buildHeader(){
           </nav>
           <p class="mnav__note">Diseñamos, fabricamos e instalamos. Te enviamos una prueba digital antes de imprimir.</p>
           <a class="mnav__cta mnav__meson" href="contacto.html">${I.headset}<span>Mesón de atención</span></a>
+          <a class="mnav__cta mnav__pol" href="politicas.html">${I.shield}<span>Políticas Bacano</span></a>
           <a class="mnav__cta" href="contacto.html">Pedir cotización</a>
           <div class="mnav__links">
             <button type="button" data-mcart>${I.cart}<span>Mi carrito</span></button>
@@ -490,6 +492,16 @@ function buildFooter(){
             <li><a href="nosotros.html#garantias">Garantías</a></li>
             <li><a href="index.html#faq">Preguntas frecuentes</a></li>
             <li><a href="contacto.html">Mesón de atención</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Políticas Bacano</h4>
+          <ul>
+            <li><a href="politicas.html#terminos">Términos y condiciones</a></li>
+            <li><a href="politicas.html#devoluciones">Devoluciones y garantía</a></li>
+            <li><a href="politicas.html#despacho">Despacho y entregas</a></li>
+            <li><a href="politicas.html#privacidad">Privacidad</a></li>
+            <li><a href="politicas.html#servidores">Servidores y sitios web</a></li>
           </ul>
         </div>
         <div>

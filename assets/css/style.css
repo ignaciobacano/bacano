@@ -960,7 +960,8 @@ select.input{cursor:pointer}
    ============================================================ */
 .footer{background:var(--ink); color:#fff; padding-top:clamp(64px,8vw,120px)}
 .footer__grid{display:grid; gap:clamp(34px,4vw,56px); padding-bottom:clamp(48px,6vw,88px)}
-@media(min-width:820px){.footer__grid{grid-template-columns:1.7fr 1fr 1fr 1.2fr}}
+@media(min-width:820px){.footer__grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1100px){.footer__grid{grid-template-columns:1.5fr 1fr 1fr 1.1fr 1.2fr}}
 .footer h4{font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; margin-bottom:24px; color:rgba(255,255,255,.4); font-weight:600}
 .footer li{margin-bottom:12px}
 .footer a{color:rgba(255,255,255,.82); font-size:.88rem; transition:opacity .3s}
@@ -1538,3 +1539,22 @@ select.input{cursor:pointer}
 .courier-ops .check{border:1px solid var(--line); border-radius:999px; padding:8px 16px}
 .courier-ops .check:has(input:checked){border-color:var(--black); background:var(--black); color:#fff}
 .courier-ops .check:has(input:checked) input{accent-color:#fff}
+
+/* «Políticas Bacano»: con contorno, para no competir con el Mesón ni con Pedir cotización */
+.hdr__pol{gap:8px; margin-right:4px; background:var(--paper); color:var(--ink); box-shadow:inset 0 0 0 1.5px var(--ink)}
+.hdr__pol svg{width:16px; height:16px; flex:none}
+.hdr__pol.is-active{background:var(--ink); color:var(--paper)}
+.mnav__pol{gap:10px; margin-bottom:10px; background:var(--paper); color:var(--ink); box-shadow:inset 0 0 0 1.5px var(--ink)}
+.mnav__pol svg{width:18px; height:18px; flex:none}
+/* el aviso de retracto que la ley pide destacado y antes del pago */
+.aviso-retracto{display:grid; gap:4px; background:var(--ink); color:#d9d9d9; border-radius:10px; padding:14px 16px; font-size:.86rem; line-height:1.5}
+.aviso-retracto b{color:#fff; font-size:.95rem}
+.aviso-retracto a{color:#fff; text-decoration:underline}
+@media(max-width:1199px){
+  .hdr__pol{width:44px; height:44px; padding:0; justify-content:center}
+  .hdr__pol span{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+}
+@media(max-width:1099px){
+  .hdr__meson{width:44px; height:44px; padding:0; justify-content:center; margin-right:0}
+  .hdr__meson span{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+}
