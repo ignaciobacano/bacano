@@ -116,6 +116,11 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
                   <b class="entrega-precio">$7.500</b>
                 </label>
                 <label class="check entrega-op" style="border:1px solid var(--line);border-radius:9px;padding:12px 14px">
+                  <input type="radio" name="entrega" value="Delivery en Puerto Varas">
+                  <span style="flex:1"><b>Delivery en Puerto Varas</b><br><small style="color:var(--gray)">Te lo llevamos dentro de Puerto Varas</small></span>
+                  <b class="entrega-precio">$15.000</b>
+                </label>
+                <label class="check entrega-op" style="border:1px solid var(--line);border-radius:9px;padding:12px 14px">
                   <input type="radio" name="entrega" value="Despacho a regiones">
                   <span style="flex:1"><b>Despacho a regiones</b><br><small style="color:var(--gray)">Por Chilexpress, Cruz del Sur o Starken · lo pagas al recibir</small></span>
                   <b class="entrega-precio">Por pagar</b>
@@ -133,11 +138,11 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
               </div>
             </fieldset>
 
-            <!-- Delivery en Puerto Montt -->
+            <!-- Delivery en Puerto Montt o en Puerto Varas: la misma dirección -->
             <fieldset class="entrega-bloque" id="bloqueDelivery" hidden>
               <legend class="lb">¿Dónde lo llevamos?</legend>
               <div class="form-row form-row--2">
-                <div><label class="lb" for="direccion">Dirección en Puerto Montt</label><input class="input" id="direccion" name="direccion" placeholder="Calle, número, depto."></div>
+                <div><label class="lb" for="direccion" id="direccionLb">Dirección en Puerto Montt</label><input class="input" id="direccion" name="direccion" placeholder="Calle, número, depto."></div>
                 <div><label class="lb" for="referencia">Referencia (opcional)</label><input class="input" id="referencia" name="referencia" placeholder="Ej: casa esquina, portón verde"></div>
               </div>
             </fieldset>
@@ -221,7 +226,7 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
       <div class="step"><h3>Confirmás el pedido</h3><p>Recibís un número de seguimiento y el detalle por correo.</p></div>
       <div class="step"><h3>Subís tu diseño</h3><p>Por enlace o WhatsApp. Si no tenés, lo diseñamos por vos.</p></div>
       <div class="step"><h3>Aprobás la prueba</h3><p>Revisás medidas, textos y colores antes de producir.</p></div>
-      <div class="step"><h3>Recibís tu trabajo</h3><p>Retiro en taller, delivery en Puerto Montt o despacho a regiones.</p></div>
+      <div class="step"><h3>Recibís tu trabajo</h3><p>Retiro en taller, delivery en Puerto Montt o Puerto Varas, o despacho a regiones.</p></div>
     </div>
   </div>
 </section>
@@ -230,6 +235,6 @@ setTimeout(function(){var h=document.documentElement;if(h.classList.contains("is
 
 <script src="assets/js/data.js?v=10"></script>
 <script src="catalogo-core.js"></script>
-<script src="assets/js/app.js?v=27"></script>
+<script src="assets/js/app.js?v=28"></script>
 </body>
 </html>

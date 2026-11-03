@@ -613,6 +613,7 @@ const Cart = {
   },
   /* tipo de entrega elegido en el checkout (Ignacio, 2026-11-02):
      retiro en taller sin costo · delivery en Puerto Montt $7.500 (gratis sobre $80.000) ·
+     delivery en Puerto Varas $15.000 (2026-11-03) ·
      despacho a regiones POR PAGAR (lo cobra el courier al recibir).
      El mismo cálculo se repite en mercadopago.php, que es el que cobra. */
   entrega: "Retiro en taller",
@@ -622,8 +623,9 @@ const Cart = {
       const p = this.find(i.id);
       return a + (p && !p.digital ? p.precio * i.qty : 0);
     }, 0);
-    if(s === 0 || this.entrega !== "Delivery en Puerto Montt") return 0;
-    return s >= SITE.envioGratisDesde ? 0 : DELIVERY_PUERTO_MONTT;
+    if(s === 0 || !DELIVERY[this.entrega]) return 0;
+    if(this.entrega === "Delivery en Puerto Montt" && s >= SITE.envioGratisDesde) return 0;
+    return DELIVERY[this.entrega];
   },
   /* lo que se lee en la línea de despacho */
   envioTexto(){
@@ -1301,13 +1303,14 @@ async function resultadoPago(){
   return true;
 }
 
-const DELIVERY_PUERTO_MONTT = 7500;   /* el mismo valor que DELIVERY_PM en mercadopago.php */
+/* los mismos valores que DELIVERY en mercadopago.php; solo Puerto Montt es gratis sobre $80.000 */
+const DELIVERY = { "Delivery en Puerto Montt": 7500, "Delivery en Puerto Varas": 15000 };
 
 function textoEntrega(d){
   if(d.entrega === "Retiro en taller")
     return `Entrega: Retiro en taller\nRetira: ${d.r_nombre} · RUT ${d.r_rut}\n`;
-  if(d.entrega === "Delivery en Puerto Montt")
-    return `Entrega: Delivery en Puerto Montt\nDirección: ${d.direccion}${d.referencia ? " (" + d.referencia + ")" : ""}\n`;
+  if(DELIVERY[d.entrega])
+    return `Entrega: ${d.entrega}\nDirección: ${d.direccion}${d.referencia ? " (" + d.referencia + ")" : ""}\n`;
   return `Entrega: Despacho a regiones por ${d.courier} (por pagar)\nRecibe: ${d.d_nombre} · RUT ${d.d_rut} · ${d.d_telefono}\nDestino: ${d.d_direccion}, ${d.comuna}, región de ${d.region}\n`;
 }
 function textoFactura(d){
@@ -1370,14 +1373,15 @@ function initCheckout(){
   });
 
   /* cada entrega muestra y exige sus datos; la factura, los suyos */
-  const BLOQUES = { "Retiro en taller":"#bloqueRetiro", "Delivery en Puerto Montt":"#bloqueDelivery", "Despacho a regiones":"#bloqueRegiones" };
+  const BLOQUES = { "#bloqueRetiro":["Retiro en taller"], "#bloqueDelivery":Object.keys(DELIVERY), "#bloqueRegiones":["Despacho a regiones"] };
   const OPCIONALES = ["referencia"];
   const mostrar = (sel, si) => {
     const b = $(sel); b.hidden = !si;
     $$(".input", b).forEach(i => i.required = si && !OPCIONALES.includes(i.name));
   };
   const ajustar = () => {
-    Object.entries(BLOQUES).forEach(([valor, sel]) => mostrar(sel, form.entrega.value === valor));
+    Object.entries(BLOQUES).forEach(([sel, valores]) => mostrar(sel, valores.includes(form.entrega.value)));
+    $("#direccionLb").textContent = form.entrega.value === "Delivery en Puerto Varas" ? "Dirección en Puerto Varas" : "Dirección en Puerto Montt";
     mostrar("#bloqueFactura", form.documento.value === "Factura");
     $$(".entrega-op").forEach(l => l.classList.toggle("is-on", $("input", l).checked));
     Cart.entrega = form.entrega.value;

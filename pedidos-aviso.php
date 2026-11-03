@@ -71,8 +71,8 @@ function textoEntrega($c) {
   $e = $c['entrega'] ?? '';
   if ($e === 'Retiro en taller')
     return "Retiro en taller\nRetira: {$c['r_nombre']} · RUT {$c['r_rut']}";
-  if ($e === 'Delivery en Puerto Montt')
-    return "Delivery en Puerto Montt\nDirección: {$c['direccion']}" . (($c['referencia'] ?? '') !== '' ? " ({$c['referencia']})" : '');
+  if ($e === 'Delivery en Puerto Montt' || $e === 'Delivery en Puerto Varas')
+    return "$e\nDirección: {$c['direccion']}" . (($c['referencia'] ?? '') !== '' ? " ({$c['referencia']})" : '');
   if ($e === 'Despacho a regiones')
     return "Despacho a regiones por {$c['courier']}, POR PAGAR al recibir\n"
          . "Recibe: {$c['d_nombre']} · RUT {$c['d_rut']} · {$c['d_telefono']}\n"

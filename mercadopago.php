@@ -19,12 +19,14 @@ define('CONFIG_BD', RAIZ . '/config.php');
 define('DATAJS',    RAIZ . '/assets/js/data.js');
 define('CATALOGO_CORE', RAIZ . '/catalogo-core.json');   /* lo escribe catalogo-sync.php */
 define('API_MP',    'https://api.mercadopago.com');
-define('DELIVERY_PM', 7500);  /* delivery en Puerto Montt: el mismo valor que DELIVERY_PUERTO_MONTT en app.js */
+/* delivery con costo: los mismos valores que DELIVERY en app.js; solo Puerto Montt es gratis sobre $80.000 */
+const DELIVERY = ['Delivery en Puerto Montt' => 7500, 'Delivery en Puerto Varas' => 15000];
 
-/* Las tres entregas (Ignacio, 2026-11-02) y lo que exige cada una */
+/* Las entregas (Ignacio, 2026-11-02; Puerto Varas el 2026-11-03) y lo que exige cada una */
 const ENTREGAS = [
   'Retiro en taller'         => ['r_nombre', 'r_rut'],
   'Delivery en Puerto Montt' => ['direccion'],
+  'Delivery en Puerto Varas' => ['direccion'],
   'Despacho a regiones'      => ['courier', 'd_nombre', 'd_rut', 'd_telefono', 'region', 'comuna', 'd_direccion'],
 ];
 const COURIERS = ['Chilexpress', 'Cruz del Sur', 'Starken'];
@@ -245,6 +247,7 @@ switch ($accion) {
     if ($cliente['entrega'] === 'Despacho a regiones' && !in_array($cliente['courier'], COURIERS, true))
       error('Elige la empresa de envío: Chilexpress, Cruz del Sur o Starken.');
     if ($cliente['entrega'] === 'Delivery en Puerto Montt') $cliente['comuna'] = 'Puerto Montt';
+    if ($cliente['entrega'] === 'Delivery en Puerto Varas') $cliente['comuna'] = 'Puerto Varas';
 
     /* con factura, todos sus datos */
     $cliente['documento'] = $cliente['documento'] === 'Factura' ? 'Factura' : 'Boleta';
@@ -268,8 +271,9 @@ switch ($accion) {
     $cupon     = strtoupper(trim((string)($d['cupon'] ?? '')));
     $pct       = $cat['cupones'][$cupon] ?? 0;
     $descuento = $pct ? (int)round($subtotal * $pct / 100) : 0;
-    /* solo el delivery en Puerto Montt se cobra aquí; a regiones es por pagar */
-    $envio     = ($cliente['entrega'] !== 'Delivery en Puerto Montt' || $subtotal >= $cat['envioGratis']) ? 0 : DELIVERY_PM;
+    /* solo el delivery se cobra aquí; a regiones es por pagar */
+    $envio     = DELIVERY[$cliente['entrega']] ?? 0;
+    if ($cliente['entrega'] === 'Delivery en Puerto Montt' && $subtotal >= $cat['envioGratis']) $envio = 0;
     $total     = $subtotal - $descuento + $envio;
 
     $numero = 'BC-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(2)));
@@ -283,7 +287,7 @@ switch ($accion) {
         'id' => $l['id'], 'title' => $l['nombre'], 'quantity' => $l['qty'],
         'unit_price' => $l['precio'], 'currency_id' => 'CLP',
       ], $lineas);
-      if ($envio) $items[] = ['id' => 'despacho', 'title' => 'Delivery en Puerto Montt', 'quantity' => 1,
+      if ($envio) $items[] = ['id' => 'despacho', 'title' => $cliente['entrega'], 'quantity' => 1,
                               'unit_price' => $envio, 'currency_id' => 'CLP'];
     }
 
