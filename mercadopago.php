@@ -210,7 +210,8 @@ function consultarPago($id) {
   [$cod, $p] = mp('GET', '/v1/payments/' . $id);
   if ($cod >= 400 || empty($p['status'])) return null;
   actualizarPedido($p['external_reference'] ?? '', $p['status']);
-  avisarPedido($p, confMp()['avisar_a'] ?? 'contacto@bacano.cl');
+  enviarPedidoACore($p, !empty(confMp()['prueba']));   /* el pedido se ve en Bacano Core → Pedidos */
+  avisarPedido($p);                                     /* el comprobante al cliente, una vez */
   return $p;
 }
 

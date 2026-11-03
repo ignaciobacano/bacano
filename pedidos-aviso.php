@@ -2,9 +2,9 @@
 /* ============================================================
    BACANO.CL — Pedidos del carrito y sus correos
    Cada pedido se guarda como un archivo JSON fuera de la carpeta
-   pública. Cuando Mercado Pago confirma el pago, se envían dos
-   correos, una sola vez: el aviso a Bacano y el comprobante al
-   cliente. Lo usa mercadopago.php.
+   pública. Cada consulta del pago lo manda a Bacano Core (Pedidos),
+   y cuando Mercado Pago lo aprueba el cliente recibe su comprobante,
+   una sola vez. Lo usa mercadopago.php.
    ============================================================ */
 
 /* Carpeta de pedidos: fuera de public_html, para que nadie la abra desde internet */
@@ -101,8 +101,51 @@ function enviarCorreo($para, $asunto, $texto, $responderA = '') {
   return $ok;
 }
 
-/* Se llama cada vez que se consulta un pago. Solo actúa la primera vez que llega aprobado. */
-function avisarPedido($pago, $avisarA) {
+/* ============================================================
+   EL PEDIDO VA A BACANO CORE (Ignacio, 2026-11-02)
+   Los pedidos ya no llegan por correo a Bacano: se ven en Bacano Core →
+   Pedidos. Cada vez que se consulta un pago (la vuelta del cliente y el
+   aviso de Mercado Pago) el pedido se manda a Core, que comprueba el pago
+   con Mercado Pago antes de guardarlo. Core no duplica: el segundo envío
+   solo actualiza el estado del pago.
+   ============================================================ */
+define('URL_CORE_PEDIDOS', 'https://bacanocore.cl/api/tienda/pedidos');
+
+function enviarPedidoACore($pago, $prueba) {
+  $numero = $pago['external_reference'] ?? '';
+  $p = leerPedido($numero);
+  if (!$p) return;
+  $envio = file_exists(__DIR__ . '/mercadopago-config-envio.php') ? (require __DIR__ . '/mercadopago-config-envio.php') : [];
+  $clave = (string)($envio['clave'] ?? '');
+  if (strlen($clave) < 32) { error_log("Pedido $numero: falta la clave para enviarlo a Bacano Core"); return; }
+
+  $cuerpo = [
+    'clave'   => $clave,
+    'numero'  => $numero,
+    'pago_id' => (string)($pago['id'] ?? ''),
+    'modo'    => $prueba ? 'prueba' : 'produccion',
+    'creado'  => $p['creado'],
+    'cliente' => $p['cliente'],
+    'lineas'  => $p['lineas'],
+    'totales' => $p['totales'],
+  ];
+  $ch = curl_init((string)($envio['core_url'] ?? URL_CORE_PEDIDOS));
+  curl_setopt_array($ch, [
+    CURLOPT_POST           => true,
+    CURLOPT_POSTFIELDS     => json_encode($cuerpo, JSON_UNESCAPED_UNICODE),
+    CURLOPT_HTTPHEADER     => ['Content-Type: application/json', 'Accept: application/json'],
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_TIMEOUT        => 30,
+    CURLOPT_FOLLOWLOCATION => false,
+  ]);
+  $resp = curl_exec($ch);
+  $cod  = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+  curl_close($ch);
+  if ($cod !== 200) error_log("Pedido $numero: Bacano Core contestó $cod " . substr((string)$resp, 0, 200));
+}
+
+/* El comprobante al cliente: se manda una sola vez, la primera vez que el pago llega aprobado. */
+function avisarPedido($pago) {
   if (($pago['status'] ?? '') !== 'approved') return;
   $numero = $pago['external_reference'] ?? '';
   $f = archivoPedido($numero);
@@ -117,41 +160,23 @@ function avisarPedido($pago, $avisarA) {
   $c = $p['cliente'];
   $idPago = (string)($pago['id'] ?? '');
   $metodo = trim(($pago['payment_type_id'] ?? '') . ' ' . ($pago['payment_method_id'] ?? ''));
-  $detalle = detallePedido($p);
-  $entrega = textoEntrega($c);
-
-  $aBacano = "Nuevo pedido pagado en bacano.cl\n\n"
-    . "Pedido:  $numero\n"
-    . "Pago Mercado Pago:  $idPago ($metodo)\n"
-    . 'Fecha:  ' . date('d-m-Y H:i') . "\n\n"
-    . "PRODUCTOS\n$detalle\n\n"
-    . "CLIENTE\n"
-    . "Nombre: {$c['nombre']}\n"
-    . "Correo: {$c['email']}\n"
-    . "Teléfono: {$c['telefono']}\n"
-    . "\nDOCUMENTO\n" . textoDocumento($c) . "\n\n"
-    . "ENTREGA\n$entrega\n\n"
-    . 'Notas: ' . ($c['notas'] !== '' ? $c['notas'] : '—') . "\n\n"
-    . "Responde este correo para escribirle directamente al cliente.\n";
 
   $aCliente = "Hola {$c['nombre']}:\n\n"
     . "Recibimos tu pago. Este es el comprobante de tu pedido en Bacano.\n\n"
     . "Pedido:  $numero\n"
     . "Pago Mercado Pago:  $idPago\n\n"
-    . "$detalle\n\n"
-    . "Entrega: $entrega\n\n"
-    . "Documento: " . textoDocumento($c) . "\n\n"
+    . detallePedido($p) . "\n\n"
+    . 'Entrega: ' . textoEntrega($c) . "\n\n"
+    . 'Documento: ' . textoDocumento($c) . "\n\n"
     . "Te escribiremos para que nos envíes tu diseño y apruebes la prueba digital antes de producir.\n"
     . "Si tienes dudas, responde este correo o escríbenos por WhatsApp al +56 9 6776 0841.\n\n"
     . "Bacano · Puerto Montt, Chile · bacano.cl\n";
 
-  $ok1 = enviarCorreo($avisarA, "Pedido pagado $numero · " . clp($p['totales']['total']), $aBacano, $c['email']);
-  $ok2 = enviarCorreo($c['email'], "Tu pedido $numero en Bacano", $aCliente);
+  /* si no salió, se vuelve a intentar en la próxima consulta del pago */
+  $ok = enviarCorreo($c['email'], "Tu pedido $numero en Bacano", $aCliente);
 
-  /* si no salió el aviso a Bacano, se vuelve a intentar en la próxima consulta del pago */
   $p['pago'] = ['id' => $idPago, 'estado' => 'approved', 'metodo' => $metodo, 'fecha' => date('c')];
-  $p['avisado'] = $ok1;
-  $p['correo_cliente'] = $ok2;
+  $p['avisado'] = $ok;
   ftruncate($h, 0);
   rewind($h);
   fwrite($h, json_encode($p, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
