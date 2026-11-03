@@ -261,7 +261,7 @@ switch ($accion) {
       $id = (string)($i['id'] ?? '');
       $q  = (int)($i['qty'] ?? 0);
       if (!isset($cat['productos'][$id]) || $q < 1 || $q > 999)
-        error('Un producto de tu carrito ya no está disponible. Revisalo y probá de nuevo.');
+        error('Un producto de tu carrito ya no está disponible. Revísalo y prueba de nuevo.');
       $p = $cat['productos'][$id];
       $lineas[] = ['id' => $id, 'nombre' => $p['nombre'], 'qty' => $q, 'precio' => $p['precio']];
       $subtotal += $p['precio'] * $q;
@@ -312,7 +312,7 @@ switch ($accion) {
 
     [$cod, $r] = mp('POST', '/checkout/preferences', $pref, $numero);
     if ($cod >= 400 || empty($r['init_point']))
-      error('Mercado Pago no pudo preparar el pago. Probá de nuevo o escribinos por WhatsApp.', 502);
+      error('Mercado Pago no pudo preparar el pago. Prueba de nuevo o escríbenos por WhatsApp.', 502);
 
     guardarPedido($numero, $cliente, $lineas, $total);
     guardarPedidoArchivo($numero, $cliente, $lineas, [

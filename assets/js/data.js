@@ -42,7 +42,7 @@ let SITE = {
   email: "contacto@bacano.cl",
   direccion: "Puerto Montt, Chile",
   horario: "Lun a Vie 9:00–18:30 · Sáb 9:00–12:00 · Solo atención digital",
-  rut: "77.123.456-7",
+  rut: "77.257.839-3",
   anios: 12,
   envioGratisDesde: 80000,
   ivaIncluido: true
@@ -245,7 +245,7 @@ let TESTIMONIOS = [];
 
 let FAQS = [
   { q:"¿Cómo envío mi diseño o archivo?",
-    a:"Después de comprar te llega un correo con un enlace para subir tu archivo (PDF, AI, PSD, PNG o JPG). También podés enviarlo por WhatsApp. Si no tenés diseño, nuestro equipo lo crea por vos y te muestra una propuesta antes de imprimir." },
+    a:"Después de comprar te llega un correo con un enlace para subir tu archivo (PDF, AI, PSD, PNG o JPG). También puedes enviarlo por WhatsApp. Si no tienes diseño, nuestro equipo lo crea por ti y te muestra una propuesta antes de imprimir." },
   { q:"¿Puedo ver una prueba antes de que impriman?",
     a:"Sí. En todos los trabajos enviamos una prueba digital (mockup) para tu aprobación por escrito. Nada entra a máquina sin tu confirmación, así evitamos errores de texto, medidas o color." },
   { q:"¿Hacen despacho a regiones?",
@@ -260,7 +260,7 @@ let FAQS = [
 
 /* ------------------------------------------------------------
    VISTA PREVIA DEL PANEL
-   Si abrís cualquier página con ?preview=1, el sitio muestra los
+   Si abres cualquier página con ?preview=1, el sitio muestra los
    cambios guardados en el panel (admin.html) sin publicarlos.
    ------------------------------------------------------------ */
 if(location.search.includes("preview=1") || location.hash.includes("preview")){

@@ -681,7 +681,7 @@ const Cart = {
       <div class="line__img"><img src="${p.img}" alt="${p.nombre}" loading="lazy"></div>
       <div class="line__info">
         <h4>${p.nombre}</h4>
-        <small>${p.unidad}${compact ? "" : ` · Entrega ${p.plazo}`}</small>
+        <small>${p.unidad || ""}${compact || !p.plazo ? "" : ` · Entrega ${p.plazo}`}</small>
         <div class="line__row">
           <div class="qty">
             <button data-minus="${p.id}" aria-label="Quitar uno">−</button>
@@ -1172,7 +1172,7 @@ function buildShop(){
       ? list.map(cardHTML).join("")
       : `<div class="empty" style="grid-column:1/-1">${I.search}
           <h4>Sin resultados</h4>
-          <p>Probá con otra palabra o quitá algún filtro. También podés pedirnos una cotización a medida.</p>
+          <p>Prueba con otra palabra o quita algún filtro. También puedes pedirnos una cotización a medida.</p>
           <a class="btn btn--red btn--sm" href="contacto.html" style="margin-top:14px">Cotizar a medida</a>
         </div>`;
     $("#results").textContent = `${list.length} producto${list.length === 1 ? "" : "s"}`;
@@ -1237,7 +1237,7 @@ function renderCartPage(){
       <span class="pay">Transferencia</span><span class="pay">Débito</span><span class="pay">Crédito</span><span class="pay">Factura 30 días</span>
     </div>
     <div class="secure-note" style="margin-top:14px">${I.shield}<span>Tus datos viajan cifrados y no se comparten con terceros.</span></div>
-    <div class="secure-note" style="margin-top:8px">${I.check}<span>Aprobás una prueba digital antes de que entre a máquina.</span></div>`;
+    <div class="secure-note" style="margin-top:8px">${I.check}<span>Apruebas una prueba digital antes de que entre a máquina.</span></div>`;
 }
 
 /* ============================================================
@@ -1309,7 +1309,7 @@ async function resultadoPago(){
       ws(`Hola Bacano, mi pago del pedido ${nro} quedó en proceso.`) + seguir);
   } else {
     pantallaPago(I.x, "El pago no se completó",
-      `No se hizo ningún cobro. Tu carrito sigue guardado: podés intentarlo de nuevo con otro medio de pago o coordinar con nosotros.`,
+      `No se hizo ningún cobro. Tu carrito sigue guardado: puedes intentarlo de nuevo con otro medio de pago o coordinar con nosotros.`,
       `<a class="btn btn--red" href="carrito.html">Volver al carrito</a>` + ws(`Hola Bacano, tuve un problema al pagar el pedido ${nro}.`));
   }
   return true;
@@ -1353,7 +1353,7 @@ function initCheckout(){
     if(pago.ok && pago.url){ location.href = pago.url; return; }
     boton.disabled = false;
     boton.innerHTML = textoBoton;
-    if(!pago.sinPago){ toast(pago.error || "No se pudo preparar el pago. Probá de nuevo."); return; }
+    if(!pago.sinPago){ toast(pago.error || "No se pudo preparar el pago. Prueba de nuevo."); return; }
 
     const nro = "BC-" + Date.now().toString().slice(-6);
     const detalle = Cart.items.map(i => {
